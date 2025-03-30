@@ -46,7 +46,7 @@
                                 <Font size="14.0" />
                             </font>
                         </PasswordField>
-                        <Button id="JB1" fx:id="B1" layoutX="87.0" layoutY="342.0" mnemonicParsing="false" onAction="#switchToDueñoView" prefHeight="30.0" prefWidth="118.0" style="-fx-background-size: 10px;" text="Iniciar Sesión" textFill="#34401a">
+                        <Button id="JB1" fx:id="B1" layoutX="96.0" layoutY="403.0" mnemonicParsing="false" onAction="#switchToDueñoView" prefHeight="30.0" prefWidth="118.0" style="-fx-background-size: 10px;" text="Iniciar Sesión" textFill="#34401a">
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font>
@@ -55,16 +55,11 @@
                      </cursor>
                         </Button>
                   <Label layoutX="95.0" layoutY="386.0" />
-                  <Button id="JB2" fx:id="JB2" layoutX="73.0" layoutY="420.0" mnemonicParsing="false" text="Crear nueva cuenta">
+                  <Button id="BRecordarC" fx:id="BRecordarC" layoutX="62.0" layoutY="325.0" mnemonicParsing="false" text="¿Ólvidaste tu contraseña?">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
-                  <Label layoutX="135.0" layoutY="391.0" text="Ó">
-                     <font>
-                        <Font name="Arial Black" size="16.0" />
-                     </font>
-                  </Label>
                     </children>
                 </Pane>
                 <Pane layoutX="300.0" layoutY="1.0" prefHeight="508.0" prefWidth="423.0">

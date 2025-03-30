@@ -22,6 +22,8 @@ public class LoginController {
     private TextField usernameField;
     @FXML
     private TextField passwordField;
+    @FXML
+    private Button BRecordarC; 
     private SqlLib db;
 
     /**
