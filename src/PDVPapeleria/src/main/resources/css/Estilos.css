@@ -1,0 +1,22 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 30 mar 2025, 12:39:33
+    Author     : jeshu
+*/
+.root{
+    -fx-background-color:#c4def6; 
+}
+
+.button{
+    -fx-background-color: #66a5ad; 
+    -fx-background-radius: 5px; 
+    -fx-cursor: hand; 
+    -fx-effect:  dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 5, 5); 
+}
+
+.pane {
+    -fx-background-color: #003b46; 
+}

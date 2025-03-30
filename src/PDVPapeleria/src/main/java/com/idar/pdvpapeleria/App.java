@@ -37,6 +37,7 @@ public class App extends Application {
         Parent root = loader.load();
         LoginController controller = loader.getController();
         Scene scene = new Scene(root, 700, 500);
+        scene.getStylesheets().add(getClass().getResource("/css/Estilos.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
     }

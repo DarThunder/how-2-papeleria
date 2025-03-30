@@ -1,6 +1,6 @@
-com/idar/pdvpapeleria/ConnectionDB.class
-com/idar/pdvpapeleria/controllers/LoginController.class
-lib/SqlLib.class
-com/idar/pdvpapeleria/controllers/DueñoViewController.class
-com/idar/pdvpapeleria/App.class
-com/idar/pdvpapeleria/controllers/AdministracionEmpleados.class
+com\idar\pdvpapeleria\App.class
+com\idar\pdvpapeleria\ConnectionDB.class
+com\idar\pdvpapeleria\controllers\AdministracionEmpleados.class
+com\idar\pdvpapeleria\controllers\DueñoViewController.class
+com\idar\pdvpapeleria\controllers\LoginController.class
+lib\SqlLib.class
