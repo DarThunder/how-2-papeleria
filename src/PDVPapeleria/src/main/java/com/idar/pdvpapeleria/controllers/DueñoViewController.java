@@ -10,26 +10,50 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import java.io.File;
+import java.io.IOException;
 
 public class DueñoViewController {
-    
-    @FXML
-    private Pane P1,P2;
-    @FXML
-    private Button BEmpleados, BInventario, BVentas;
-    @FXML
-    private Label L1;
+
+    @FXML private Pane panel1, panel2;
+    @FXML private Button empleadosButton, inventarioButton, ventasButton;
+    @FXML private Label titleLabel;
+
+    private void switchToScene(Button button, String fxmlPath) {
+        try {
+            File fxmlFile = new File(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
+            Parent root = loader.load();
+            Stage stage = (Stage) button.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.sizeToScene();
+            stage.centerOnScreen();
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            titleLabel.setText("Error al cargar la escena");
+        }
+    }
 
     @FXML
-    private void switchToAdministracionEmpleados() throws IOException {
-        File fxmlFile = new File("src/main/resources/scenes/administracionEmpleados.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
-        Parent root = loader.load();
-        Stage stage = (Stage) BEmpleados.getScene().getWindow();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.centerOnScreen();
-        stage.show();
+    private void switchToAdministracionEmpleados() {
+        switchToScene(empleadosButton, "src/main/resources/scenes/administracionEmpleados.fxml");
+    }
+    @FXML
+    private void switchToInventario() {
+        switchToScene(inventarioButton, "src/main/resources/scenes/inventario.fxml");
+    }
+    @FXML
+    private void switchToVentas() {
+        switchToScene(ventasButton, "src/main/resources/scenes/ventas.fxml");
     }
 }
