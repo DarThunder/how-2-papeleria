@@ -60,6 +60,15 @@ public class App extends Application {
      * @param args Argumentos de la línea de comandos.
      */
     public static void main(String[] args) {
+      //Usar la primera vez que se accede a la aplicacion
+        /*SqlLib db = new SqlLib("jdbc:mysql://localhost:3306/pdvpapeleria", "root", "");
+        boolean success = db.createUser("Dueño", "usuario_prueba", "12345");
+
+        if (success) {
+            System.out.println("Usuario agregado correctamente.");
+        } else {
+            System.out.println("Error al agregar el usuario.");
+        }*/
         launch();
     }
 }

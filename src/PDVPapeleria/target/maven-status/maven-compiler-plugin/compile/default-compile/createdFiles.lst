@@ -1,6 +1,8 @@
+com\idar\pdvpapeleria\objects\Empleado.class
+com\idar\pdvpapeleria\controllers\AdministracionEmpleadosController.class
 com\idar\pdvpapeleria\App.class
 com\idar\pdvpapeleria\ConnectionDB.class
-com\idar\pdvpapeleria\controllers\AdministracionEmpleados.class
 com\idar\pdvpapeleria\controllers\DueñoViewController.class
 com\idar\pdvpapeleria\controllers\LoginController.class
+com\idar\pdvpapeleria\controllers\PlantillaController.class
 lib\SqlLib.class

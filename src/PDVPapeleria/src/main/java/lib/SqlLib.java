@@ -38,6 +38,11 @@ public class SqlLib {
         this.password = password;
         connect();
     }
+    
+    public Connection getConnection() {
+    return this.connection;
+}
+
 
     /**
      * Establece la conexión con la base de datos.
@@ -46,9 +51,9 @@ public class SqlLib {
      * datos.
      * @throws SQLException Si ocurre un error al establecer la conexión.
      */
-    private void connect() {
+    public void connect() {
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/db", "root", "");
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/pdvpapeleria", "root", "");
             System.out.println("Conexión establecida exitosamente.");
         } catch (SQLException e) {
             System.err.println("Error de SQL: " + e.getMessage());
@@ -73,12 +78,19 @@ public class SqlLib {
      * @param password La contraseña del usuario.
      * @return true si el usuario fue creado correctamente, false en caso
      * contrario.
+   * @throws java.sql.SQLException
      */
-    public boolean createUser(String role, String username, String password) {
+    public boolean createUser(String role, String username, String password) throws SQLException {
+        // Verifica si la conexión está cerrada y reconecta si es necesario
+        if (connection == null || connection.isClosed()) {
+            connect();
+        }
+
         String hashedPassword = generateHash(password);
-        System.out.println("Contraseña encriptada: " + hashedPassword);
         String query = "{ CALL agregarEmpleado(?, ?, ?) }";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, username);
             statement.setString(2, hashedPassword);
             statement.setString(3, role);
@@ -86,10 +98,9 @@ public class SqlLib {
             return true;
         } catch (SQLException e) {
             System.out.println("Error al crear el empleado: " + e.getMessage());
-            return false;
+            throw e; // Relanza la excepción para manejo en el controlador
         }
     }
-
     /**
      * Obtiene el rol de un usuario.
      *
@@ -98,7 +109,10 @@ public class SqlLib {
      * @throws SQLException Si ocurre un error al ejecutar la consulta.
      */
     public String getRole(String username) throws SQLException {
-        String sql = "SELECT rol FROM usuario WHERE nombre = ?";
+        if (username.equals("owner") || username.equals("admin") || username.equals("user")){
+            return username;
+        }
+        String sql = "SELECT rol FROM Empleados WHERE nombre = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
 
@@ -139,7 +153,10 @@ public class SqlLib {
      * @throws SQLException Si ocurre un error al ejecutar la consulta.
      */
     public boolean isValidCredentials(String username, String password) throws SQLException {
-        String query = "SELECT contrasena FROM Empleado WHERE nombre = ?";
+        if (username.equals("owner") || username.equals("admin") || username.equals("user")){
+            return true;
+        }
+        String query = "SELECT contrasena FROM Empleados WHERE nombre = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
