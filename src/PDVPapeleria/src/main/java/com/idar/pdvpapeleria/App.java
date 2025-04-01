@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -24,7 +25,7 @@ import static javafx.application.Application.launch;
  * Se encarga de inicializar la ventana principal y cargar la escena del login.
  */
 public class App extends Application {
-    private static SqlLib db;
+    private static SqlLib pdvpapeleria;
 
     /**
      * Método de inicio de la aplicación JavaFX.
@@ -72,4 +73,3 @@ public class App extends Application {
         launch();
     }
 }
-
