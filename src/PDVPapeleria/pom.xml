@@ -114,5 +114,5 @@
         <exec.mainClass>com.idar.pdvpapeleria.App</exec.mainClass>
     </properties>
 
-    <name>PDVPapeleria</name>
+    <name>PDVPapeleria1.1</name>
 </project>

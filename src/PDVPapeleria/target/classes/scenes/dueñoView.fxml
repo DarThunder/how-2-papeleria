@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: #c4def6;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: #c4def6;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.DueñoViewController">
    <children>
-      <BorderPane fx:id="P1BUTTO" prefHeight="700.0" prefWidth="150.0" style="-fx-background-color: #003b46;" />
+      <BorderPane fx:id="P1" prefHeight="700.0" prefWidth="150.0" style="-fx-background-color: #003b46;">
+         <bottom>
+            <Button fx:id="BAtras" mnemonicParsing="false" onAction="#switchToLogin" text="Atrás" BorderPane.alignment="BOTTOM_LEFT">
+               <BorderPane.margin>
+                  <Insets bottom="10.0" left="10.0" />
+               </BorderPane.margin>
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Button>
+         </bottom></BorderPane>
       <BorderPane fx:id="P2" layoutX="749.0" prefHeight="700.0" prefWidth="150.0" style="-fx-background-color: #003b46;" />
       <Label fx:id="L1" layoutX="186.0" layoutY="52.0" text="¿Qué quieres administrar?">
          <font>
