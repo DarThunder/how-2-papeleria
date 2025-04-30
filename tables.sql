@@ -33,6 +33,15 @@ CREATE TABLE producto (
     deletedAt TIMESTAMP NULL DEFAULT NULL
 );
 
+-- Tabla de proveedor --
+CREATE TABLE proveedor (
+    idProveedor INT PRIMARY KEY NOT NULL,
+    correo VARCHAR(254) NOT NULL,
+    servicio VARCHAR(254) NOT NULL,
+    nombre VARCHAR(254) NOT NULL,
+    telefono VARCHAR(254) NOT NULL
+);
+
 -- Tabla de relación proveedor --
 CREATE TABLE provee (
     idProducto INT NOT NULL,
@@ -40,13 +49,4 @@ CREATE TABLE provee (
     PRIMARY KEY (idProducto, idProveedor),
     FOREIGN KEY (idProducto) REFERENCES producto(idProducto),
     FOREIGN KEY (idProveedor) REFERENCES proveedor(idProveedor)
-);
-
--- Tabla de proveedor --
-CREATE TABLE proveedor (
-    idProveedor INT PRIMARY KEY NOT NULL,
-    correo VARCHAR(255) NOT NULL,
-    servicio VARCHAR(255) NOT NULL,
-    nombre VARCHAR(255) NOT NULL,
-    telefono VARCHAR(255) NOT NULL
 );
