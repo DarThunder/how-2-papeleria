@@ -1,18 +1,18 @@
 -- Tabla de empleados --
-CREATE TABLE empleado (
-	  idEmpleado INT AUTO_INCREMENT PRIMARY KEY, 
-    contraseña VARCHAR(255) NOT NULL, 
-    nombre VARCHAR(255) NOT NULL, 
-    estado VARCHAR(255) NOT NULL,
+CREATE TABLE Empleado (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
     rol ENUM('Dueño', 'Administrador', 'Cajero') NOT NULL,
-    codigoSeguridad VARCHAR(255) NOT NULL,
-	  isDeleted BOOLEAN DEFAULT FALSE,
-    deletedAt TIMESTAMP NULL DEFAULT NULL
-); 
+    contraseña VARCHAR(255) NOT NULL,
+    codigoSeguridad VARCHAR(4) NOT NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL,
+    UNIQUE (nombre),               -- Restricción de unicidad para el nombre
+    UNIQUE (codigoSeguridad)       -- Restricción de unicidad para el código de seguridad
+);
 
 -- Tabla de ventas --
 CREATE TABLE venta (
-	  folio INT PRIMARY KEY AUTO_INCREMENT,
+    folio INT PRIMARY KEY AUTO_INCREMENT,
     idEmpleado INT NOT NULL,
     fechaYHora DATETIME NOT NULL,
     total INT NOT NULL,
@@ -26,7 +26,6 @@ CREATE TABLE producto (
     precioDeCompra INT NOT NULL,
     precioDeVenta INT NOT NULL,
     stock INT NOT NULL,
-    imagen VARCHAR(255),
     descripcion TEXT,
     categoria VARCHAR(255), 
     isDeleted BOOLEAN DEFAULT FALSE,
