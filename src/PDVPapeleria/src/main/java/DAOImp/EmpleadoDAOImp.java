@@ -26,22 +26,28 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
 
     @Override
     public boolean createUser(EmpleadoVO empleado) {
-        if (existeNombreUsuario(empleado.getNombre()) || existeCodigoSeguridad(empleado.getCodigoSeguridad())) {
+        try {
+            if (existeNombreUsuario(empleado.getNombre()) || existeCodigoSeguridad(empleado.getCodigoSeguridad())) {
+                return false;
+            }
+            String hashedPassword = generateHash(empleado.getPassword());
+            String query = "{ CALL agregarEmpleado(?, ?, ?, ?) }";
+            
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                
+                statement.setString(1, empleado.getNombre());
+                statement.setString(2, hashedPassword);
+                statement.setString(3, empleado.getCodigoSeguridad());
+                statement.setString(4, empleado.getRol());
+                statement.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Error al crear empleado: " + e.getMessage());
+            }
             return false;
-        }
-        String hashedPassword = generateHash(empleado.getPassword());
-        String query = "{ CALL agregarEmpleado(?, ?, ?, ?) }";
-
-        try (Connection connection = DatabaseConnection.getInstance().getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, empleado.getNombre());
-            statement.setString(2, hashedPassword);
-            statement.setString(3, empleado.getCodigoSeguridad());
-            statement.setString(4, empleado.getRol());
-            statement.execute();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Error al crear empleado: " + e.getMessage());
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
@@ -49,7 +55,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     @Override
     public boolean isValidCredentials(String username, String password) {
         try {
-            String query = "SELECT contrasena, estado FROM empleado WHERE nombre = ?";
+            String query = "SELECT contraseña, estado FROM empleado WHERE nombre = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, username);
@@ -58,7 +64,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
                     String storedHash = rs.getString("contraseña");
                     String estado = rs.getString("estado");
                     
-                    if ("Activo".equalsIgnoreCase(estado)) {
+                    if ("Active".equalsIgnoreCase(estado)) {
                         if (BCrypt.checkpw(password, storedHash)) {
                             return true;
                         } else {
