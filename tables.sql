@@ -5,7 +5,7 @@ CREATE TABLE Empleado (
     rol ENUM('Dueño', 'Administrador', 'Cajero') NOT NULL,
     contraseña VARCHAR(255) NOT NULL,
     codigoSeguridad VARCHAR(4) UNIQUE NOT NULL,
-    estado ENUM('Activo', 'Inactivo') NOT NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL
 );
 
 -- Tabla de ventas --
