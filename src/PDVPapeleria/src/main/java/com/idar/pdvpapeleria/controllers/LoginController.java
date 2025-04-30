@@ -62,11 +62,11 @@ public class LoginController {
             if (empleado.isValidCredentials(username, password)) {
                 String role = empleado.getRole(username);
                 switch (role) {
-                    /*case "Dueño" ->
-                        switchToDueñoView();*/
-                    case "admin" ->
+                    case "Dueño" ->
+                        switchToDueñoView();
+                    case "Administrador" ->
                         switchToAdminView();
-                    case "user" ->
+                    case "Cajero" ->
                         switchToCajeroView();
                     default ->
                         errorMessageLabel.setText("Rol desconocido o no autorizado.");

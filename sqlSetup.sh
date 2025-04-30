@@ -38,10 +38,10 @@ else
 fi
 
 echo "Ejecutando '$TABLES_SQL'..."
-$MYSQL -u $DB_USER $DB_NAME < "$TABLES_SQL"
+$MYSQL -u $DB_USER $DB_NAME < $TABLES_SQL
 
 echo "Ejecutando '$PROCEDURES_SQL'..."
-$MYSQL -u $DB_USER $DB_NAME < "$PROCEDURES_SQL"
+$MYSQL -u $DB_USER $DB_NAME < $PROCEDURES_SQL
 
 echo "✔ Base de datos '$DB_NAME' inicializada correctamente."
 

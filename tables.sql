@@ -4,7 +4,7 @@ CREATE TABLE empleado (
     contraseña VARCHAR(255) NOT NULL, 
     nombre VARCHAR(255) NOT NULL, 
     estado VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'user') NOT NULL,
+    rol ENUM('Dueño', 'Administrador', 'Cajero') NOT NULL,
     codigoSeguridad VARCHAR(255) NOT NULL,
 	  isDeleted BOOLEAN DEFAULT FALSE,
     deletedAt TIMESTAMP NULL DEFAULT NULL
