@@ -11,8 +11,8 @@ CREATE PROCEDURE agregarEmpleado(
     IN p_rol ENUM('Dueño', 'Administrador', 'Cajero')
 )
 BEGIN
-    INSERT INTO empleado (nombre, contraseña, rol, codigoSeguridad, estado)
-    VALUES (p_nombre, p_contraseña, p_rol, p_codigoSeguridad, 'activo');
+    INSERT INTO Empleado (nombre, contraseña, rol, codigoSeguridad, estado)
+    VALUES (p_nombre, p_contraseña, p_rol, p_codigoSeguridad, 'Activo');
 END $$
 
 DELIMITER ;

@@ -7,9 +7,11 @@ VO/ProductoVO.class
 DAOImp/EmpleadoDAOImp.class
 DAO/ProductoDAO.class
 com/idar/pdvpapeleria/App.class
+com/idar/pdvpapeleria/controllers/AdministracionEmpleados.class
 VO/EmpleadoVO.class
 com/idar/pdvpapeleria/ConnectionDB.class
 com/idar/pdvpapeleria/controllers/LoginController.class
+lib/SqlLib.class
 com/idar/pdvpapeleria/controllers/CajeroViewController.class
 com/idar/pdvpapeleria/controllers/PlantillaController.class
 DAO/DatabaseConnection.class

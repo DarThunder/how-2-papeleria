@@ -48,7 +48,7 @@ public class App extends Application {
     public static void main(String[] args) throws SQLException {
         DatabaseConnection.getInstance();
         
-        EmpleadoVO nuevoEmpleado = new EmpleadoVO("admin", "8888", "Luis", "123");
+        EmpleadoVO nuevoEmpleado = new EmpleadoVO("Administrador", "8888", "Luis", "123");
         EmpleadoDAO empleadoDAO = new EmpleadoDAOImp();
         boolean success = empleadoDAO.createUser(nuevoEmpleado);
         //boolean success = false;

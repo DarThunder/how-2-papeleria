@@ -16,7 +16,7 @@ CREATE TABLE venta (
     idEmpleado INT NOT NULL,
     fechaYHora DATETIME NOT NULL,
     total INT NOT NULL,
-    FOREIGN KEY (idEmpleado) REFERENCES empleado(idEmpleado)
+    FOREIGN KEY (idEmpleado) REFERENCES Empleado(id)
 ); 
 
 -- Tabla de productos --

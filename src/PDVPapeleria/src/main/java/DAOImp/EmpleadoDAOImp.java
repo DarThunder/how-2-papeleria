@@ -55,7 +55,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     @Override
     public boolean isValidCredentials(String username, String password) {
         try {
-            String query = "SELECT contraseña, estado FROM empleado WHERE nombre = ?";
+            String query = "SELECT contraseña, estado FROM Empleado WHERE nombre = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, username);
@@ -64,7 +64,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
                     String storedHash = rs.getString("contraseña");
                     String estado = rs.getString("estado");
                     
-                    if ("Active".equalsIgnoreCase(estado)) {
+                    if ("Activo".equalsIgnoreCase(estado)) {
                         if (BCrypt.checkpw(password, storedHash)) {
                             return true;
                         } else {
@@ -87,7 +87,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     @Override
     public boolean existeNombreUsuario(String username) {
         try {
-            String query = "SELECT COUNT(*) FROM empleado WHERE nombre = ?";
+            String query = "SELECT COUNT(*) FROM Empleado WHERE nombre = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -107,7 +107,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     @Override
     public boolean existeCodigoSeguridad(String codigoSeguridad) {
         try {
-            String query = "SELECT COUNT(*) FROM empleado WHERE codigoSeguridad = ?";
+            String query = "SELECT COUNT(*) FROM Empleado WHERE codigoSeguridad = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -127,7 +127,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     @Override
     public String getRole(String username) {
         try {
-            String query = "SELECT rol FROM empleado WHERE nombre = ?";
+            String query = "SELECT rol FROM Empleado WHERE nombre = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -147,7 +147,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     @Override
     public boolean verificarCodigoSeguridad(String username, String codigoSeguridad) {
         try {
-            String query = "SELECT * FROM empleado WHERE nombre = ? AND codigoSeguridad = ?";
+            String query = "SELECT * FROM Empleado WHERE nombre = ? AND codigoSeguridad = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -169,7 +169,7 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     public boolean cambiarContraseña(String nuevaContraseña, String codigoSeguridad) {
         try {
             String hash = generateHash(nuevaContraseña);
-            String query = "UPDATE empleado SET contraseña = ? WHERE codigoSeguridad = ?";
+            String query = "UPDATE Empleado SET contraseña = ? WHERE codigoSeguridad = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
 
