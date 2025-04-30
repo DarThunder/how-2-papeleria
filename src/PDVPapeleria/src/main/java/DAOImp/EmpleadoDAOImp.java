@@ -26,16 +26,15 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
 
     @Override
     public boolean createUser(EmpleadoVO empleado) {
+        if (existeNombreUsuario(empleado.getNombre()) || existeCodigoSeguridad(empleado.getCodigoSeguridad())) {
+            return false;
+        }
+        String hashedPassword = generateHash(empleado.getPassword());
+        String query = "{ CALL agregarEmpleado(?, ?, ?, ?) }";
+
         try {
-            if (existeNombreUsuario(empleado.getNombre()) || existeCodigoSeguridad(empleado.getCodigoSeguridad())) {
-                return false;
-            }
-            String hashedPassword = generateHash(empleado.getPassword());
-            String query = "{ CALL agregarEmpleado(?, ?, ?, ?) }";
-            
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-                
                 statement.setString(1, empleado.getNombre());
                 statement.setString(2, hashedPassword);
                 statement.setString(3, empleado.getCodigoSeguridad());
@@ -45,41 +44,36 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
             } catch (SQLException e) {
                 System.out.println("Error al crear empleado: " + e.getMessage());
             }
-            return false;
-        } catch (SQLException ex) {
-            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException e) {
+            System.out.println("Error al obtener la conexión: " + e.getMessage());
         }
         return false;
     }
 
     @Override
-    public boolean isValidCredentials(String username, String password) {
-        try {
-            String query = "SELECT contraseña, estado FROM Empleado WHERE nombre = ?";
-            Connection connection = DatabaseConnection.getInstance().getConnection();
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, username);
-                ResultSet rs = statement.executeQuery();
-                if (rs.next()) {
-                    String storedHash = rs.getString("contraseña");
-                    String estado = rs.getString("estado");
-                    
-                    if ("Activo".equalsIgnoreCase(estado)) {
-                        if (BCrypt.checkpw(password, storedHash)) {
-                            return true;
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
-                        }
+    public boolean isValidCredentials(String username, String password) throws SQLException {
+        String query = "SELECT contraseña, estado FROM Empleado WHERE nombre = ?";
+        Connection connection = DatabaseConnection.getInstance().getConnection();
+        try (
+                PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String storedHash = rs.getString("contraseña");
+                String estado = rs.getString("estado");
+
+                if ("Activo".equalsIgnoreCase(estado)) {
+                    if (BCrypt.checkpw(password, storedHash)) {
+                        return true;
                     } else {
-                        JOptionPane.showMessageDialog(null, "Usuario inactivo");
+                        JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Usuario no encontrado");
+                    JOptionPane.showMessageDialog(null, "Usuario inactivo");
                 }
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuario no encontrado");
             }
-            return false;
-        }   catch (SQLException ex) {
-            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
