@@ -1,13 +1,11 @@
 -- Tabla de empleados --
 CREATE TABLE Empleado (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
+    nombre VARCHAR(255) UNIQUE NOT NULL,
     rol ENUM('Dueño', 'Administrador', 'Cajero') NOT NULL,
     contraseña VARCHAR(255) NOT NULL,
-    codigoSeguridad VARCHAR(4) NOT NULL,
+    codigoSeguridad VARCHAR(4) UNIQUE NOT NULL,
     estado ENUM('Activo', 'Inactivo') NOT NULL,
-    UNIQUE (nombre),               -- Restricción de unicidad para el nombre
-    UNIQUE (codigoSeguridad)       -- Restricción de unicidad para el código de seguridad
 );
 
 -- Tabla de ventas --
