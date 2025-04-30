@@ -8,7 +8,6 @@ package com.idar.pdvpapeleria;
  *
  * @author DYLAN
  */
-import DAO.DatabaseConnection;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +19,6 @@ import DAOImp.EmpleadoDAOImp;
 import VO.EmpleadoVO;
 import com.idar.pdvpapeleria.controllers.LoginController;
 import java.io.File;
-import java.sql.SQLException;
 import static javafx.application.Application.launch;
 
 /**
@@ -45,13 +43,10 @@ public class App extends Application {
         return new FXMLLoader(fxmlFile.toURI().toURL());
     }
 
-    public static void main(String[] args) throws SQLException {
-        DatabaseConnection.getInstance();
-        
-        EmpleadoVO nuevoEmpleado = new EmpleadoVO("admin", "8888", "Luis", "123");
+    public static void main(String[] args) {
+        EmpleadoVO nuevoEmpleado = new EmpleadoVO("Administrador", "8888", "Luis", "123");
         EmpleadoDAO empleadoDAO = new EmpleadoDAOImp();
         boolean success = empleadoDAO.createUser(nuevoEmpleado);
-        //boolean success = false;
         if (success) {
             System.out.println("Usuario agregado correctamente.");
         } else {

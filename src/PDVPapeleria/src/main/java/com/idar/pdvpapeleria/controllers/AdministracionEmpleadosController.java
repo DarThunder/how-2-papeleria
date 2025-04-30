@@ -101,39 +101,30 @@ public class AdministracionEmpleadosController {
         PEditar.setVisible(true);
     }
 
-    /**
-     * Verifica si los campos de entrada son válidos. Los campos que se
-     * verifican incluyen: nombre, contraseña, rol y código de seguridad. El
-     * código de seguridad debe tener exactamente 4 caracteres.
-     *
-     * @return true si todos los campos están completos y el código de seguridad
-     * es válido; false en caso contrario.
-     */
     @FXML
     private boolean verificarCampos() {
-        boolean camposCompletos = !TFNombre.getText().trim().isEmpty()
+        // Verifica si los campos no están vacíos
+        return !TFNombre.getText().trim().isEmpty()
                 && !TFContraseña.getText().trim().isEmpty()
+                && !TFCodigoSeguridad.getText().trim().isEmpty()
                 && CBRol.getValue() != null;
-        boolean codigoSeguridadValido = TFCodigoSeguridad.getText().length() == 4;
-        if (!camposCompletos) {
-            return false;
-        }
-        return codigoSeguridadValido;
     }
 
-    /**
-     * Agrega un nuevo empleado al sistema. Verifica primero que los campos sean
-     * válidos y que el nombre de usuario y el código de seguridad no existan.
-     * Si los datos son correctos, se crea el usuario en la base de datos. Si
-     * ocurre algún error, se muestra un mensaje adecuado.
-     *
-     * @throws SQLException si ocurre un error al interactuar con la base de
-     * datos.
-     */
+    @FXML
+    private boolean validarCodigoSeguridad() {
+        // Verifica que el código de seguridad tenga exactamente 4 caracteres
+        return TFCodigoSeguridad.getText().length() == 4;
+    }
+
     @FXML
     private void agregarEmpleado() throws SQLException {
         if (!verificarCampos()) {
-            mostrarError("Todos los campos deben estar completos");
+            mostrarError("Todos los campos deben estar completos.");
+            return;
+        }
+
+        if (!validarCodigoSeguridad()) {
+            mostrarError("El código de seguridad debe tener exactamente 4 caracteres.");
             return;
         }
 
@@ -141,11 +132,6 @@ public class AdministracionEmpleadosController {
         String codigoSeguridad = TFCodigoSeguridad.getText();
         String contraseña = TFContraseña.getText();
         String rol = CBRol.getValue();
-
-        if (!validarCodigoSeguridad(codigoSeguridad)) {
-            mostrarError("El código de seguridad debe tener exactamente 4 caracteres.");
-            return;
-        }
 
         EmpleadoVO empleado = crearEmpleado(nombre, codigoSeguridad, contraseña, rol);
 
@@ -159,10 +145,6 @@ public class AdministracionEmpleadosController {
         } else {
             mostrarError("Error al agregar al empleado");
         }
-    }
-
-    private boolean validarCodigoSeguridad(String codigoSeguridad) {
-        return codigoSeguridad.length() == 4;
     }
 
     private EmpleadoVO crearEmpleado(String nombre, String codigoSeguridad, String contraseña, String rol) {

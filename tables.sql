@@ -1,22 +1,20 @@
 -- Tabla de empleados --
-CREATE TABLE empleado (
-	  idEmpleado INT AUTO_INCREMENT PRIMARY KEY, 
-    contraseña VARCHAR(255) NOT NULL, 
-    nombre VARCHAR(255) NOT NULL, 
-    estado VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'user') NOT NULL,
-    codigoSeguridad VARCHAR(255) NOT NULL,
-	  isDeleted BOOLEAN DEFAULT FALSE,
-    deletedAt TIMESTAMP NULL DEFAULT NULL
-); 
+CREATE TABLE Empleado (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) UNIQUE NOT NULL,
+    rol ENUM('Dueño', 'Administrador', 'Cajero') NOT NULL,
+    contraseña VARCHAR(255) NOT NULL,
+    codigoSeguridad VARCHAR(4) UNIQUE NOT NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL
+);
 
 -- Tabla de ventas --
 CREATE TABLE venta (
-	  folio INT PRIMARY KEY AUTO_INCREMENT,
+    folio INT PRIMARY KEY AUTO_INCREMENT,
     idEmpleado INT NOT NULL,
     fechaYHora DATETIME NOT NULL,
     total INT NOT NULL,
-    FOREIGN KEY (idEmpleado) REFERENCES empleado(idEmpleado)
+    FOREIGN KEY (idEmpleado) REFERENCES Empleado(id)
 ); 
 
 -- Tabla de productos --
@@ -26,7 +24,6 @@ CREATE TABLE producto (
     precioDeCompra INT NOT NULL,
     precioDeVenta INT NOT NULL,
     stock INT NOT NULL,
-    imagen VARCHAR(255),
     descripcion TEXT,
     categoria VARCHAR(255), 
     isDeleted BOOLEAN DEFAULT FALSE,

@@ -30,7 +30,7 @@ public class ProductoDAO {
     public ResultSet getProductos() throws SQLException {
         String query = "SELECT idProducto, nombre, precioDeCompra, precioDeVenta, stock, categoria "
                 + "FROM producto "
-                + "WHERE isDeleted = FALSE "
+                + "WHERE is_deleted = FALSE "
                 + "ORDER BY nombre";
         PreparedStatement statement = connection.prepareStatement(query);
         return statement.executeQuery();

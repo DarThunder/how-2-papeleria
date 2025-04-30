@@ -26,22 +26,21 @@ fi
 
 EXISTS=$($MYSQL -e "SHOW DATABASES LIKE '$DB_NAME';" 2>/dev/null | grep "$DB_NAME")
 
-if [[ -z "$EXISTS" ]]; then
-  echo "La base de datos '$DB_NAME' no existe. Creándola..."
-  $MYSQL -e "CREATE DATABASE $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" || {
-    echo "Error al crear la base de datos."
-    exit 1
-  }
-  echo "Base de datos '$DB_NAME' creada."
-else
-  echo "✔ La base de datos '$DB_NAME' ya existe."
+if [[ -n "$EXISTS" ]]; then
+  $MYSQL -e "DROP DATABASE $DB_NAME;"
 fi
 
+$MYSQL -e "CREATE DATABASE $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" || {
+  echo "Error al crear la base de datos."
+  exit 1
+  }
+echo "Base de datos '$DB_NAME' creada."
+
 echo "Ejecutando '$TABLES_SQL'..."
-$MYSQL -u $DB_USER $DB_NAME < "$TABLES_SQL"
+$MYSQL -u $DB_USER $DB_NAME < $TABLES_SQL
 
 echo "Ejecutando '$PROCEDURES_SQL'..."
-$MYSQL -u $DB_USER $DB_NAME < "$PROCEDURES_SQL"
+$MYSQL -u $DB_USER $DB_NAME < $PROCEDURES_SQL
 
 echo "✔ Base de datos '$DB_NAME' inicializada correctamente."
 
