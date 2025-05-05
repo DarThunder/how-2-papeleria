@@ -18,6 +18,7 @@ public class ProductoVO {
     private final IntegerProperty precioDeVenta;
     private final IntegerProperty stock;
     private final StringProperty categoria;
+    private IntegerProperty cantidad;
 
     // Constructor
     public ProductoVO(int id, String nombre, int precioCompra, int precioVenta, int stock, String categoria) {
@@ -27,6 +28,7 @@ public class ProductoVO {
         this.precioDeVenta = new SimpleIntegerProperty(precioVenta);
         this.stock = new SimpleIntegerProperty(stock);
         this.categoria = new SimpleStringProperty(categoria);
+        this.cantidad = new SimpleIntegerProperty(1);
     }
 
     // Getters y propiedades para JavaFX
@@ -76,6 +78,14 @@ public class ProductoVO {
 
     public StringProperty categoriaProperty() {
         return categoria;
+    }
+
+    public int getCantidad() {
+        return cantidad.get();
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = new SimpleIntegerProperty(cantidad);
     }
 
 }
