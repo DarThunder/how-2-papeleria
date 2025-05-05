@@ -44,7 +44,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        EmpleadoVO nuevoEmpleado = new EmpleadoVO("Dueño", "8888", "Luis", "123");
+        EmpleadoVO nuevoEmpleado = new EmpleadoVO("Cajero", "9999", "Juan", "321");
         EmpleadoDAO empleadoDAO = new EmpleadoDAOImp();
         boolean success = empleadoDAO.createUser(nuevoEmpleado);
         if (success) {

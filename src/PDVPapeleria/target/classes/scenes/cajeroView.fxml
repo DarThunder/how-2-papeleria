@@ -48,6 +48,25 @@
             <Label text="F6 - Eliminar producto"/>
             <Label text="F7 - Procesar pago"/>
             <Label text="F8 - Cancelar pago"/>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         </VBox>
     </VBox>
 </AnchorPane>

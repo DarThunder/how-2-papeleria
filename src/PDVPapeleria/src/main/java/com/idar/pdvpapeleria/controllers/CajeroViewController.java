@@ -43,9 +43,9 @@ public class CajeroViewController implements Initializable {
     @FXML
     private TableColumn<ProductoVO, Integer> productCountCol;
     @FXML
-    private TableColumn<ProductoVO, Float> productPriceCol;
+    private TableColumn<ProductoVO, Integer> productPriceCol;
     @FXML
-    private TableColumn<ProductoVO, Float> productSubtotalCol;
+    private TableColumn<ProductoVO, Integer> productSubtotalCol;
     @FXML
     private Label totalLabel;
     @FXML
@@ -73,23 +73,6 @@ public class CajeroViewController implements Initializable {
         productCountCol.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
         productPriceCol.setCellValueFactory(new PropertyValueFactory<>("precioDeVenta"));
         productSubtotalCol.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
-
-        // Formateador para columnas monetarias
-        productPriceCol.setCellFactory(col -> new TableCell<ProductoVO, Float>() {
-            @Override
-            protected void updateItem(Float price, boolean empty) {
-                super.updateItem(price, empty);
-                setText(empty || price == null ? "" : String.format("$%.2f", price));
-            }
-        });
-
-        productSubtotalCol.setCellFactory(col -> new TableCell<ProductoVO, Float>() {
-            @Override
-            protected void updateItem(Float subtotal, boolean empty) {
-                super.updateItem(subtotal, empty);
-                setText(empty || subtotal == null ? "" : String.format("$%.2f", subtotal));
-            }
-        });
     }
 
     private void setupEventHandlers() {
@@ -104,17 +87,13 @@ public class CajeroViewController implements Initializable {
         });
 
         AnchorPane.getScene().setOnKeyPressed(this::handleKeyEvents);
-
-        // Listener para actualizar el total cuando cambia la lista
-        products.addListener((javafx.collections.ListChangeListener.Change<? extends ProductoVO> c) -> {
-            updateTotal();
-        });
     }
 
     private void updateTotal() {
         int total = 0;
         for (ProductoVO p : products) {
-            total += p.getPrecioDeCompra();
+          System.out.println(p.getCantidad());
+            total += (p.getPrecioDeVenta() * p.getCantidad());
         }
         totalLabel.setText(String.format("Total: $%d", total));
     }
@@ -149,6 +128,7 @@ public class CajeroViewController implements Initializable {
                     newProduct.setCantidad(1);
                     products.add(newProduct);
                     productMap.put(id, newProduct);
+                    productosTableView.setItems(products);
                 } else {
                     showAlert(Alert.AlertType.INFORMATION, "No encontrado", "No se encontró ningún producto con ese ID.");
                     return;
@@ -156,6 +136,7 @@ public class CajeroViewController implements Initializable {
             }
             idProductField.clear();
             idProductField.requestFocus();
+            updateTotal();
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "ID inválido", "El ID debe ser un número entero.");
         }
@@ -177,6 +158,7 @@ public class CajeroViewController implements Initializable {
         try {
             products.clear();
             productMap.clear();
+            updateTotal();
             showAlert(Alert.AlertType.INFORMATION, "Cancelación de pago realizado", "La cancelación ha sido procesado correctamente.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error la cancelación de pago", "Ocurrió un error al cancelar el pago: " + e.getMessage());
@@ -195,6 +177,7 @@ public class CajeroViewController implements Initializable {
 
             products.clear();
             productMap.clear();
+            updateTotal();
             showAlert(Alert.AlertType.INFORMATION, "Pago realizado", "El pago ha sido procesado correctamente.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error en el pago", "Ocurrió un error al procesar el pago: " + e.getMessage());
@@ -215,6 +198,7 @@ public class CajeroViewController implements Initializable {
 
             if (removedProduct != null) {
                 products.remove(removedProduct);
+                updateTotal();
                 showAlert(Alert.AlertType.INFORMATION, "Producto eliminado", "El producto ha sido eliminado de la lista.");
                 idProductField.clear();
             } else {
