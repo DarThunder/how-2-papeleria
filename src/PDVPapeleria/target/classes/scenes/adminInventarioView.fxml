@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -38,16 +39,20 @@
       </StackPane>
       <Pane layoutX="95.0" layoutY="63.0" prefHeight="338.0" prefWidth="505.0" style="-fx-background-color: #c4def6;">
          <children>
-            <TableView fx:id="productosTableView" layoutX="14.0" layoutY="48.0" prefHeight="265.0" prefWidth="472.0">
-                <columns>
-                  <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                  <TableColumn fx:id="nombreCol" prefWidth="120.0" text="Nombre" />
-                  <TableColumn fx:id="precioCompraCol" prefWidth="80.0" text="P. Compra" />
-                  <TableColumn fx:id="precioVentaCol" prefWidth="80.0" text="P. Venta" />
-                  <TableColumn fx:id="stockCol" prefWidth="50.0" text="Stock" />
-                  <TableColumn fx:id="categoriaCol" prefWidth="90.0" text="Categoría" />
-                </columns>
-            </TableView>
+            <ScrollPane layoutX="14.0" layoutY="48.0" prefHeight="265.0" prefWidth="472.0">
+               <content>
+                  <TableView fx:id="productosTableView" prefHeight="264.0" prefWidth="469.0">
+                     <columns>
+                        <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
+                        <TableColumn fx:id="nombreCol" prefWidth="120.0" text="Nombre" />
+                        <TableColumn fx:id="precioCompraCol" prefWidth="80.0" text="P. Compra" />
+                        <TableColumn fx:id="precioVentaCol" prefWidth="80.0" text="P. Venta" />
+                        <TableColumn fx:id="stockCol" prefWidth="50.0" text="Stock" />
+                        <TableColumn fx:id="categoriaCol" prefWidth="90.0" text="Categoría" />
+                     </columns>
+                  </TableView>
+               </content>
+            </ScrollPane>
             <TextField fx:id="buscarField" layoutX="236.0" layoutY="14.0" />
             <Button fx:id="btnBuscar" layoutX="391.0" layoutY="14.0" mnemonicParsing="false" text="Buscar" />
          </children>
