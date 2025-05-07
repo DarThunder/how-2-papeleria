@@ -32,10 +32,9 @@ CREATE TABLE producto (
 
 -- Tabla de proveedor --
 CREATE TABLE proveedor (
-    idProveedor INT PRIMARY KEY NOT NULL,
-    correo VARCHAR(254) NOT NULL,
-    servicio VARCHAR(254) NOT NULL,
+    idProveedor INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(254) NOT NULL,
+    servicio VARCHAR(254) NOT NULL,
     telefono VARCHAR(254) NOT NULL
 );
 
