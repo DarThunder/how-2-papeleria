@@ -1,3 +1,7 @@
+create database pdvpapeleria;
+
+use pdvpapeleria;
+
 -- Tabla de empleados --
 CREATE TABLE Empleado (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,7 +19,7 @@ CREATE TABLE venta (
     fechaYHora DATETIME NOT NULL,
     total INT NOT NULL,
     FOREIGN KEY (idEmpleado) REFERENCES Empleado(id)
-); 
+);
 
 -- Tabla de productos --
 CREATE TABLE producto (
@@ -25,7 +29,13 @@ CREATE TABLE producto (
     precioDeVenta INT NOT NULL,
     stock INT NOT NULL,
     descripcion TEXT,
-    categoria VARCHAR(255), 
+    categoria ENUM(
+        'Material de Escritura',
+        'Papelería y Cuadernos',
+        'Arte y Manualidades',
+        'Oficina y Organización',
+        'Tecnología y Electrónica'
+    ) NOT NULL,
     isDeleted BOOLEAN DEFAULT FALSE,
     deletedAt TIMESTAMP NULL DEFAULT NULL
 );
