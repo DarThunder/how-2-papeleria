@@ -1,7 +1,12 @@
+com\idar\pdvpapeleria\controllers\AdminProveedoresViewController.class
 com\idar\pdvpapeleria\controllers\AdministracionEmpleadosController.class
+com\idar\pdvpapeleria\controllers\AdminEditarProveedorViewController.class
 com\idar\pdvpapeleria\controllers\CajeroViewController.class
+DAO\ProveedorDAO.class
 DAOImp\EmpleadoDAOImp.class
+com\idar\pdvpapeleria\controllers\AdminEliminarProveedorViewController.class
 DAOImp\ProductoDAOImp.class
+VO\ProveedorVO.class
 DAO\DatabaseConnection.class
 com\idar\pdvpapeleria\controllers\DueñoViewController.class
 com\idar\pdvpapeleria\controllers\LoginController.class
@@ -12,9 +17,11 @@ com\idar\pdvpapeleria\controllers\VerificacionCodigoSeguridadController.class
 DAO\ProductoDAO.class
 com\idar\pdvpapeleria\App.class
 com\idar\pdvpapeleria\ConnectionDB.class
+DAOImp\ProveedorDAOImp.class
 com\idar\pdvpapeleria\controllers\CajeroViewController$1.class
 com\idar\pdvpapeleria\controllers\AdministracionEmpleados.class
 com\idar\pdvpapeleria\controllers\PlantillaController.class
+com\idar\pdvpapeleria\controllers\AdminAgregarProveedorViewController.class
 lib\SqlLib.class
 VO\EmpleadoVO.class
 com\idar\pdvpapeleria\controllers\CambiarContraseñaController.class
