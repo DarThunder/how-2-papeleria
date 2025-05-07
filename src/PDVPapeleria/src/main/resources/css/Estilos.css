@@ -8,7 +8,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 */
 .root{
     -fx-background-color:#c4def6; 
-    -fx-font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .button{
@@ -18,22 +17,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-effect:  dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 5, 5); 
 }
 
-.button:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 2);
-}
-
 .pane {
     -fx-background-color: #003b46; 
-}
-
-.table-view {
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);
-}
-
-.table-row-cell:odd {
-    -fx-background-color: #f9f9f9;
-}
-
-.table-row-cell:selected {
-    -fx-background-color: #e3f2fd;
 }
