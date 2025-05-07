@@ -14,7 +14,7 @@ CREATE TABLE Empleado (
 
 -- Tabla de ventas --
 CREATE TABLE venta (
-    folio INT PRIMARY KEY AUTO_INCREMENT,
+    folio INT AUTO_INCREMENT PRIMARY KEY,
     idEmpleado INT NOT NULL,
     fechaYHora DATETIME NOT NULL,
     total INT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE venta (
 
 -- Tabla de productos --
 CREATE TABLE producto (
-    idProducto INT PRIMARY KEY NOT NULL,
+    idProducto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     precioDeCompra INT NOT NULL,
     precioDeVenta INT NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE producto (
 
 -- Tabla de proveedor --
 CREATE TABLE proveedor (
-    idProveedor INT PRIMARY KEY AUTO_INCREMENT,
+    idProveedor INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(254) NOT NULL,
     servicio VARCHAR(254) NOT NULL,
     telefono VARCHAR(254) NOT NULL
