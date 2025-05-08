@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="562.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.OpcionesAdministradorController">
+   <children>
+      <Pane prefHeight="562.0" prefWidth="750.0" style="-fx-background-color: #c4def6;" stylesheets="@../css/Estilos.css">
+         <children>
+            <Pane prefHeight="115.0" prefWidth="750.0" style="-fx-background-color: #003b46;">
+               <children>
+                  <Label fx:id="L1" layoutX="59.0" layoutY="33.0" text="ADMINISTRACIÓN DE INVENTARIO" textFill="WHITE">
+                     <font>
+                        <Font name="Arial Black" size="33.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Label fx:id="L11" layoutX="123.0" layoutY="136.0" text="¿Qué quieres administrar?">
+               <font>
+                  <Font name="Arial Black" size="35.0" />
+               </font>
+            </Label>
+            <Button fx:id="BProducto" layoutX="56.0" layoutY="396.0" mnemonicParsing="false" onAction="#abrirVentanaProducto" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #66a5ad;" text="PRODUCTO">
+               <font>
+                  <Font name="Arial Black" size="18.0" />
+               </font>
+            </Button>
+            <Button fx:id="BProveedor" layoutX="439.0" layoutY="396.0" mnemonicParsing="false" onAction="#abrirVentanaProveedor" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #66a5ad;" text="PROVEEDOR">
+               <font>
+                  <Font name="Arial Black" size="18.0" />
+               </font>
+            </Button>
+            <ImageView fitHeight="204.0" fitWidth="206.0" layoutX="79.0" layoutY="203.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/producto_icon.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="176.0" fitWidth="185.0" layoutX="476.0" layoutY="212.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/proveedor_icon.png" />
+               </image>
+            </ImageView>
+            <Button layoutX="14.0" layoutY="518.0" mnemonicParsing="false" text="Atrás" onAction="#regresarAlogin">
+               <font>
+                  <Font name="Arial Black" size="13.0" />
+               </font></Button>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

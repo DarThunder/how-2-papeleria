@@ -3,6 +3,7 @@ package com.idar.pdvpapeleria.controllers;
 import DAO.ProductoDAO;
 import DAOImp.ProductoDAOImp;
 import VO.ProductoVO;
+import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -11,7 +12,21 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import java.sql.*;
+import javafx.fxml.FXMLLoader;
+import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
+import javafx.scene.control.TableRow;
+import javafx.geometry.Insets;
+import javafx.scene.Parent;
 
+/**
+ *
+ * @author Alvaro
+ */
 public class AdminViewController {
 
     @FXML
@@ -43,6 +58,8 @@ public class AdminViewController {
         productoDAO = ProductoDAOImp.getInstance();
         cargarProductos();
         configurarBuscador();
+        configurarSeleccionFila();
+        
     }
 
     private void configurarColumnas() {
@@ -66,6 +83,7 @@ public class AdminViewController {
                         rs.getInt("precioDeCompra"),
                         rs.getInt("precioDeVenta"),
                         rs.getInt("stock"),
+                        rs.getString("descripcion"),
                         rs.getString("categoria")
                 ));
             }
@@ -93,15 +111,57 @@ public class AdminViewController {
     }
 
     private void filtrarPorNombreYCategoria(String filtro) {
-        datosFiltrados.setPredicate(producto -> {
-            if (filtro == null || filtro.isEmpty()) {
-                return true;
-            }
-            String lowerCaseFilter = filtro.toLowerCase();
-            return producto.getNombre().toLowerCase().contains(lowerCaseFilter)
-                    || (producto.getCategoria() != null && producto.getCategoria().toLowerCase().contains(lowerCaseFilter));
+    datosFiltrados.setPredicate(producto -> {
+        // Si no hay filtro o está vacío, mostrar todos los productos
+        if (filtro == null || filtro.isEmpty()) {
+            return true;
+        }
+        
+        // Convertir el filtro a minúsculas para comparación sin distinción de mayúsculas/minúsculas
+        String lowerCaseFilter = filtro.toLowerCase();
+        
+        // Filtrar solo por nombre
+        return producto.getNombre().toLowerCase().contains(lowerCaseFilter);
+    });
+}
+    
+    private void configurarSeleccionFila() {
+        productosTableView.setRowFactory(tv -> {
+            TableRow<ProductoVO> row = new TableRow<>();
+            
+            row.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.PRIMARY && 
+                    event.getClickCount() == 1 && 
+                    !row.isEmpty()) {
+                    
+                    ProductoVO productoSeleccionado = row.getItem();
+                    mostrarDetalleProducto(productoSeleccionado);
+                }
+            });
+            return row;
         });
     }
+    
+    private void mostrarDetalleProducto(ProductoVO producto) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/producto_detalle.fxml"));
+        Parent root = loader.load();
+        
+        // Obtiene el controlador y establece el producto
+        ProductoDetalleController controller = loader.getController();
+        controller.setProducto(producto);
+        
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Detalles del Producto");
+        dialog.setScene(new Scene(root));
+        dialog.showAndWait();
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+        mostrarAlerta("Error", "No se pudo cargar la ventana de detalles");
+    }
+}
 
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

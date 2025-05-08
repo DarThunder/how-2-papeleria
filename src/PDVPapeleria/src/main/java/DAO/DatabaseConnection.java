@@ -18,7 +18,7 @@ public class DatabaseConnection {
     private final Connection connection;
     private final String url = "jdbc:mysql://localhost:3306/pdvpapeleria";
     private final String username = "root"; // cambiele aqui a su usuario no sean cojudos
-    private final String password = "admin"; // Aca tambien cambienle la contraseña
+    private final String password = ""; // Aca tambien cambienle la contraseña
 
     private DatabaseConnection() throws SQLException {
         connection = DriverManager.getConnection(url, username, password);

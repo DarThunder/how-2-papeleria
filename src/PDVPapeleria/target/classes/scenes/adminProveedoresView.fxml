@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" stylesheets="@../css/Estilos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.AdminProveedoresViewController">
+    <top>
+        <HBox alignment="CENTER" style="-fx-background-color: #2d6e65;">
+            <Label text="Administrador - Proveedores" textFill="WHITE">
+                <font>
+                    <Font name="Georgia Bold" size="26.0" />
+                </font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <left>
+        <VBox alignment="TOP_CENTER" spacing="20" style="-fx-background-color: #295951;">
+         <children>
+               <Button id="agregarViewButton" fx:id="agregarViewButton" onAction="#onAgregarViewButtonClicked" style="-fx-background-size: 10px;" text="Agregar">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+               <Button fx:id="editarViewButton" onAction="#onEditarViewButtonClicked" prefHeight="25.0" prefWidth="60.0" text="Editar" />
+               <Button id="EliminarViewButton" fx:id="eliminarViewButton" onAction="#onEliminarViewButtonClicked" text="Eliminar" />
+         </children>
+        </VBox>
+    </left>
+    
+    <center>
+        <TableView fx:id="tablaProveedores">
+            <columns>
+                <TableColumn fx:id="columnaId" prefWidth="151.0" text="ID" />
+                <TableColumn fx:id="columnaNombre" prefWidth="237.0" text="Nombre" />
+                <TableColumn fx:id="columnaServicio" prefWidth="175.0" text="Servicio" />
+                <TableColumn fx:id="columnaTelefono" prefWidth="177.0" text="Teléfono" />
+            </columns>
+        </TableView>
+    </center>
+    
+</BorderPane>

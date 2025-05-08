@@ -8,7 +8,7 @@ import javafx.beans.property.*;
 
 /**
  *
- * @author laura
+ * @author Alvaro
  */
 public class ProductoVO {
 
@@ -17,16 +17,24 @@ public class ProductoVO {
   private final IntegerProperty precioDeCompra;
   private final IntegerProperty precioDeVenta;
   private final IntegerProperty stock;
+  private final StringProperty descripcion;
   private final StringProperty categoria;
   private IntegerProperty cantidad;
+  
+  //constructor de 6 parametros
+  public ProductoVO(int id, String nombre, int precioCompra, int precioVenta, 
+                     int stock, String categoria) {
+        this(id, nombre, precioCompra, precioVenta, stock, "", categoria); // Descripción vacía
+    }
 
-  // Constructor
-  public ProductoVO(int id, String nombre, int precioCompra, int precioVenta, int stock, String categoria) {
+  // Constructor de 7 parametros
+  public ProductoVO(int id, String nombre, int precioCompra, int precioVenta, int stock, String descripcion, String categoria) {
     this.idProducto = new SimpleIntegerProperty(id);
     this.nombre = new SimpleStringProperty(nombre);
     this.precioDeCompra = new SimpleIntegerProperty(precioCompra);
     this.precioDeVenta = new SimpleIntegerProperty(precioVenta);
     this.stock = new SimpleIntegerProperty(stock);
+    this.descripcion = new SimpleStringProperty(descripcion);
     this.categoria = new SimpleStringProperty(categoria);
     this.cantidad = new SimpleIntegerProperty(1);
   }
@@ -72,6 +80,14 @@ public class ProductoVO {
     return stock;
   }
 
+  public String getDescripcion() {
+    return descripcion.get();
+  }
+  
+  public StringProperty descripcionProperty() {
+    return descripcion;
+  }
+  
   public String getCategoria() {
     return categoria.get();
   }

@@ -2,8 +2,10 @@ com\idar\pdvpapeleria\controllers\AdminProveedoresViewController.class
 com\idar\pdvpapeleria\controllers\AdministracionEmpleadosController.class
 com\idar\pdvpapeleria\controllers\AdminEditarProveedorViewController.class
 com\idar\pdvpapeleria\controllers\CajeroViewController.class
+com\idar\pdvpapeleria\controllers\ProductoDetalleController.class
 DAO\ProveedorDAO.class
 DAOImp\EmpleadoDAOImp.class
+Vista\AlertaPDV.class
 com\idar\pdvpapeleria\controllers\AdminEliminarProveedorViewController.class
 DAOImp\ProductoDAOImp.class
 VO\ProveedorVO.class
@@ -20,6 +22,7 @@ com\idar\pdvpapeleria\ConnectionDB.class
 DAOImp\ProveedorDAOImp.class
 com\idar\pdvpapeleria\controllers\CajeroViewController$1.class
 com\idar\pdvpapeleria\controllers\AdministracionEmpleados.class
+com\idar\pdvpapeleria\controllers\OpcionesAdministradorController.class
 com\idar\pdvpapeleria\controllers\PlantillaController.class
 com\idar\pdvpapeleria\controllers\AdminAgregarProveedorViewController.class
 lib\SqlLib.class

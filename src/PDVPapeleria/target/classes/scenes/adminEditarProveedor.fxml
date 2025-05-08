@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" stylesheets="@../repos/how-2-papeleria/src/PDVPapeleria/src/main/resources/css/Estilos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.AdminAgregarProveedorViewController">
+    <top>
+        <HBox alignment="CENTER" style="-fx-background-color: #2d6e65;">
+            <Label text="Administrador - Proveedores" textFill="WHITE">
+                <font>
+                    <Font name="Georgia Bold" size="26.0" />
+                </font>
+            </Label>
+        </HBox>
+    </top>
+    
+    <left>
+        <VBox alignment="TOP_CENTER" prefHeight="570.0" prefWidth="249.0" spacing="20" style="-fx-background-color: #688780;">
+            <Button fx:id="agregarViewButton" onAction="#onAgregarViewButtonClicked" text="Agregar">
+            <VBox.margin>
+               <Insets left="-165.0" top="25.0" />
+            </VBox.margin></Button>
+            <Button fx:id="editarViewButton" onAction="#onEditarViewButtonClicked" prefHeight="25.0" prefWidth="60.0" text="Editar">
+            <VBox.margin>
+               <Insets left="-10.0" top="-45.0" />
+            </VBox.margin></Button>
+            <Button fx:id="eliminarViewButton" onAction="#onEliminarViewButtonClicked" text="Eliminar">
+            <VBox.margin>
+               <Insets left="-5.0" right="-150.0" top="-45.0" />
+            </VBox.margin></Button>
+         <VBox alignment="CENTER" prefHeight="430.0" prefWidth="249.0" style="-fx-background-color: #295951;">
+            <children>
+               <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold; -fx-font-style: italic;" text="ACTUALIZA LOS DATOS DE UN PROVEEDOR" textAlignment="CENTER" wrappingWidth="265.095703125">
+                  <font>
+                     <Font size="24.0" />
+                  </font>
+                  <VBox.margin>
+                     <Insets bottom="25.0" />
+                  </VBox.margin>
+               </Text>
+               <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-style: italic;" text="Nombre" textFill="WHITE">
+                  <VBox.margin>
+                     <Insets left="-150.0" />
+                  </VBox.margin>
+               </Label>
+               <TextField id="labelNombreProveedor" fx:id="TF_Nombre" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="195.0">
+                  <VBox.margin>
+                     <Insets bottom="10.0" top="5.0" />
+                  </VBox.margin>
+               </TextField>
+               <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-style: italic;" text="Servicio" textFill="WHITE">
+                  <VBox.margin>
+                     <Insets left="-150.0" />
+                  </VBox.margin>
+               </Label>
+               <TextField id="labelServicioProveedor" fx:id="TF_Servicio" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="195.0">
+                  <VBox.margin>
+                     <Insets bottom="10.0" top="5.0" />
+                  </VBox.margin>
+               </TextField>
+               <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-style: italic;" text="Telefono" textFill="WHITE">
+                  <VBox.margin>
+                     <Insets bottom="5.0" left="-149.0" />
+                  </VBox.margin>
+               </Label>
+               <TextField id="labelTelefonoProveedor" fx:id="TF_Telefono" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="195.0" />
+            </children>
+         </VBox>
+         <Button fx:id="guardarCambiosButton" onAction="#agregarProveedor" prefHeight="25.0" prefWidth="142.0" text="Guardar Cambios">
+            <VBox.margin>
+               <Insets top="-10.0" />
+            </VBox.margin>
+         </Button>
+         <Button fx:id="resetearCamposButton" onAction="#resetearCampos" prefHeight="25.0" prefWidth="141.0" text="Resetear Campos">
+            <VBox.margin>
+               <Insets bottom="15.0" top="-10.0" />
+            </VBox.margin>
+         </Button>
+        </VBox>
+    </left>
+    
+    <center>
+        <TableView fx:id="tablaProveedores" prefHeight="454.0" prefWidth="569.0">
+            <columns>
+                <TableColumn fx:id="columnaId" prefWidth="110.0" text="ID" />
+                <TableColumn fx:id="columnaNombre" prefWidth="159.0" text="Nombre" />
+                <TableColumn fx:id="columnaServicio" prefWidth="122.0" text="Servicio" />
+                <TableColumn fx:id="columnaTelefono" prefWidth="157.0" text="Teléfono" />
+            </columns>
+        </TableView>
+    </center>
+   <bottom>
+      <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #2d6e65;" BorderPane.alignment="CENTER">
+         <children>
+            <TextField maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" prefWidth="195.0" />
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="28.0" style="-fx-border-radius: 100%;" text="🔍" />
+         </children>
+      </HBox>
+   </bottom>
+    
+</BorderPane>

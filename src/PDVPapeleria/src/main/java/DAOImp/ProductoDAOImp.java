@@ -36,7 +36,7 @@ public class ProductoDAOImp implements ProductoDAO {
      */
     @Override
     public ResultSet getProductos() throws SQLException {
-        String query = "SELECT idProducto, nombre, precioDeCompra, precioDeVenta, stock, categoria FROM producto WHERE isDeleted = FALSE ORDER BY nombre";
+        String query = "SELECT idProducto, nombre, precioDeCompra, precioDeVenta, stock, descripcion, categoria FROM producto WHERE isDeleted = FALSE ORDER BY nombre";
         PreparedStatement statement = DatabaseConnection.getInstance().getConnection().prepareStatement(query);
         return statement.executeQuery();
     }
