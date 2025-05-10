@@ -22,6 +22,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import Vista.AlertaPDV;
 
 /**
  * FXML Controller class
@@ -30,6 +31,8 @@ import javafx.stage.Stage;
  */
 public class AdminEditarProveedorViewController implements Initializable {
 
+    AlertaPDV alerta = new AlertaPDV();
+    public int Id;
     List<ProveedorVO> proveedores = new ArrayList<ProveedorVO>();
     private DatabaseConnection db;
     private ProveedorDAOImp proveedorDAO;
@@ -77,11 +80,7 @@ public class AdminEditarProveedorViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.db = db;
-        this.proveedorDAO = new ProveedorDAOImp(db);
-        configurarTabla();
-        cargarProveedores();
-        mostrarInfo();
+        
     }
     
     /**
@@ -93,7 +92,6 @@ public class AdminEditarProveedorViewController implements Initializable {
      */
     @FXML
     private void switchToView(String fxmlPath, Button botoncito) throws IOException {
-        System.out.println(fxmlPath);
         File fxmlFile = new File(fxmlPath);
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
@@ -110,7 +108,7 @@ public class AdminEditarProveedorViewController implements Initializable {
                 ((AdminEliminarProveedorViewController) controller).setDB(this.db);
             }
         } catch (SQLException e) {
-            error("Error al pasar la conexión a la nueva vista: " + e.getMessage());
+            alerta.mostrarExcepcion("Error","Error al pasar la conexión a la nueva vista", e);
             e.printStackTrace();
         }
 
@@ -133,8 +131,22 @@ public class AdminEditarProveedorViewController implements Initializable {
     
     @FXML
     private void editarProveedor(){
-    
-}
+        String Nombre = TF_Nombre.getText();
+        String Servicio = TF_Servicio.getText();
+        String Telefono = TF_Telefono.getText();
+        
+        if(validarCampos(Nombre, Servicio, Telefono)){
+            try {
+                proveedorDAO.editarProveedor(Id, Nombre, Servicio, Telefono);
+                cargarProveedores();
+                alerta.mostrarExito("Exito", "Proveedor editado correctamente");
+                resetearCampos();
+            } catch (SQLException e){
+                alerta.mostrarExcepcion("Error", "Error al editar proveedor", e);
+                System.err.println("Error al editar proveedor: " + e.getMessage());
+            }   
+        }
+    }
     
     /**
      * Al hacer click en el boton "Agregar" abre el respectivo FXML
@@ -188,7 +200,7 @@ public class AdminEditarProveedorViewController implements Initializable {
             ObservableList<ProveedorVO> datos = FXCollections.observableArrayList(proveedores);
             tablaProveedores.setItems(datos);
         } catch (SQLException e) {
-            error(e.getMessage());
+            alerta.mostrarExcepcion("Error","Error al cargar proveedores", e);
             System.err.println("Error al cargar proveedores: " + e.getMessage());
         }
     }
@@ -208,32 +220,6 @@ public class AdminEditarProveedorViewController implements Initializable {
         configurarTabla();
         cargarProveedores();
         mostrarInfo();
-    }
-
-    /**
-     * Muestra un mensaje de error en la UI
-     * 
-     * @param texto 
-     */
-    public void error(String texto) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null); 
-        alert.setContentText("Error: " + texto);
-        alert.show();
-    }   
-    
-    /**
-     * Muestra un mensaje en la UI
-     * 
-     * @param mensaje 
-     */
-    private void mostrarMensajeExito(String mensaje) {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Operación exitosa");
-    alert.setHeaderText(null);
-    alert.setContentText(mensaje);
-    alert.showAndWait();
     }
     
     /**
@@ -264,23 +250,23 @@ public class AdminEditarProveedorViewController implements Initializable {
         boolean telefonoVacio = Telefono.isEmpty();
         
         if(nombreVacio && servicioVacio && telefonoVacio){
-            error("Campos vacios");
+            alerta.mostrarError("Campos vacios", "Llena todos los campos");
             return false;
         }
         if (nombreVacio){
-            error("Campo Nombre vacio");
+            alerta.mostrarError("Campo Nombre vacio", "Llena el campo de nombre");
             return false;
         }
         if (servicioVacio){
-            error("Campo Servicio vacio");
+            alerta.mostrarError("Campo Servicio vacio", "Llena el campo de servicio");
             return false;
         }
         if (telefonoVacio){
-            error("Campo Telefono vacio");
+            alerta.mostrarError("Campo Telefono vacio", "Llena el campo de telefono");
             return false;
         }
         if (!validarTelefono(Telefono)){
-            error("El telefono no es valido");
+            alerta.mostrarError("El telefono no es valido", "Ingresa un numero de telefono valido '10 digitos'");
             return false;
         }
         return true;
@@ -299,16 +285,18 @@ public class AdminEditarProveedorViewController implements Initializable {
     //CORREGIR ESTA MAMADA
     @FXML
     public void mostrarInfo(){
-        tablaProveedores.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            int indice = newIndex.intValue();
-            System.out.println(newIndex);
-            if (indice >= 0 && indice < proveedores.size()){
-                ProveedorVO seleccionado = proveedores.get(indice);
+        tablaProveedores.setOnMouseClicked(event -> {
+            ProveedorVO seleccionado = proveedores.get(
+                    tablaProveedores.getSelectionModel().getSelectedIndex());
+            if (seleccionado != null){
+                //System.out.println("Seleccionado: " + seleccionado);
                 
                 TF_Nombre.setText(seleccionado.getNombreProveedor());
                 TF_Servicio.setText(seleccionado.getServicioProveedor());
                 TF_Telefono.setText(seleccionado.getTelefonoProveedor());
+                
+                Id = seleccionado.getIdProveedor();
             }
-      });
+        });
     }
 }

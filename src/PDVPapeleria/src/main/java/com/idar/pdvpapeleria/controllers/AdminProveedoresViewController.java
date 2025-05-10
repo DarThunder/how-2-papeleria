@@ -17,6 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javax.swing.JOptionPane;
 import DAO.DatabaseConnection;
+import Vista.AlertaPDV;
 import java.io.File;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +28,7 @@ import javafx.stage.Stage;
 
 public class AdminProveedoresViewController implements Initializable {
 
+    AlertaPDV alerta = new AlertaPDV();
     private DatabaseConnection db;
     private ProveedorDAOImp proveedorDAO;
 
@@ -65,6 +67,7 @@ public class AdminProveedoresViewController implements Initializable {
                     
         } catch (SQLException e) {
             System.err.println("Error al conectar a la base de datos: " + e.getMessage());
+            alerta.mostrarError("Error BD", "Error al conectar a la base de datos");
         }
     }
     
@@ -77,7 +80,6 @@ public class AdminProveedoresViewController implements Initializable {
      */
     @FXML
     private void switchToView(String fxmlPath, Button botoncito) throws IOException {
-        System.out.println(fxmlPath);
         File fxmlFile = new File(fxmlPath);
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
@@ -95,7 +97,7 @@ public class AdminProveedoresViewController implements Initializable {
                 ((AdminEliminarProveedorViewController) controller).setDB(this.db);
             }
         } catch (SQLException e) {
-            error("Error al pasar la conexión a la nueva vista: " + e.getMessage());
+            alerta.mostrarExcepcion("Error","Error al pasar la conexión a la nueva vista: ", e);
             e.printStackTrace();
         }
 
@@ -154,7 +156,7 @@ public class AdminProveedoresViewController implements Initializable {
             ObservableList<ProveedorVO> datos = FXCollections.observableArrayList(proveedores);
             tablaProveedores.setItems(datos);
         } catch (SQLException e) {
-            error(e.getMessage());
+            alerta.mostrarExcepcion("Error", "No se cargaron los proveedores", e);
             System.err.println("Error al cargar proveedores: " + e.getMessage());
         }
     }
@@ -167,18 +169,5 @@ public class AdminProveedoresViewController implements Initializable {
     public void setDB() throws SQLException {
         this.db = DatabaseConnection.getInstance();
     }
-
-    /**
-     * Muestra un mensaje de error en la UI
-     * 
-     * @param texto 
-     */
-    public void error(String texto) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null); 
-        alert.setContentText("Error: " + texto);
-        alert.show();
-    }    
 
 }

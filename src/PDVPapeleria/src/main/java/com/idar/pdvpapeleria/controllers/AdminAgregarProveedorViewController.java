@@ -21,6 +21,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import Vista.AlertaPDV;
 
 /**
  * FXML Controller class
@@ -29,6 +30,7 @@ import javafx.stage.Stage;
  */
 public class AdminAgregarProveedorViewController implements Initializable {
 
+    AlertaPDV alerta = new AlertaPDV();
     List<ProveedorVO> proveedores = new ArrayList<ProveedorVO>();
     private DatabaseConnection db;
     private ProveedorDAOImp proveedorDAO;
@@ -87,7 +89,6 @@ public class AdminAgregarProveedorViewController implements Initializable {
      */
     @FXML
     private void switchToView(String fxmlPath, Button botoncito) throws IOException {
-        System.out.println(fxmlPath);
         File fxmlFile = new File(fxmlPath);
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
@@ -104,7 +105,7 @@ public class AdminAgregarProveedorViewController implements Initializable {
                 ((AdminEliminarProveedorViewController) controller).setDB(this.db);
             }
         } catch (SQLException e) {
-            error("Error al pasar la conexión a la nueva vista: " + e.getMessage());
+            alerta.mostrarExcepcion("Error", "Error al pasar la conexión a la nueva vista", e);
             e.printStackTrace();
         }
 
@@ -134,10 +135,10 @@ public class AdminAgregarProveedorViewController implements Initializable {
             try {
                 proveedorDAO.agregarProveedor(p);
                 cargarProveedores();
-                mostrarMensajeExito("Se agregó correctamente al proveedor");
+                alerta.mostrarExito("Exito", "Se agregó correctamente al proveedor");
                 resetearCampos();
             } catch (SQLException e){
-                error(e.getMessage());
+                alerta.mostrarExcepcion("Error", "Error al agregar proveedor", e);
                 System.err.println("Error al agregar proveedor: " + e.getMessage());
             }   
         }
@@ -195,7 +196,7 @@ public class AdminAgregarProveedorViewController implements Initializable {
             ObservableList<ProveedorVO> datos = FXCollections.observableArrayList(proveedores);
             tablaProveedores.setItems(datos);
         } catch (SQLException e) {
-            error(e.getMessage());
+            alerta.mostrarExcepcion("Error", "No se cargaron los proveedores", e);
             System.err.println("Error al cargar proveedores: " + e.getMessage());
         }
     }
@@ -216,32 +217,6 @@ public class AdminAgregarProveedorViewController implements Initializable {
         cargarProveedores();
     }
 
-    /**
-     * Muestra un mensaje de error en la UI
-     * 
-     * @param texto 
-     */
-    public void error(String texto) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null); 
-        alert.setContentText("Error: " + texto);
-        alert.show();
-    }   
-    
-    /**
-     * Muestra un mensaje en la UI
-     * 
-     * @param mensaje 
-     */
-    private void mostrarMensajeExito(String mensaje) {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Operación exitosa");
-    alert.setHeaderText(null);
-    alert.setContentText(mensaje);
-    alert.showAndWait();
-    }
-    
     /**
      * Valida que el telefono tenga el formato de uno real: 10 digitos y que no 
      * tenga ninguna letra.
@@ -270,23 +245,23 @@ public class AdminAgregarProveedorViewController implements Initializable {
         boolean telefonoVacio = Telefono.isEmpty();
         
         if(nombreVacio && servicioVacio && telefonoVacio){
-            error("Campos vacios");
+            alerta.mostrarError("Campos vacios", "Llena todos los campos");
             return false;
         }
         if (nombreVacio){
-            error("Campo Nombre vacio");
+            alerta.mostrarError("Campo Nombre vacio", "Llena el campo de nombre");
             return false;
         }
         if (servicioVacio){
-            error("Campo Servicio vacio");
+            alerta.mostrarError("Campo Servicio vacio", "Llena el campo de servicio");
             return false;
         }
         if (telefonoVacio){
-            error("Campo Telefono vacio");
+            alerta.mostrarError("Campo Telefono vacio", "Llena el campo de telefono");
             return false;
         }
         if (!validarTelefono(Telefono)){
-            error("El telefono no es valido");
+            alerta.mostrarError("El telefono no es valido", "Ingresa un numero de telefono valido '10 digitos'");
             return false;
         }
         return true;

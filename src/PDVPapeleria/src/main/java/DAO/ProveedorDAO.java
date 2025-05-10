@@ -20,4 +20,6 @@ public interface ProveedorDAO {
     
     public boolean eliminarProveedor(List<ProveedorVO> proveedores, int indiceSeleccionado);
     
+    public boolean editarProveedor(int id, String nombre, String servicio, String telefono) throws SQLException;
+    
 }
