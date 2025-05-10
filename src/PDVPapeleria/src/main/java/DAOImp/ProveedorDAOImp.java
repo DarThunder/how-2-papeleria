@@ -26,7 +26,7 @@ public class ProveedorDAOImp implements ProveedorDAO{
     @Override
     public List<ProveedorVO> obtenerTodosProveedores() throws SQLException {
         List<ProveedorVO> proveedores = new ArrayList<>();
-        String sql = "SELECT * FROM proveedor";
+        String sql = "SELECT * FROM proveedor WHERE isDeleted = false";
         
         Connection conn = null;
         PreparedStatement stmt = null;
