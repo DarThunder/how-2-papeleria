@@ -43,3 +43,22 @@ BEGIN
 END $$
 
 DELIMITER $$
+
+-- Procedimiento almacenado para editar proveedor
+DELIMITER $$
+
+CREATE PROCEDURE editarProveedor(
+	in p_id INT,
+    in p_nombre VARCHAR(100),
+    in p_servicio VARCHAR(100),
+    in p_telefono VARCHAR(10)
+)
+BEGIN
+	UPDATE proveedor
+		SET nombre = p_nombre, 
+			servicio = p_servicio, 
+			telefono = p_telefono
+	WHERE idProveedor = p_id;
+END $$
+
+DELIMITER $$
