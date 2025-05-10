@@ -47,6 +47,8 @@ CREATE TABLE proveedor (
     servicio VARCHAR(254) NOT NULL,
     telefono VARCHAR(254) NOT NULL
 );
+-- Añadimos el isDeleted en proveedor
+ALTER TABLE proveedor ADD isDeleted BOOLEAN DEFAULT FALSE;
 
 -- Tabla de relación proveedor --
 CREATE TABLE provee (
