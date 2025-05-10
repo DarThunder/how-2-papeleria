@@ -62,3 +62,43 @@ BEGIN
 END $$
 
 DELIMITER $$
+
+
+
+
+-- Eliminar procedimiento almacenado si existe
+DROP PROCEDURE IF EXISTS agregarProductoConProveedor;
+
+DELIMITER $$
+
+CREATE PROCEDURE agregarProductoConProveedor(
+    IN p_nombre VARCHAR(255),
+    IN p_precioDeCompra INT,
+    IN p_precioDeVenta INT,
+    IN p_stock INT,
+    IN p_descripcion TEXT,
+    IN p_categoria ENUM(
+        'Material de Escritura',
+        'Papelería y Cuadernos',
+        'Arte y Manualidades',
+        'Oficina y Organización',
+        'Tecnología y Electrónica'
+    ),
+    IN p_idProveedor INT
+)
+BEGIN
+    DECLARE product_id INT;
+    
+    -- Insertar el producto
+    INSERT INTO producto (nombre, precioDeCompra, precioDeVenta, stock, descripcion, categoria)
+    VALUES (p_nombre, p_precioDeCompra, p_precioDeVenta, p_stock, p_descripcion, p_categoria);
+    
+    -- Obtener el ID del producto recién insertado
+    SET product_id = LAST_INSERT_ID();
+    
+    -- Establecer la relación con el proveedor
+    INSERT INTO provee (idProducto, idProveedor)
+    VALUES (product_id, p_idProveedor);
+END $$
+
+DELIMITER ;
