@@ -17,6 +17,7 @@ END $$
 
 DELIMITER ;
 
+
 -- Procedimiento almacenado para agregar un nuevo proveedor
 DELIMITER $$
 
@@ -39,7 +40,10 @@ CREATE PROCEDURE eliminarProveedor(
 	in p_id INT
 )
 BEGIN
-	DELETE FROM proveedor WHERE idProveedor = p_id;
+	-- Elimina el proveedor de la tabla proveedor
+	UPDATE `proveedor` 
+		SET `isDeleted` = '1' 
+	WHERE (`idProveedor` = p_id);
 END $$
 
 DELIMITER $$
@@ -62,8 +66,6 @@ BEGIN
 END $$
 
 DELIMITER $$
-
-
 
 
 -- Eliminar procedimiento almacenado si existe
