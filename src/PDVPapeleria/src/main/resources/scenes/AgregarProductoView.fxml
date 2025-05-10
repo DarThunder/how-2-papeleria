@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.AgregarProductoController">
+    <VBox spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+        <Label text="Agregar Nuevo Producto" style="-fx-font-weight: bold;">
+            <font>
+                <Font size="20.0" />
+            </font>
+        </Label>
+        
+        <Label text="Nombre:" />
+        <TextField fx:id="nombreField" />
+        
+        <Label text="Precio de Compra:" />
+        <TextField fx:id="precioCompraField" />
+        
+        <Label text="Precio de Venta:" />
+        <TextField fx:id="precioVentaField" />
+        
+        <Label text="Stock Inicial:" />
+        <TextField fx:id="stockField" />
+        
+        <Label text="Categoría:" />
+        <TextField fx:id="categoriaField" />
+        
+        <Button fx:id="btnGuardar" text="Guardar Producto" onAction="#guardarProducto" />
+        <Button fx:id="btnCancelar" text="Cancelar" onAction="#cancelar" />
+    </VBox>
+</AnchorPane>

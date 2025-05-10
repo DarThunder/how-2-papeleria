@@ -3,6 +3,7 @@ package com.idar.pdvpapeleria.controllers;
 import DAO.ProductoDAO;
 import DAOImp.ProductoDAOImp;
 import VO.ProductoVO;
+import java.io.File;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -12,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import java.sql.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
@@ -47,7 +49,9 @@ public class AdminViewController {
     private TextField buscarField;
     @FXML
     private Button btnBuscar;
-
+    @FXML
+    private Button btnAtras;
+    
     private ProductoDAO productoDAO;
     private ObservableList<ProductoVO> listaProductosOriginal;
     private FilteredList<ProductoVO> datosFiltrados;
@@ -59,6 +63,7 @@ public class AdminViewController {
         cargarProductos();
         configurarBuscador();
         configurarSeleccionFila();
+        configurarMenuContextual();
         
     }
 
@@ -125,6 +130,18 @@ public class AdminViewController {
     });
 }
     
+    private void configurarMenuContextual() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem modificarItem = new MenuItem("Modificar");
+        MenuItem eliminarItem = new MenuItem("Eliminar");
+
+        modificarItem.setOnAction(this::modificarProducto);
+        eliminarItem.setOnAction(this::eliminarProducto);
+
+        contextMenu.getItems().addAll(modificarItem, eliminarItem);
+        productosTableView.setContextMenu(contextMenu);
+    }
+    
     private void configurarSeleccionFila() {
         productosTableView.setRowFactory(tv -> {
             TableRow<ProductoVO> row = new TableRow<>();
@@ -162,7 +179,99 @@ public class AdminViewController {
         mostrarAlerta("Error", "No se pudo cargar la ventana de detalles");
     }
 }
+    
+    @FXML
+    private void agregarProducto() {
+        try {
+            File fxmlFile = new File("src/main/resources/scenes/AgregarProductoView.fxml");
+            FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
+            Parent root = loader.load();
 
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Agregar Producto");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+            cargarProductos();
+
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo cargar la ventana de agregar producto");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void modificarProducto(ActionEvent event) {
+        ProductoVO seleccionado = productosTableView.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            try {
+                File fxmlFile = new File("src/main/resources/scenes/ModificarProductoView.fxml");
+                FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
+                Parent root = loader.load();
+
+                ModificarProductoController controller = loader.getController();
+                controller.initData(seleccionado);
+
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Modificar Producto");
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.showAndWait();
+
+                cargarProductos();
+
+            } catch (IOException e) {
+                mostrarAlerta("Error", "No se pudo cargar la ventana de modificación");
+                e.printStackTrace();
+            }
+        } else {
+            mostrarAlerta("Advertencia", "Seleccione un producto para modificar");
+        }
+    }
+
+    @FXML
+    private void eliminarProducto(ActionEvent event) {
+        ProductoVO seleccionado = productosTableView.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            if (seleccionado.getStock() < 0) {
+                mostrarAlerta("Advertencia", "No se puede eliminar un producto con stock existente");
+                return;
+            }
+            try {
+                // Confirmar eliminación
+                Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmacion.setTitle("Confirmar Eliminación");
+                confirmacion.setHeaderText(null);
+                confirmacion.setContentText("¿Está seguro de eliminar el producto: " + seleccionado.getNombre() + "?");
+
+                if (confirmacion.showAndWait().get() == ButtonType.OK) {
+                    boolean eliminado = productoDAO.eliminarProducto(seleccionado.getIdProducto());
+                    if (eliminado) {
+                        listaProductosOriginal.remove(seleccionado);
+                        mostrarAlerta("Éxito", "Producto eliminado correctamente");
+                    } else {
+                        mostrarAlerta("Error", "No se pudo eliminar el producto");
+                    }
+                }
+            } catch (SQLException e) {
+                mostrarAlerta("Error", "Error al eliminar el producto: " + e.getMessage());
+            }
+        } else {
+            mostrarAlerta("Advertencia", "Seleccione un producto para eliminar");
+        }
+    }
+
+    @FXML
+        private void regresarOpcionesAdmin(ActionEvent event) throws IOException {
+            File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
+            FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
+            Parent root = loader.load();
+            Stage stage = (Stage) btnAtras.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        }
+    
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);

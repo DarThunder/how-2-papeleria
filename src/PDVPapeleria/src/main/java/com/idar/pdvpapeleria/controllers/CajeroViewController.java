@@ -1,8 +1,3 @@
-
-
-
-
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
@@ -12,9 +7,12 @@ package com.idar.pdvpapeleria.controllers;
 import DAOImp.ProductoDAOImp;
 import VO.ProductoVO;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -172,7 +170,11 @@ public class CajeroViewController implements Initializable {
 
         try {
             products.forEach(producto -> {
-                productoDao.sellProducto(producto.getIdProducto(), producto.getCantidad());
+                try {
+                    productoDao.reducirStock(producto.getIdProducto(), producto.getCantidad());
+                } catch (SQLException ex) {
+                    Logger.getLogger(CajeroViewController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
 
             products.clear();

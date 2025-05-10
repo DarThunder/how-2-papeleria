@@ -14,12 +14,17 @@ import java.sql.SQLException;
 
 public interface ProductoDAO {
 
-    ProductoVO getProducto(int id);
-
     ResultSet getProductos() throws SQLException;
 
-    boolean setProducto(ProductoVO product);
-    
-    boolean sellProducto(int id, int cantidad);
+    ProductoVO getProductoById(int id) throws SQLException;
 
+    boolean agregarProducto(ProductoVO producto) throws SQLException;
+
+    boolean actualizarProducto(ProductoVO producto) throws SQLException;
+
+    boolean eliminarProducto(int idProducto) throws SQLException;
+
+    ResultSet buscarProductos(String criterio) throws SQLException;
+
+    boolean reducirStock(int idProducto, int cantidad) throws SQLException;
 }
