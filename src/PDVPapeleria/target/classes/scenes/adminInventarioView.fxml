@@ -3,54 +3,67 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.AdminViewController">
-   <children>
-      <Pane prefHeight="63.0" prefWidth="600.0" style="-fx-background-color: #07575b;">
-         <children>
-            <Label layoutX="226.0" layoutY="23.0" text="Administracion de Producto" />
-         </children>
-      </Pane>
-      <StackPane layoutY="63.0" prefHeight="338.0" prefWidth="95.0" style="-fx-background-color: #003b46;">
-         <children>
-            <Button mnemonicParsing="false" text="Agregar" textAlignment="CENTER" StackPane.alignment="TOP_CENTER">
-               <StackPane.margin>
-                  <Insets top="20.0" />
-               </StackPane.margin>
-            </Button>
-            <Button mnemonicParsing="false" text="Eliminar" textAlignment="CENTER">
-               <StackPane.margin>
-                  <Insets top="-180.0" />
-               </StackPane.margin>
-            </Button>
-            <Button mnemonicParsing="false" text="Editar" textAlignment="CENTER">
-               <StackPane.margin>
-                  <Insets top="-90.0" />
-               </StackPane.margin>
-            </Button>
-         </children>
-      </StackPane>
-      <Pane layoutX="95.0" layoutY="63.0" prefHeight="338.0" prefWidth="505.0" style="-fx-background-color: #c4def6;">
-         <children>
-            <TableView fx:id="productosTableView" layoutX="14.0" layoutY="48.0" prefHeight="265.0" prefWidth="472.0">
-                <columns>
-                  <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                  <TableColumn fx:id="nombreCol" prefWidth="120.0" text="Nombre" />
-                  <TableColumn fx:id="precioCompraCol" prefWidth="80.0" text="P. Compra" />
-                  <TableColumn fx:id="precioVentaCol" prefWidth="80.0" text="P. Venta" />
-                  <TableColumn fx:id="stockCol" prefWidth="50.0" text="Stock" />
-                  <TableColumn fx:id="categoriaCol" prefWidth="90.0" text="Categoría" />
-                </columns>
-            </TableView>
-            <TextField fx:id="buscarField" layoutX="236.0" layoutY="14.0" />
-            <Button fx:id="btnBuscar" layoutX="391.0" layoutY="14.0" mnemonicParsing="false" text="Buscar" />
-         </children>
-      </Pane>
-   </children>
+<AnchorPane prefHeight="528.0" prefWidth="691.0" style="-fx-background-color: #c4def6;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.AdminViewController">
+    
+    <!-- Barra superior con título centrado -->
+    <StackPane prefHeight="74" style="-fx-background-color: #07575b;" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <Label fx:id="L1" text="ADMINISTRACIÓN DE PRODUCTO" textFill="WHITE">
+            <font>
+                <Font name="Arial Black" size="30" />
+            </font>
+        </Label>
+    </StackPane>
+    
+    <!-- Contenido principal -->
+    <VBox prefHeight="457.0" prefWidth="691.0" spacing="10" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="74">
+        <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </padding>
+        <children>
+            <HBox spacing="10" HBox.hgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" />
+                </padding>
+                <children>
+                    <!-- Botón Agregar a la izquierda -->
+                    <Button fx:id="btnAgregar" maxWidth="Infinity" mnemonicParsing="false" text="Agregar" onAction="#agregarProducto"/>
+                    
+                    <!-- Espaciador para empujar los elementos de búsqueda a la derecha -->
+                    <Pane HBox.hgrow="ALWAYS" />
+                    
+                    <!-- Campos de búsqueda a la derecha -->
+                    <TextField fx:id="buscarField" maxWidth="300" prefWidth="200" promptText="Buscar producto..." HBox.hgrow="NEVER" />
+                    <Button fx:id="btnBuscar" text="Buscar" />
+                </children>
+            </HBox>
+            
+            <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+                <TableView fx:id="productosTableView">
+                    <columns>
+                        <TableColumn fx:id="idCol" text="ID" />
+                        <TableColumn fx:id="nombreCol" text="Nombre" />
+                        <TableColumn fx:id="precioCompraCol" text="P. Compra" />
+                        <TableColumn fx:id="precioVentaCol" text="P. Venta" />
+                        <TableColumn fx:id="stockCol" text="Stock" />
+                        <TableColumn fx:id="categoriaCol" text="Categoría" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </ScrollPane>
+         <Button fx:id="btnAtras" mnemonicParsing="false" text="Atras" onAction="#regresarOpcionesAdmin"/>
+        </children>
+    </VBox>
 </AnchorPane>

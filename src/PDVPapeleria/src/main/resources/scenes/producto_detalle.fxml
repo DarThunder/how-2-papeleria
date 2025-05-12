@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.idar.pdvpapeleria.controllers.ProductoDetalleController">
+    
+    <!-- Encabezado con color #07575b -->
+    <StackPane style="-fx-background-color: #07575b;">
+        <Label text="Detalle del Producto" style="-fx-text-fill: white; -fx-font-weight: bold;">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+            <font>
+                <Font name="Arial" size="16.0"/>
+            </font>
+        </Label>
+    </StackPane>
+    
+    <!-- Cuerpo con color #c4def6 -->
+    <VBox style="-fx-background-color: #c4def6;" spacing="10">
+        <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+        </padding>
+        
+        <VBox spacing="5">
+            <Label fx:id="idLabel"/>
+            <Label fx:id="nombreLabel"/>
+            <Label fx:id="precioCompraLabel"/>
+            <Label fx:id="precioVentaLabel"/>
+            <Label fx:id="stockLabel"/>
+            <Label fx:id="categoriaLabel"/>
+            <Label fx:id="descripcionLabel" wrapText="true" maxWidth="300"/>
+        </VBox>
+    </VBox>
+</VBox>

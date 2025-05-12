@@ -142,7 +142,9 @@ public class LoginController {
      */
     @FXML
     private void switchToAdminView() throws IOException {
-        File fxmlFile = new File("src/main/resources/scenes/adminInventarioView.fxml");
+        //File fxmlFile = new File("src/main/resources/scenes/adminInventarioView.fxml");
+        //CARLOS ACA PON LA INTERFAZ DONDE SELECCIONAS SI ES LA GESTION DE PROVEEDORES O DE PRODUCTOS
+        File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
         Stage stage = (Stage) B1.getScene().getWindow();

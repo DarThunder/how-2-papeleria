@@ -4,8 +4,10 @@
  */
 package Vista;
 
+import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 /**
  *
@@ -39,5 +41,26 @@ public class AlertaPDV {
 
         alerta.setContentText(contenido);
         alerta.showAndWait();
+    }
+
+    /**
+     * Muestra un mensaje de confirmacion de "Si" o "No"
+     * 
+     * @param titulo
+     * @param mensaje
+     * @return 
+     */
+    public static boolean mostrarConfirmacion(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+
+        ButtonType botonSi = new ButtonType("Sí");
+        ButtonType botonNo = new ButtonType("No");
+        alert.getButtonTypes().setAll(botonSi, botonNo);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+        return resultado.isPresent() && resultado.get() == botonSi;
     }
 }
