@@ -1,13 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
 import DAOImp.EmpleadoDAOImp;
+import Vista.AlertaPDV;
 import java.io.IOException;
-import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -44,23 +39,26 @@ public class VerificacionCodigoSeguridadController {
     @FXML
     private void verificarCodigoSeguridad() {
         String username = TFNombre.getText().trim();
-        String codigoSeguridad = TFCodigoSeguridad.getText().trim(); 
+        String codigoSeguridad = TFCodigoSeguridad.getText().trim();
+
         if (username.isEmpty() || codigoSeguridad.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Campos incompletos", "Por favor complete todos los campos.");
             return;
         }
+
         if (codigoSeguridad.length() != 4) {
-            JOptionPane.showMessageDialog(null, "El código de seguridad debe tener exactamente 4 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Código de seguridad inválido", "El código de seguridad debe tener exactamente 4 caracteres.");
             return;
         }
+
         if (db.verificarCodigoSeguridad(username, codigoSeguridad)) {
             try {
                 switchToCambiarContraseña(codigoSeguridad);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                AlertaPDV.mostrarExcepcion("Error de carga", "Error al cargar la pantalla de cambiar contraseña", e);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Código de seguridad incorrecto o usuario no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Error", "Código de seguridad incorrecto o usuario no encontrado.");
         }
     }
 

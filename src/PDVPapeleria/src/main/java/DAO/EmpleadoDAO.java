@@ -6,6 +6,7 @@ package DAO;
 
 import VO.EmpleadoVO;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
@@ -17,6 +18,8 @@ public interface EmpleadoDAO {
 
     boolean existeNombreUsuario(String username);
 
+    boolean existeEmpleadoPorId(int id);
+
     boolean existeCodigoSeguridad(String codigoSeguridad);
 
     String getRole(String username) throws SQLException;
@@ -26,4 +29,9 @@ public interface EmpleadoDAO {
     boolean verificarCodigoSeguridad(String username, String codigoSeguridad);
 
     boolean cambiarContraseña(String nuevaContraseña, String codigoSeguridad);
+
+    boolean eliminarEmpleado(int id);
+
+    List<EmpleadoVO> obtenerTodosEmpleados() throws SQLException;
+
 }

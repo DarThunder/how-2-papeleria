@@ -1,6 +1,7 @@
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.ProductoDAO;
+import DAOImp.ProductoDAOImp;
 import VO.ProductoVO;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -39,7 +40,7 @@ public class AdminViewController {
     @FXML
     public void initialize() throws SQLException {
         configurarColumnas();
-        productoDAO = new ProductoDAO();
+        productoDAO = ProductoDAOImp.getInstance();
         cargarProductos();
         configurarBuscador();
     }

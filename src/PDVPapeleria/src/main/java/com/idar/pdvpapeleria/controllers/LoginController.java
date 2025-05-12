@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import DAO.EmpleadoDAO;
 import DAOImp.EmpleadoDAOImp;
+import Vista.AlertaPDV;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -58,25 +59,34 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
+        if (username.isEmpty() || password.isEmpty()) {
+            AlertaPDV.mostrarError("Campos incompletos", "Por favor, complete todos los campos.");
+            return;
+        }
+
         try {
-            if (empleado.isValidCredentials(username, password)) {
-                String role = empleado.getRole(username);
-                switch (role) {
-                    case "Dueño" ->
-                        switchToDueñoView();
-                    case "Administrador" ->
-                        switchToAdminView();
-                    case "Cajero" ->
-                        switchToCajeroView();
-                    default ->
-                        errorMessageLabel.setText("Rol desconocido o no autorizado.");
+            if (empleado.existeNombreUsuario(username)) {
+                if (empleado.isValidCredentials(username, password)) {
+                    String role = empleado.getRole(username);
+                    switch (role) {
+                        case "Dueño" ->
+                            switchToDueñoView();
+                        case "Administrador" ->
+                            switchToAdminView();
+                        case "Cajero" ->
+                            switchToCajeroView();
+                        default ->
+                            AlertaPDV.mostrarError("Error", "Rol desconocido o no autorizado.");
+                    }
+                } else {
+                    AlertaPDV.mostrarError("Error de autenticación", "Contraseña incorrecta.");
                 }
             } else {
-                errorMessageLabel.setText("Nombre de usuario o contraseña incorrectos.");
+                AlertaPDV.mostrarError("Error de autenticación", "Nombre de usuario incorrecto.");
             }
         } catch (SQLException | IOException e) {
-            errorMessageLabel.setText("Error al iniciar sesión.");
-            e.printStackTrace();
+            AlertaPDV.mostrarExcepcion("Error de conexión con la base de datos", "Error al iniciar sesión, inténtelo más tarde", e);
+            e.printStackTrace(); 
         }
     }
 

@@ -8,9 +8,10 @@ import DAO.DatabaseConnection;
 import DAO.EmpleadoDAO;
 import VO.EmpleadoVO;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class EmpleadoDAOImp implements EmpleadoDAO {
@@ -54,26 +55,56 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
     public boolean isValidCredentials(String username, String password) throws SQLException {
         String query = "SELECT contraseña, estado FROM Empleado WHERE nombre = ?";
         Connection connection = DatabaseConnection.getInstance().getConnection();
-        try (
-                PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String storedHash = rs.getString("contraseña");
                 String estado = rs.getString("estado");
 
-                if ("Activo".equalsIgnoreCase(estado)) {
-                    if (BCrypt.checkpw(password, storedHash)) {
-                        return true;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Usuario inactivo");
+                if (!"Activo".equalsIgnoreCase(estado)) {
+                    return false;
                 }
+                return BCrypt.checkpw(password, storedHash);
             } else {
-                JOptionPane.showMessageDialog(null, "Usuario no encontrado");
+                return false;
             }
+        }
+    }
+
+    @Override
+    public boolean eliminarEmpleado(int idEmpleado) {
+        String sql = "{CALL eliminarEmpleado(?)}";
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (CallableStatement stmt = connection.prepareCall(sql)) {
+                stmt.setInt(1, idEmpleado);
+                stmt.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Error al llamar al procedimiento: " + e.getMessage());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existeEmpleadoPorId(int id) {
+        try {
+            String query = "SELECT COUNT(*) FROM Empleado WHERE id = ?";
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setInt(1, id);
+                ResultSet rs = stmt.executeQuery();
+                return rs.next() && rs.getInt(1) > 0;
+            } catch (SQLException e) {
+                System.out.println("Error al verificar ID: " + e.getMessage());
+            }
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
@@ -182,5 +213,28 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
 
     private String generateHash(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    @Override
+    public List<EmpleadoVO> obtenerTodosEmpleados() throws SQLException {
+        List<EmpleadoVO> empleados = new ArrayList<>();
+        String query = "SELECT id, nombre, rol, codigoSeguridad, estado FROM Empleado";
+
+        Connection connection = DatabaseConnection.getInstance().getConnection();
+        try (
+                PreparedStatement statement = connection.prepareStatement(query); ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                EmpleadoVO empleado = new EmpleadoVO();
+                empleado.setId(rs.getInt("id"));
+                empleado.setNombre(rs.getString("nombre"));
+                empleado.setRol(rs.getString("rol"));
+                empleado.setCodigoSeguridad(rs.getString("codigoSeguridad"));
+                empleado.setEstado(rs.getString("estado"));
+                empleados.add(empleado);
+            }
+        }
+
+        return empleados;
     }
 }

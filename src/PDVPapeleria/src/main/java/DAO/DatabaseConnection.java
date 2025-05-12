@@ -17,12 +17,12 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
     private final Connection connection;
     private final String url = "jdbc:mysql://localhost:3306/pdvpapeleria";
-    private final String username = "dard"; // cambiele aqui a su usuario no sean cojudos
+    private final String username = "laura"; // cambiele aqui a su usuario no sean cojudos
     private final String password = "";
 
     private DatabaseConnection() throws SQLException {
         connection = DriverManager.getConnection(url, username, password);
-        System.out.println("Conexion establecida exitosamente.");
+        System.out.println("Conexion estab lecida exitosamente.");
     }
 
     public static DatabaseConnection getInstance() throws SQLException {

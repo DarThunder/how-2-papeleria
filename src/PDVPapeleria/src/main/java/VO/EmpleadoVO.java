@@ -14,6 +14,8 @@ public class EmpleadoVO {
     private String codigoSeguridad;
     private String nombre;
     private String password;
+    private String estado;
+    private int id;
 
     public EmpleadoVO() {
     }
@@ -56,4 +58,22 @@ public class EmpleadoVO {
     public void setPassword(String password) {
         this.password = password;
     }
+    
+     public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    
 }

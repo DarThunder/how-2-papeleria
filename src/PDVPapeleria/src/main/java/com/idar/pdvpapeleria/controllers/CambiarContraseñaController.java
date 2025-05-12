@@ -1,22 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
 import DAOImp.EmpleadoDAOImp;
+import Vista.AlertaPDV;
 import java.io.IOException;
-import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -45,32 +39,35 @@ public class CambiarContraseñaController {
     private void cambiarContraseña() {
         String nuevaContraseña = TFCambiarContraseña.getText().trim();
         String repetirContraseña = TFRepetirContraseña.getText().trim();
+
         if (nuevaContraseña.isEmpty() || repetirContraseña.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Campos incompletos", "Por favor, complete todos los campos");
             return;
         }
+
         if (!nuevaContraseña.equals(repetirContraseña)) {
-            JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Error", "Las contraseñas no coinciden.");
             return;
         }
+
         if (db.cambiarContraseña(nuevaContraseña, codigoSeguridad)) {
-            JOptionPane.showMessageDialog(null, "Contraseña cambiada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            AlertaPDV.mostrarExito("Éxito", "Contraseña cambiada exitosamente.");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                AlertaPDV.mostrarExcepcion("Interrupción del Thread.Sleep", "Ocurrio una interrupción inesperada durante la pausa del hilo", e);
             }
             try {
                 switchToLogin();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                AlertaPDV.mostrarExcepcion("Error de carga", "Se produjo un error al cargar la pantalla de inicio de sesión", e);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Error al cambiar la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Error", "Error al cambiar la contraseña.");
         }
     }
 
-    // Método para cambiar a la pantalla de login si el usuario cancela
+    // Método para cambiar a la pantalla de verificación de código de seguridad
     @FXML
     private void switchToVerificacionCodigoSeguridad() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/verificacionCodigoSeguridad.fxml"));
@@ -83,10 +80,10 @@ public class CambiarContraseñaController {
         stage.show();
     }
 
-    // Método para cambiar a la pantalla del login si el usuario cancela
+    // Método para cambiar a la pantalla del login
     @FXML
     private void switchToLogin() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/scees/login.fxml"));
         Parent root = loader.load();
         Stage stage = (Stage) BCambiarContraseña.getScene().getWindow();
         Scene scene = new Scene(root);
