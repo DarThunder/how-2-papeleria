@@ -10,6 +10,7 @@ DAOImp\ProductoDAOImp.class
 DAO\DatabaseConnection.class
 com\idar\pdvpapeleria\controllers\DueñoViewController.class
 com\idar\pdvpapeleria\controllers\LoginController.class
+com\idar\pdvpapeleria\controllers\AgregarProductoController$1.class
 VO\ProductoVO.class
 com\idar\pdvpapeleria\controllers\AdminViewController.class
 DAO\ProductoDAO.class
@@ -27,6 +28,7 @@ VO\ProveedorVO.class
 com\idar\pdvpapeleria\controllers\ModificarProductoController.class
 DAO\EmpleadoDAO.class
 com\idar\pdvpapeleria\controllers\VerificacionCodigoSeguridadController.class
+com\idar\pdvpapeleria\controllers\AgregarProductoController$2.class
 com\idar\pdvpapeleria\App.class
 com\idar\pdvpapeleria\ConnectionDB.class
 com\idar\pdvpapeleria\controllers\PlantillaController.class

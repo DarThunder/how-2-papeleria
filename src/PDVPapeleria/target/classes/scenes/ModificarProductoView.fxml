@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.ModificarProductoController">
-    <VBox spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-        <Label text="Modificar Producto" style="-fx-font-weight: bold;">
+<AnchorPane prefHeight="450.0" prefWidth="400.0" style="-fx-background-color: #c4def6;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.ModificarProductoController">
+    <VBox prefWidth="360.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="24.0">
+        <Label style="-fx-font-weight: bold;" text="Modificar Porducto">
             <font>
                 <Font size="20.0" />
             </font>
         </Label>
         
-        <Label text="Nombre:" />
+        <!-- Contenedor horizontal para label y combobox de proveedor -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <Label prefHeight="18.0" prefWidth="162.0" text="Seleccionar nuevo proveedor:" />
+            <ComboBox fx:id="proveedorComboBox" prefHeight="26.0" prefWidth="179.0" />
+        </HBox>
+        
+        <Label text="Editar nombre:" />
         <TextField fx:id="nombreField" />
         
-        <Label text="Precio de Compra:" />
+        <Label text="Editar descripción:" />
+        <TextField fx:id="descripcionField" />
+        
+        <Label text="Editar precio de Compra:" />
         <TextField fx:id="precioCompraField" />
         
-        <Label text="Precio de Venta:" />
+        <Label text="Editar precio de Venta:" />
         <TextField fx:id="precioVentaField" />
         
-        <Label text="Stock:" />
+        <Label text="Editar stock inicial:" />
         <TextField fx:id="stockField" />
         
-        <Label text="Categoría:" />
-        <TextField fx:id="categoriaField" />
+        <!-- ComboBox para categoría -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <Label prefHeight="18.0" prefWidth="146.0" text="Nueva categoría:" />
+            <ComboBox fx:id="categoriaComboBox" prefHeight="26.0" prefWidth="194.0" />
+        </HBox>
         
-        <ComboBox fx:id="categoriaComboBox" prefWidth="200.0" />
-        
-        <Button fx:id="btnGuardar" text="Guardar Cambios" onAction="#guardarCambios" />
-        <Button fx:id="btnCancelar" text="Cancelar" onAction="#cancelar" />
+        <Button fx:id="btnGuardar" onAction="#guardarCambios" text="Guardar Cambios" />
+        <Button fx:id="btnCancelar" onAction="#cancelar" text="Cancelar" />
     </VBox>
 </AnchorPane>

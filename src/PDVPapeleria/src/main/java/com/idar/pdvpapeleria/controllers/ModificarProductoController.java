@@ -88,7 +88,7 @@ public class ModificarProductoController implements Initializable {
             categoriaComboBox.setValue(producto.getCategoria());
         }
     }
-
+    
     @FXML
     private void guardarCambios() {
         try {
