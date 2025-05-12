@@ -104,3 +104,29 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS ObtenerProductosPorProveedor;
+-- Procedimiento para obtener los productos de un proveedor por su nombre --
+
+DELIMITER $$
+
+CREATE PROCEDURE ObtenerProductosPorProveedor(IN nombre_proveedor VARCHAR(255))
+BEGIN
+    SELECT 
+        p.idProducto,
+        p.nombre AS nombre_producto,
+        p.precioDeCompra,
+        p.precioDeVenta,
+        p.stock,
+        p.categoria
+    FROM 
+        provee pr
+    JOIN 
+        proveedor prov ON pr.idProveedor = prov.idProveedor
+    JOIN 
+        producto p ON pr.idProducto = p.idProducto
+    WHERE 
+        prov.nombre = nombre_proveedor;
+END $$
+
+DELIMITER ;
