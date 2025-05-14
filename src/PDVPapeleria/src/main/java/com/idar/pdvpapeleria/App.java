@@ -46,8 +46,9 @@ public class App extends Application {
     public static void main(String[] args) {
         EmpleadoVO nuevoEmpleado = new EmpleadoVO("Dueño", "9999", "Dylan", "123");
         EmpleadoVO nuevoAdmin = new EmpleadoVO("Administrador", "8888", "Luis", "123");
+        EmpleadoVO nuevoDueño = new EmpleadoVO("Dueño", "7777", "Jose", "456");
         EmpleadoDAO empleadoDAO = new EmpleadoDAOImp();
-        boolean success = empleadoDAO.createUser(nuevoEmpleado) && empleadoDAO.createUser(nuevoAdmin);
+        boolean success = empleadoDAO.createUser(nuevoEmpleado) && empleadoDAO.createUser(nuevoAdmin) && empleadoDAO.createUser(nuevoDueño);
         if (success) {
             System.out.println("Usuarios agregado correctamente.");
         } else {

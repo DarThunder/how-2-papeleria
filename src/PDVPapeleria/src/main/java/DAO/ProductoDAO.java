@@ -18,7 +18,7 @@ public interface ProductoDAO {
 
     ProductoVO getProductoById(int id) throws SQLException;
 
-    boolean agregarProducto(ProductoVO producto) throws SQLException;
+    boolean agregarProductoConProveedor(ProductoVO producto, int Provvedor) throws SQLException;
 
     boolean actualizarProducto(ProductoVO producto) throws SQLException;
 

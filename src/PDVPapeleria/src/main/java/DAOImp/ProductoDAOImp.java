@@ -3,6 +3,7 @@ package DAOImp;
 import DAO.DatabaseConnection;
 import DAO.ProductoDAO;
 import VO.ProductoVO;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,14 +50,19 @@ public class ProductoDAOImp implements ProductoDAO {
     }
 
     @Override
-    public boolean agregarProducto(ProductoVO producto) throws SQLException {
-        String query = "INSERT INTO producto (nombre, precioDeCompra, precioDeVenta, stock, descripcion, categoria) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = DatabaseConnection.getInstance().getConnection().prepareStatement(query)) {
+    public boolean agregarProductoConProveedor(ProductoVO producto, int idProveedor) throws SQLException {
+        // Usamos el procedimiento almacenado que ya tienes definido
+        String sql = "{ CALL agregarProductoConProveedor(?, ?, ?, ?, ?, ?, ?) }";
+        
+        try (CallableStatement stmt = DatabaseConnection.getInstance().getConnection().prepareCall(sql)) {
             stmt.setString(1, producto.getNombre());
             stmt.setInt(2, producto.getPrecioDeCompra());
             stmt.setInt(3, producto.getPrecioDeVenta());
             stmt.setInt(4, producto.getStock());
-            stmt.setString(5, producto.getCategoria());
+            stmt.setString(5, producto.getDescripcion());
+            stmt.setString(6, producto.getCategoria());
+            stmt.setInt(7, idProveedor);
+            
             return stmt.executeUpdate() > 0;
         }
     }
