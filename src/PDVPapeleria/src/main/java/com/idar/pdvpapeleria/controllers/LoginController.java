@@ -162,7 +162,7 @@ public class LoginController {
      */
     @FXML
     private void switchToCajeroView() throws IOException {
-        File fxmlFile = new File("src/main/resources/scenes/cajeroView.fxml");
+        File fxmlFile = new File("src/main/resources/scenes/abrirCajaView.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
         Stage stage = (Stage) B1.getScene().getWindow();
