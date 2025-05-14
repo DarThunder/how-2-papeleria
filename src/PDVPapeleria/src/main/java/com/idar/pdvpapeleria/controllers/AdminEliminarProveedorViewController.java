@@ -31,6 +31,7 @@ import javafx.stage.Stage;
  */
 public class AdminEliminarProveedorViewController implements Initializable {
 
+    AlertaPDV alerta = new AlertaPDV();
     List<ProveedorVO> proveedores = new ArrayList<ProveedorVO>();
     private DatabaseConnection db;
     private ProveedorDAOImp proveedorDAO;
@@ -99,7 +100,7 @@ public class AdminEliminarProveedorViewController implements Initializable {
                 ((AdminEliminarProveedorViewController) controller).setDB(this.db);
             }
         } catch (SQLException e) {
-            error("Error al pasar la conexión a la nueva vista: " + e.getMessage());
+            alerta.mostrarExcepcion("Error","Error al pasar la conexión a la nueva vista", e);
             e.printStackTrace();
         }
 
@@ -123,21 +124,21 @@ public class AdminEliminarProveedorViewController implements Initializable {
         //System.out.println("Indice Seleccionado: " + indice);
         
         if(indice > -1){
-            boolean resultado = mostrarConfirmacion("Eliminar", 
+            boolean resultado = alerta.mostrarConfirmacion("Eliminar", 
                     "¡Seguro que desea eliminar el siguiente proveedor?");
             if(resultado){
                 try{
                 proveedorDAO.eliminarProveedor(proveedores, indice);
                 cargarProveedores();
-                mostrarMensajeExito("El proveedor fue eliminado");
+                alerta.mostrarExito("Exito","El proveedor fue eliminado");
                 } catch (SQLException e){
-                    AlertaPDV.mostrarExcepcion("Error", "No se pudo eliminar el proveedor", e);
+                    alerta.mostrarExcepcion("Error", "No se pudo eliminar el proveedor", e);
                 }
             } else {
-                mostrarMensajeExito("Operación cancelada exitosamente");
+                alerta.mostrarExito("Exito", "Operación cancelada exitosamente");
             }
         } else {
-            error("Selecciona a un proveedor de la tabla");
+            alerta.mostrarError("Error","Selecciona a un proveedor de la tabla");
         }
     }
     
@@ -195,7 +196,7 @@ public class AdminEliminarProveedorViewController implements Initializable {
             ObservableList<ProveedorVO> datos = FXCollections.observableArrayList(proveedores);
             tablaProveedores.setItems(datos);
         } catch (SQLException e) {
-            error(e.getMessage());
+            alerta.mostrarExcepcion("Error","Error al cargar proveedores", e);
             System.err.println("Error al cargar proveedores: " + e.getMessage());
         }
     }
@@ -216,50 +217,4 @@ public class AdminEliminarProveedorViewController implements Initializable {
         cargarProveedores();
     }
 
-    /**
-     * Muestra un mensaje de error en la UI
-     * 
-     * @param texto 
-     */
-    public void error(String texto) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null); 
-        alert.setContentText("Error: " + texto);
-        alert.show();
-    }   
-    
-    /**
-     * Muestra un mensaje en la UI
-     * 
-     * @param mensaje 
-     */
-    private void mostrarMensajeExito(String mensaje) {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Operación exitosa");
-    alert.setHeaderText(null);
-    alert.setContentText(mensaje);
-    alert.showAndWait();
-    }
-    
-    /**
-     * Muestra un mensaje de confirmacion de "Si" o "No"
-     * 
-     * @param titulo
-     * @param mensaje
-     * @return 
-     */
-    public static boolean mostrarConfirmacion(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-
-        ButtonType botonSi = new ButtonType("Sí");
-        ButtonType botonNo = new ButtonType("No");
-        alert.getButtonTypes().setAll(botonSi, botonNo);
-
-        Optional<ButtonType> resultado = alert.showAndWait();
-        return resultado.isPresent() && resultado.get() == botonSi;
-    }
 }
