@@ -130,3 +130,46 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+-- Procedimiento almacenado para cambiar el nombre del empleado
+DELIMITER $$
+CREATE PROCEDURE actualizarNombreEmpleado(IN emp_id INT, IN nuevo_nombre VARCHAR(255))
+BEGIN
+    UPDATE Empleado
+    SET nombre = nuevo_nombre
+    WHERE id = emp_id;
+END $$
+DELIMITER ;
+
+-- Procedimiento almacenado para cambiar el código de seguridad del empleado
+DELIMITER $$
+CREATE PROCEDURE actualizarCodigoSeguridadEmpleado(IN emp_id INT, IN nuevo_codigoSeguridad VARCHAR(4))
+BEGIN
+    UPDATE Empleado
+    SET codigoSeguridad = nuevo_codigoSeguridad
+    WHERE id = emp_id;
+END $$
+DELIMITER ;
+
+-- Procedimiento almacenado para cambiar el rol del empleado
+DELIMITER $$
+CREATE PROCEDURE actualizarRolEmpleado(IN emp_id INT, IN nuevo_rol ENUM('Dueño', 'Administrador', 'Cajero'))
+BEGIN
+    UPDATE Empleado
+    SET rol = nuevo_rol
+    WHERE id = emp_id;
+END $$
+DELIMITER ;
+
+-- Procedimiento almacenado para cambiar el estado del empleado
+DELIMITER $$
+CREATE PROCEDURE actualizarEstadoEmpleado(IN emp_id INT, IN nuevo_estado ENUM('Activo', 'Inactivo'))
+BEGIN
+    UPDATE Empleado
+    SET estado = nuevo_estado
+    WHERE id = emp_id;
+END $$
+DELIMITER ;
+
+

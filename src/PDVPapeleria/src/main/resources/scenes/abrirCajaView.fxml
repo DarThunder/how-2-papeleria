@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="475.0" prefWidth="663.0" stylesheets="@../css/Estilos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.AbrirCajaViewController">
+   <top>
+      <HBox alignment="CENTER" style="-fx-background-color: #2d6e65; -fx-padding: 15;" BorderPane.alignment="CENTER">
+         <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Abrir caja de empleado">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </Label>
+      </HBox>
+   </top>
+   <center>
+      <AnchorPane id="AnchorPane" styleClass="mainFxmlClass">
+          <stylesheets>
+              <URL value="@/css/Estilos.css" />
+          </stylesheets>
+         <children>
+            <VBox alignment="CENTER" spacing="20" AnchorPane.bottomAnchor="50" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50" AnchorPane.topAnchor="50">
+               <!-- Nuevos campos para nombre de usuario -->
+               <Label text="Nombre de usuario:" textAlignment="CENTER">
+                  <font>
+                     <Font size="15.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="TFNombre" prefWidth="200" promptText="Ingresa tu nombre de usuario" />
+               
+               <!-- Campos existentes para código de seguridad -->
+               <Label text="Código de seguridad:" textAlignment="CENTER">
+                  <font>
+                     <Font size="15.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="TFCodigoSeguridad" prefWidth="200" promptText="Ingresa tu código" />
+               
+               <Button fx:id="BAbrirCaja" mnemonicParsing="false" onAction="#validarCodigoSeguridad" style="-fx-background-radius: 5;" text="Abrir caja">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </Button>
+            </VBox>
+            <Button fx:id="BAtras" layoutX="25.0" layoutY="25.0" mnemonicParsing="false" onAction="#regresarAlogin" text="Atrás" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>

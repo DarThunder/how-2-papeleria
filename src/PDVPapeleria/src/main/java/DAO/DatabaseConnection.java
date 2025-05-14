@@ -17,7 +17,11 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
     private final Connection connection;
     private final String url = "jdbc:mysql://localhost:3306/pdvpapeleria";
+<<<<<<< HEAD
     private final String username = "JC"; // cambiele aqui a su usuario no sean cojudos
+=======
+    private final String username = "laura"; // cambiele aqui a su usuario no sean cojudos
+>>>>>>> 69497279847293b3160da41e01c1458294735b80
     private final String password = ""; // Aca tambien cambienle la contraseña
 
     private DatabaseConnection() throws SQLException {
