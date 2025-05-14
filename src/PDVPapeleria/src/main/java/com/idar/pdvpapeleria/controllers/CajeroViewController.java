@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package com.idar.pdvpapeleria.controllers;
 
 import DAOImp.ProductoDAOImp;
@@ -11,14 +7,16 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -26,24 +24,20 @@ import javafx.scene.layout.AnchorPane;
 
 public class CajeroViewController implements Initializable {
 
-    private final ProductoDAOImp productoDao = ProductoDAOImp.getInstance();
-    private final ObservableList<ProductoVO> products = FXCollections.observableArrayList();
-    private final Map<Integer, ProductoVO> productMap = new HashMap<>(); // Para búsquedas rápidas
-
     @FXML
     private AnchorPane AnchorPane;
     @FXML
     private TextField idProductField;
     @FXML
-    private TableView<ProductoVO> productosTableView;
+    private TableView<ProductoConCantidad> productosTableView;
     @FXML
-    private TableColumn<ProductoVO, String> productNameCol;
+    private TableColumn<ProductoConCantidad, String> productNameCol;
     @FXML
-    private TableColumn<ProductoVO, Integer> productCountCol;
+    private TableColumn<ProductoConCantidad, Integer> productCountCol;
     @FXML
-    private TableColumn<ProductoVO, Integer> productPriceCol;
+    private TableColumn<ProductoConCantidad, Integer> productPriceCol;
     @FXML
-    private TableColumn<ProductoVO, Integer> productSubtotalCol;
+    private TableColumn<ProductoConCantidad, Integer> productSubtotalCol;
     @FXML
     private Label totalLabel;
     @FXML
@@ -52,18 +46,50 @@ public class CajeroViewController implements Initializable {
     private Button payButton;
     @FXML
     private Button deleteButton;
-    private boolean isSellInAction;
+
+    private final ProductoDAOImp productoDao = ProductoDAOImp.getInstance();
+    private final ObservableList<ProductoConCantidad> products = FXCollections.observableArrayList();
+    private final Map<Integer, ProductoConCantidad> productMap = new HashMap<>();
+
+    public static class ProductoConCantidad {
+
+        private final ProductoVO producto;
+        private int cantidad;
+
+        public ProductoConCantidad(ProductoVO producto, int cantidad) {
+            this.producto = producto;
+            this.cantidad = cantidad;
+        }
+
+        public String getNombre() {
+            return producto.getNombre();
+        }
+
+        public int getPrecioDeVenta() {
+            return producto.getPrecioDeVenta();
+        }
+
+        public int getCantidad() {
+            return cantidad;
+        }
+
+        public void setCantidad(int cantidad) {
+            this.cantidad = cantidad;
+        }
+
+        public int getSubtotal() {
+            return cantidad * producto.getPrecioDeVenta();
+        }
+
+        public int getIdProducto() {
+            return producto.getIdProducto();
+        }
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.isSellInAction = true;
         configureTableColumns();
-
-        Platform.runLater(() -> {
-            if (AnchorPane.getScene() != null) {
-                setupEventHandlers();
-            }
-        });
+        setupEventHandlers();
     }
 
     private void configureTableColumns() {
@@ -83,148 +109,97 @@ public class CajeroViewController implements Initializable {
                 onSearchButtonClicked();
             }
         });
+    }
 
-        AnchorPane.getScene().setOnKeyPressed(this::handleKeyEvents);
+    @FXML
+    private void onSearchButtonClicked() {
+        String idProducto = idProductField.getText().trim();
+
+        if (idProducto.isEmpty()) {
+            showAlert("Campo vacío", "Por favor ingresa un ID de producto.");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(idProducto);
+            ProductoConCantidad existingProduct = productMap.get(id);
+
+            if (existingProduct != null) {
+                existingProduct.setCantidad(existingProduct.getCantidad() + 1);
+            } else {
+                ProductoVO producto = productoDao.getProductoById(id);
+                if (producto != null) {
+                    ProductoConCantidad newProduct = new ProductoConCantidad(producto, 1);
+                    products.add(newProduct);
+                    productMap.put(id, newProduct);
+                } else {
+                    showAlert("No encontrado", "No se encontró ningún producto con ese ID.");
+                    return;
+                }
+            }
+            productosTableView.refresh();
+            updateTotal();
+            idProductField.clear();
+        } catch (NumberFormatException e) {
+            showAlert("ID inválido", "El ID debe ser un número entero.");
+        } catch (SQLException e) {
+            showAlert("Error", "Error al buscar producto: " + e.getMessage());
+        }
     }
 
     private void updateTotal() {
-        int total = 0;
-        for (ProductoVO p : products) {
-          System.out.println(p.getCantidad());
-            total += (p.getPrecioDeVenta() * p.getCantidad());
-        }
+        int total = products.stream().mapToInt(ProductoConCantidad::getSubtotal).sum();
         totalLabel.setText(String.format("Total: $%d", total));
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    private void onSearchButtonClicked() {
-        if(!this.isSellInAction) return;
-        String idProducto = idProductField.getText().trim();
-
-        if (idProducto.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Campo vacío", "Por favor ingresa un ID de producto.");
-            return;
-        }
-
-        try {
-            int id = Integer.parseInt(idProducto);
-            ProductoVO existingProduct = productMap.get(id);
-
-            if (existingProduct != null) {
-                existingProduct.setCantidad(existingProduct.getCantidad() + 1);
-                productosTableView.refresh();
-            } else {
-                ProductoVO newProduct = productoDao.getProducto(id);
-                if (newProduct != null) {
-                    newProduct.setCantidad(1);
-                    products.add(newProduct);
-                    productMap.put(id, newProduct);
-                    productosTableView.setItems(products);
-                } else {
-                    showAlert(Alert.AlertType.INFORMATION, "No encontrado", "No se encontró ningún producto con ese ID.");
-                    return;
-                }
-            }
-            idProductField.clear();
-            idProductField.requestFocus();
-            updateTotal();
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "ID inválido", "El ID debe ser un número entero.");
-        }
-    }
-    
-    private void onInitButtonClicked(){
-        if(this.isSellInAction)return;
-        
-        products.clear();
-        configureTableColumns();
-        showAlert(Alert.AlertType.INFORMATION, "Venta iniciada", "Se inicio una venta");
-    }
-
-    private void onCancelButtonClicked() {
-        if (products.isEmpty() || !this.isSellInAction) {
-            return;
-        }
-
-        try {
-            products.clear();
-            productMap.clear();
-            updateTotal();
-            showAlert(Alert.AlertType.INFORMATION, "Cancelación de pago realizado", "La cancelación ha sido procesado correctamente.");
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error la cancelación de pago", "Ocurrió un error al cancelar el pago: " + e.getMessage());
-        }
-    }
-
+    @FXML
     private void onPayButtonClicked() {
         if (products.isEmpty()) {
+            showAlert("Error", "No hay productos para vender");
             return;
         }
 
         try {
-            products.forEach(producto -> {
-                try {
-                    productoDao.reducirStock(producto.getIdProducto(), producto.getCantidad());
-                } catch (SQLException ex) {
-                    Logger.getLogger(CajeroViewController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            });
+            for (ProductoConCantidad p : products) {
+                productoDao.reducirStock(p.getIdProducto(), p.getCantidad());
+            }
 
             products.clear();
             productMap.clear();
             updateTotal();
-            showAlert(Alert.AlertType.INFORMATION, "Pago realizado", "El pago ha sido procesado correctamente.");
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error en el pago", "Ocurrió un error al procesar el pago: " + e.getMessage());
+            showAlert("Éxito", "Venta realizada correctamente");
+        } catch (SQLException e) {
+            showAlert("Error", "No se pudo completar la venta: " + e.getMessage());
         }
     }
 
+    @FXML
     private void onDeleteButtonClicked() {
         String idProducto = idProductField.getText().trim();
 
         if (idProducto.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Campo vacío", "Por favor ingresa un ID de producto.");
+            showAlert("Campo vacío", "Por favor ingresa un ID de producto.");
             return;
         }
 
         try {
             int id = Integer.parseInt(idProducto);
-            ProductoVO removedProduct = productMap.remove(id);
-
-            if (removedProduct != null) {
-                products.remove(removedProduct);
+            ProductoConCantidad removed = productMap.remove(id);
+            if (removed != null) {
+                products.remove(removed);
                 updateTotal();
-                showAlert(Alert.AlertType.INFORMATION, "Producto eliminado", "El producto ha sido eliminado de la lista.");
-                idProductField.clear();
-            } else {
-                showAlert(Alert.AlertType.INFORMATION, "No encontrado", "El producto no se encuentra en la lista.");
             }
+            idProductField.clear();
         } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "ID inválido", "El ID debe ser un número entero.");
-        }
-    }
-
-    private void handleKeyEvents(KeyEvent event) {
-        switch (event.getCode()) {
-            case F5 ->
-                onSearchButtonClicked();
-            case F6 ->
-                onDeleteButtonClicked();
-            case F7 ->
-                onPayButtonClicked();
-            case F8 ->
-                onInitButtonClicked();
-            case F9 ->
-                onCancelButtonClicked();
-            case ESCAPE ->
-                idProductField.clear();
+            showAlert("ID inválido", "El ID debe ser un número entero.");
         }
     }
 }

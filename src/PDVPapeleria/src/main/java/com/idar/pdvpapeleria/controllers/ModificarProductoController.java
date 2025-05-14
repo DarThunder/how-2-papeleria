@@ -1,12 +1,18 @@
 package com.idar.pdvpapeleria.controllers;
 
+import DAO.DatabaseConnection;
 import DAO.ProductoDAO;
+import DAO.ProveedorDAO;
 import DAOImp.ProductoDAOImp;
+import DAOImp.ProveedorDAOImp;
 import VO.ProductoVO;
+import VO.ProveedorVO;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -16,21 +22,25 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import Vista.AlertaPDV;
 
 public class ModificarProductoController implements Initializable {
 
     @FXML
     private TextField nombreField;
     @FXML
+    private TextField descripcionField;
+    @FXML
     private TextField precioCompraField;
     @FXML
     private TextField precioVentaField;
     @FXML
     private TextField stockField;
-    @FXML 
-    private TextField descripcionField;
     @FXML
     private ComboBox<String> categoriaComboBox;
+    @FXML
+    private ComboBox<ProveedorVO> proveedorComboBox;
     @FXML
     private Button btnGuardar;
     @FXML
@@ -38,40 +48,83 @@ public class ModificarProductoController implements Initializable {
 
     private ProductoVO productoOriginal;
     private ProductoDAO productoDAO;
-    
-    private final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-        String newText = change.getControlNewText();
-        if (newText.matches("\\d*") && !newText.equals("0")) {
-            return change;
-        }
-        return null;
-    };
+    private ProveedorDAO proveedorDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
+            DatabaseConnection dbConnection = DatabaseConnection.getInstance();
             productoDAO = ProductoDAOImp.getInstance();
-            
-            // Configurar formateadores para campos numéricos
-            precioCompraField.setTextFormatter(new TextFormatter<>(numberFilter));
-            precioVentaField.setTextFormatter(new TextFormatter<>(numberFilter));
-            stockField.setTextFormatter(new TextFormatter<>(numberFilter));
-            
-            // Inicializar ComboBox de categorías
-            if (categoriaComboBox != null) {
-                categoriaComboBox.getItems().addAll(
-                    "Material de Escritura",
-                    "Papelería y Cuadernos",
-                    "Arte y Manualidades",
-                    "Oficina y Organización",
-                    "Tecnología y Electrónica"
-                );
-            } else {
-                System.err.println("Error: ComboBox de categoría no encontrado. Verifique el archivo FXML.");
-            }
-        } catch (Exception e) {
-            mostrarAlerta("Error", "Error al inicializar: " + e.getMessage());
+            proveedorDAO = new ProveedorDAOImp(dbConnection);
+
+            configurarValidacionesNumericas();
+            configurarComboBoxProveedores();
+            configurarComboBoxCategorias();
+
+        } catch (SQLException e) {
+            AlertaPDV.mostrarError("Error de conexión", "No se pudo establecer conexión con la base de datos");
             e.printStackTrace();
+        }
+    }
+
+    private void configurarComboBoxCategorias() {
+        ObservableList<String> categorias = FXCollections.observableArrayList(
+                "Material de Escritura",
+                "Papelería y Cuadernos",
+                "Arte y Manualidades",
+                "Oficina y Organización",
+                "Tecnología y Electrónica"
+        );
+
+        categoriaComboBox.setConverter(new StringConverter<String>() {
+            @Override
+            public String toString(String categoria) {
+                return categoria == null ? "Sin selección" : categoria;
+            }
+
+            @Override
+            public String fromString(String string) {
+                return string.equals("Sin selección") ? null : string;
+            }
+        });
+
+        categoriaComboBox.setItems(categorias);
+        categoriaComboBox.setPromptText("Seleccione una categoría");
+    }
+
+    private void configurarValidacionesNumericas() {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*")) {
+                return change;
+            }
+            return null;
+        };
+
+        precioCompraField.setTextFormatter(new TextFormatter<>(filter));
+        precioVentaField.setTextFormatter(new TextFormatter<>(filter));
+        stockField.setTextFormatter(new TextFormatter<>(filter));
+    }
+
+    private void configurarComboBoxProveedores() {
+        try {
+            proveedorComboBox.setConverter(new StringConverter<ProveedorVO>() {
+                @Override
+                public String toString(ProveedorVO proveedor) {
+                    return proveedor == null ? "Sin selección" : proveedor.getNombreProveedor();
+                }
+
+                @Override
+                public ProveedorVO fromString(String string) {
+                    return null; // No necesario para selección simple
+                }
+            });
+
+            proveedorComboBox.getItems().addAll(proveedorDAO.obtenerTodosProveedores());
+            proveedorComboBox.setPromptText("Seleccione un proveedor");
+
+        } catch (SQLException e) {
+            AlertaPDV.mostrarExcepcion("Error de carga", "No se pudieron cargar los proveedores", e);
         }
     }
 
@@ -83,23 +136,24 @@ public class ModificarProductoController implements Initializable {
         precioVentaField.setText(String.valueOf(producto.getPrecioDeVenta()));
         stockField.setText(String.valueOf(producto.getStock()));
         descripcionField.setText(producto.getDescripcion());
-        
-        if (categoriaComboBox != null) {
-            categoriaComboBox.setValue(producto.getCategoria());
+        categoriaComboBox.setValue(producto.getCategoria());
+
+        try {
+            ProveedorVO proveedorActual = proveedorDAO.obtenerProveedorDeProducto(producto.getIdProducto());
+            if (proveedorActual != null) {
+                proveedorComboBox.setValue(proveedorActual);
+            }
+        } catch (SQLException e) {
+            AlertaPDV.mostrarExcepcion("Error", "No se pudo cargar el proveedor actual", e);
         }
     }
-    
+
     @FXML
     private void guardarCambios() {
         try {
-            // Validación de campos
-            if (nombreField.getText().isEmpty() || 
-                precioCompraField.getText().isEmpty() ||
-                precioVentaField.getText().isEmpty() || 
-                stockField.getText().isEmpty() ||
-                categoriaComboBox.getValue() == null) {
-                
-                mostrarAlerta("Error", "Todos los campos son obligatorios");
+            // Validaciones
+            if (camposInvalidos()) {
+                AlertaPDV.mostrarError("Campos incompletos", "Complete todos los campos obligatorios");
                 return;
             }
 
@@ -108,22 +162,22 @@ public class ModificarProductoController implements Initializable {
             int stock = Integer.parseInt(stockField.getText());
 
             if (precioCompra <= 0 || precioVenta <= 0 || stock < 0) {
-                mostrarAlerta("Error", "Los valores numéricos deben ser positivos");
+                AlertaPDV.mostrarError("Error", "Los valores deben ser positivos");
                 return;
             }
 
             if (precioVenta <= precioCompra) {
-                mostrarAlerta("Error", "El precio de venta debe ser mayor al de compra");
+                AlertaPDV.mostrarError("Error", "El precio de venta debe ser mayor al de compra");
+                return;
+            }
+
+            if (proveedorComboBox.getValue() == null) {
+                AlertaPDV.mostrarError("Error", "Seleccione un proveedor");
                 return;
             }
 
             // Confirmación
-            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmacion.setTitle("Confirmar cambios");
-            confirmacion.setHeaderText(null);
-            confirmacion.setContentText("¿Está seguro de guardar los cambios?");
-
-            if (confirmacion.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            if (!AlertaPDV.mostrarConfirmacion("Confirmar cambios", "¿Está seguro de guardar los cambios?")) {
                 return;
             }
 
@@ -134,28 +188,38 @@ public class ModificarProductoController implements Initializable {
                     precioCompra,
                     precioVenta,
                     stock,
+                    descripcionField.getText(),
                     categoriaComboBox.getValue()
             );
 
+            ProveedorVO proveedorSeleccionado = proveedorComboBox.getValue();
+
             // Actualizar en BD
-            boolean actualizado = productoDAO.actualizarProducto(productoModificado);
+            boolean actualizado = productoDAO.actualizarProductoConProveedor(
+                    productoModificado,
+                    proveedorSeleccionado.getIdProveedor()
+            );
 
             if (actualizado) {
-                mostrarAlerta("Éxito", "Producto actualizado correctamente");
+                AlertaPDV.mostrarExito("Éxito", "Producto actualizado correctamente");
                 cerrarVentana();
             } else {
-                mostrarAlerta("Error", "No se pudo actualizar el producto");
+                AlertaPDV.mostrarError("Error", "No se pudo actualizar el producto");
             }
 
         } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "Valores numéricos inválidos");
+            AlertaPDV.mostrarError("Error", "Valores numéricos inválidos");
         } catch (SQLException e) {
-            mostrarAlerta("Error", "Error de base de datos: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            mostrarAlerta("Error", "Error inesperado: " + e.getMessage());
-            e.printStackTrace();
+            AlertaPDV.mostrarExcepcion("Error de base de datos", "Error al actualizar el producto", e);
         }
+    }
+
+    private boolean camposInvalidos() {
+        return nombreField.getText().isEmpty()
+                || precioCompraField.getText().isEmpty()
+                || precioVentaField.getText().isEmpty()
+                || stockField.getText().isEmpty()
+                || categoriaComboBox.getValue() == null;
     }
 
     @FXML
@@ -166,13 +230,5 @@ public class ModificarProductoController implements Initializable {
     private void cerrarVentana() {
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
-    }
-
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
     }
 }

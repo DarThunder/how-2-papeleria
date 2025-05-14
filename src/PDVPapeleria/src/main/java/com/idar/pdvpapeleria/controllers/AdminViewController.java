@@ -29,12 +29,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import Vista.AlertaPDV;
+import java.util.HashMap;
+import java.util.Map;
+import javafx.beans.value.ObservableValue;
 
-/**
- *
- * @author Alvaro
- */
 public class AdminViewController {
+
+    // Constante para el umbral de stock bajo
+    private static final int STOCK_BAJO_UMBRAL = 10;
+    private static final String ESTILO_STOCK_BAJO = "-fx-background-color: #ffcccc; -fx-font-weight: bold;";
 
     @FXML
     private TableView<ProductoVO> productosTableView;
@@ -56,20 +59,43 @@ public class AdminViewController {
     private Button btnBuscar;
     @FXML
     private Button btnAtras;
+    @FXML
+    private ComboBox<String> cbParametrosBusqueda;
+    @FXML
+    private Button btnLimpiar;
 
     private ProductoDAO productoDAO;
     private ObservableList<ProductoVO> listaProductosOriginal;
     private FilteredList<ProductoVO> datosFiltrados;
+    private final Map<String, String> parametrosBusqueda = new HashMap<>();
+    private String ultimoParametroBusqueda = "";
+    private String ultimoTextoBusqueda = "";
 
     @FXML
     public void initialize() throws SQLException {
+        configurarParametrosBusqueda();
+        configurarComponentes();
         configurarColumnas();
         productoDAO = ProductoDAOImp.getInstance();
         cargarProductos();
         configurarBuscador();
         configurarSeleccionFila();
         configurarMenuContextual();
+    }
 
+    private void configurarParametrosBusqueda() {
+        parametrosBusqueda.put("Nombre", "nombre");
+        parametrosBusqueda.put("ID", "idProducto");
+        parametrosBusqueda.put("Precio Compra", "precioDeCompra");
+        parametrosBusqueda.put("Precio Venta", "precioDeVenta");
+        parametrosBusqueda.put("Stock", "stock");
+        parametrosBusqueda.put("Categoría", "categoria");
+    }
+
+    private void configurarComponentes() {
+        cbParametrosBusqueda.getItems().addAll(parametrosBusqueda.keySet());
+        cbParametrosBusqueda.getSelectionModel().selectFirst();
+        btnLimpiar.setOnAction(event -> limpiarBusqueda());
     }
 
     private void configurarColumnas() {
@@ -77,7 +103,33 @@ public class AdminViewController {
         nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         precioCompraCol.setCellValueFactory(new PropertyValueFactory<>("precioDeCompra"));
         precioVentaCol.setCellValueFactory(new PropertyValueFactory<>("precioDeVenta"));
+
+        // Configuración especial para la columna de stock con resaltado
         stockCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        stockCol.setCellFactory(column -> new TableCell<ProductoVO, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                    setTooltip(null);
+                } else {
+                    setText(item.toString());
+
+                    // Resaltar si el stock es bajo
+                    if (item <= STOCK_BAJO_UMBRAL) {
+                        setStyle(ESTILO_STOCK_BAJO);
+                        setTooltip(new Tooltip("¡Stock bajo! Por favor reabastecer"));
+                    } else {
+                        setStyle("");
+                        setTooltip(null);
+                    }
+                }
+            }
+        });
+
         categoriaCol.setCellValueFactory(new PropertyValueFactory<>("categoria"));
     }
 
@@ -98,7 +150,15 @@ public class AdminViewController {
                 ));
             }
 
-            productosTableView.setItems(listaProductosOriginal);
+            // Actualizar el FilteredList con la nueva lista
+            if (datosFiltrados != null) {
+                datosFiltrados = new FilteredList<>(listaProductosOriginal, p -> true);
+                SortedList<ProductoVO> datosOrdenados = new SortedList<>(datosFiltrados);
+                datosOrdenados.comparatorProperty().bind(productosTableView.comparatorProperty());
+                productosTableView.setItems(datosOrdenados);
+            } else {
+                productosTableView.setItems(listaProductosOriginal);
+            }
 
         } catch (SQLException e) {
             AlertaPDV.mostrarError("Error", "No se pudieron cargar los productos: " + e.getMessage());
@@ -107,32 +167,93 @@ public class AdminViewController {
     }
 
     private void configurarBuscador() {
+        if (listaProductosOriginal == null) {
+            listaProductosOriginal = FXCollections.observableArrayList();
+        }
+
         datosFiltrados = new FilteredList<>(listaProductosOriginal, p -> true);
 
+        // Listener para cambios en el texto de búsqueda
         buscarField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filtrarPorNombre(newValue);
+            String parametroActual = cbParametrosBusqueda.getValue();
+            String textoActual = newValue.trim();
+
+            // Solo buscar automáticamente si es la primera vez o si cambió el parámetro
+            if (!textoActual.isEmpty() && (ultimoParametroBusqueda.isEmpty()
+                    || !parametroActual.equals(ultimoParametroBusqueda))) {
+                aplicarFiltro(parametroActual, textoActual);
+                ultimoParametroBusqueda = parametroActual;
+                ultimoTextoBusqueda = textoActual;
+            }
         });
 
-        btnBuscar.setOnAction(event -> filtrarPorNombre(buscarField.getText()));
+        // Listener para cambios en el parámetro de búsqueda
+        cbParametrosBusqueda.getSelectionModel().selectedItemProperty().addListener(
+                (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                    String textoActual = buscarField.getText().trim();
+                    if (!textoActual.isEmpty()) {
+                        aplicarFiltro(newValue, textoActual);
+                        ultimoParametroBusqueda = newValue;
+                        ultimoTextoBusqueda = textoActual;
+                    }
+                });
+
+        // Configurar botón de búsqueda manual
+        btnBuscar.setOnAction(event -> {
+            String parametroActual = cbParametrosBusqueda.getValue();
+            String textoActual = buscarField.getText().trim();
+            if (!textoActual.isEmpty()) {
+                aplicarFiltro(parametroActual, textoActual);
+                ultimoParametroBusqueda = parametroActual;
+                ultimoTextoBusqueda = textoActual;
+            }
+        });
 
         SortedList<ProductoVO> datosOrdenados = new SortedList<>(datosFiltrados);
         datosOrdenados.comparatorProperty().bind(productosTableView.comparatorProperty());
         productosTableView.setItems(datosOrdenados);
     }
 
-    private void filtrarPorNombre(String filtro) {
+    private void aplicarFiltro(String parametroSeleccionado, String textoBusqueda) {
+        if (parametroSeleccionado == null || listaProductosOriginal == null) {
+            productosTableView.setItems(listaProductosOriginal);
+            return;
+        }
+
+        String propiedad = parametrosBusqueda.get(parametroSeleccionado);
         datosFiltrados.setPredicate(producto -> {
-            // Si no hay filtro o está vacío, mostrar todos los productos
-            if (filtro == null || filtro.isEmpty()) {
-                return true;
+            try {
+                switch (propiedad) {
+                    case "nombre":
+                        return producto.getNombre().toLowerCase().startsWith(textoBusqueda.toLowerCase());
+                    case "categoria":
+                        return producto.getCategoria() != null
+                                && producto.getCategoria().toLowerCase().startsWith(textoBusqueda.toLowerCase());
+                    case "idProducto":
+                        return String.valueOf(producto.getIdProducto()).startsWith(textoBusqueda);
+                    case "precioDeCompra":
+                        return String.valueOf(producto.getPrecioDeCompra()).startsWith(textoBusqueda);
+                    case "precioDeVenta":
+                        return String.valueOf(producto.getPrecioDeVenta()).startsWith(textoBusqueda);
+                    case "stock":
+                        return String.valueOf(producto.getStock()).startsWith(textoBusqueda);
+                    default:
+                        return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
             }
-
-            // Convertir el filtro a minúsculas para comparación sin distinción de mayúsculas/minúsculas
-            String lowerCaseFilter = filtro.toLowerCase();
-
-            // Filtrar solo por nombre
-            return producto.getNombre().toLowerCase().contains(lowerCaseFilter);
         });
+    }
+
+    @FXML
+    private void limpiarBusqueda() {
+        buscarField.clear();
+        datosFiltrados.setPredicate(producto -> true);
+        productosTableView.refresh();
+        ultimoParametroBusqueda = "";
+        ultimoTextoBusqueda = "";
     }
 
     private void configurarMenuContextual() {
@@ -149,13 +270,28 @@ public class AdminViewController {
 
     private void configurarSeleccionFila() {
         productosTableView.setRowFactory(tv -> {
-            TableRow<ProductoVO> row = new TableRow<>();
+            TableRow<ProductoVO> row = new TableRow<ProductoVO>() {
+                @Override
+                protected void updateItem(ProductoVO item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setStyle("");
+                    } else {
+                        // Resaltar toda la fila si el stock es bajo
+                        if (item.getStock() <= STOCK_BAJO_UMBRAL) {
+                            setStyle(ESTILO_STOCK_BAJO);
+                        } else {
+                            setStyle("");
+                        }
+                    }
+                }
+            };
 
             row.setOnMouseClicked(event -> {
                 if (event.getButton() == MouseButton.PRIMARY
                         && event.getClickCount() == 1
                         && !row.isEmpty()) {
-
                     ProductoVO productoSeleccionado = row.getItem();
                     mostrarDetalleProducto(productoSeleccionado);
                 }
@@ -165,74 +301,62 @@ public class AdminViewController {
     }
 
     private void mostrarDetalleProducto(ProductoVO producto) {
-    // Crear diálogo
-    Dialog<Void> dialog = new Dialog<>();
-    dialog.setTitle("Detalles del Producto");
-    
-    // Configurar botón de cierre
-    dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-    
-    // Crear contenido
-    VBox content = new VBox(10);
-    content.setPadding(new Insets(15));
-    content.setStyle("-fx-background-color: #c4def6;");
-    
-    // Encabezado
-    Label header = new Label("Detalle del Producto");
-    header.setStyle("-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: white;");
-    StackPane headerPane = new StackPane(header);
-    headerPane.setStyle("-fx-background-color: #07575b; -fx-padding: 10;");
-    
-    // Detalles
-    GridPane grid = new GridPane();
-    grid.setHgap(10);
-    grid.setVgap(5);
-    grid.setPadding(new Insets(10));
-    
-    grid.add(new Label("ID:"), 0, 0);
-    grid.add(new Label(producto.getIdProducto() + ""), 1, 0);
-    
-    grid.add(new Label("Nombre:"), 0, 1);
-    grid.add(new Label(producto.getNombre()), 1, 1);
-    
-    grid.add(new Label("Precio Compra:"), 0, 2);
-    grid.add(new Label("$" + producto.getPrecioDeCompra()), 1, 2);
-    
-    grid.add(new Label("Precio Venta:"), 0, 3);
-    grid.add(new Label("$" + producto.getPrecioDeVenta()), 1, 3);
-    
-    grid.add(new Label("Stock:"), 0, 4);
-    grid.add(new Label(producto.getStock() + ""), 1, 4);
-    
-    grid.add(new Label("Categoría:"), 0, 5);
-    grid.add(new Label(producto.getCategoria()), 1, 5);
-    
-    grid.add(new Label("Descripción:"), 0, 6);
-    Label descLabel = new Label(producto.getDescripcion());
-    descLabel.setWrapText(true);
-    descLabel.setMaxWidth(300);
-    grid.add(descLabel, 1, 6);
-    
-    content.getChildren().addAll(headerPane, grid);
-    
-    // Configurar diálogo
-    dialog.getDialogPane().setContent(content);
-    dialog.getDialogPane().setMinWidth(400);
-    
-    // Configurar animación
-    dialog.getDialogPane().setOpacity(0); // Inicia invisible
-    
-    // Animación de aparición
-    FadeTransition fadeIn = new FadeTransition(Duration.millis(300), dialog.getDialogPane());
-    fadeIn.setFromValue(0);
-    fadeIn.setToValue(1);
-    
-    // Animación al mostrar
-    dialog.setOnShown(e -> fadeIn.play());
-    
-    // Mostrar diálogo
-    dialog.showAndWait();
-}
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Detalles del Producto");
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(15));
+        content.setStyle("-fx-background-color: #c4def6;");
+
+        Label header = new Label("Detalle del Producto");
+        header.setStyle("-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: white;");
+        StackPane headerPane = new StackPane(header);
+        headerPane.setStyle("-fx-background-color: #07575b; -fx-padding: 10;");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(5);
+        grid.setPadding(new Insets(10));
+
+        grid.add(new Label("ID:"), 0, 0);
+        grid.add(new Label(producto.getIdProducto() + ""), 1, 0);
+
+        grid.add(new Label("Nombre:"), 0, 1);
+        grid.add(new Label(producto.getNombre()), 1, 1);
+
+        grid.add(new Label("Precio Compra:"), 0, 2);
+        grid.add(new Label("$" + producto.getPrecioDeCompra()), 1, 2);
+
+        grid.add(new Label("Precio Venta:"), 0, 3);
+        grid.add(new Label("$" + producto.getPrecioDeVenta()), 1, 3);
+
+        grid.add(new Label("Stock:"), 0, 4);
+        Label stockLabel = new Label(producto.getStock() + "");
+        if (producto.getStock() <= STOCK_BAJO_UMBRAL) {
+            stockLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+        }
+        grid.add(stockLabel, 1, 4);
+
+        grid.add(new Label("Categoría:"), 0, 5);
+        grid.add(new Label(producto.getCategoria()), 1, 5);
+
+        grid.add(new Label("Descripción:"), 0, 6);
+        Label descLabel = new Label(producto.getDescripcion());
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(300);
+        grid.add(descLabel, 1, 6);
+
+        content.getChildren().addAll(headerPane, grid);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setMinWidth(400);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), dialog.getDialogPane());
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        dialog.setOnShown(e -> fadeIn.play());
+        dialog.showAndWait();
+    }
 
     @FXML
     private void agregarProducto() {
@@ -248,9 +372,10 @@ public class AdminViewController {
             stage.showAndWait();
 
             cargarProductos();
+            resetearBuscador();
 
         } catch (IOException e) {
-            AlertaPDV.mostrarError("Advertencia", "Seleccione un producto para modificar");
+            AlertaPDV.mostrarError("Advertencia", "Error al cargar la ventana de agregar producto");
             e.printStackTrace();
         }
     }
@@ -274,6 +399,7 @@ public class AdminViewController {
                 stage.showAndWait();
 
                 cargarProductos();
+                resetearBuscador();
 
             } catch (IOException e) {
                 AlertaPDV.mostrarError("Error", "No se pudo cargar la ventana de modificación");
@@ -294,24 +420,24 @@ public class AdminViewController {
 
         if (seleccionado.getStock() > 0) {
             boolean confirmar = AlertaPDV.mostrarConfirmacion(
-                "Producto con stock", 
-                "Este producto tiene " + seleccionado.getStock() + " unidades en stock.\n" +
-                "¿Está seguro que desea eliminarlo de todos modos?"
+                    "Producto con stock",
+                    "Este producto tiene " + seleccionado.getStock() + " unidades en stock.\n"
+                    + "¿Está seguro que desea eliminarlo de todos modos?"
             );
 
             if (!confirmar) {
-                return; // El usuario canceló la eliminación
+                return;
             }
         }
 
-        // Confirmación final de eliminación
-        if (AlertaPDV.mostrarConfirmacion("Confirmar Eliminación", 
-            "¿Está seguro de eliminar el producto: " + seleccionado.getNombre() + "?")) {
+        if (AlertaPDV.mostrarConfirmacion("Confirmar Eliminación",
+                "¿Está seguro de eliminar el producto: " + seleccionado.getNombre() + "?")) {
 
             try {
                 boolean eliminado = productoDAO.eliminarProducto(seleccionado.getIdProducto());
                 if (eliminado) {
-                    listaProductosOriginal.remove(seleccionado);
+                    cargarProductos();
+                    resetearBuscador();
                     AlertaPDV.mostrarExito("Éxito", "Producto eliminado correctamente");
                 } else {
                     AlertaPDV.mostrarError("Error", "No se pudo eliminar el producto");
@@ -321,7 +447,15 @@ public class AdminViewController {
             }
         }
     }
-    
+
+    private void resetearBuscador() {
+        buscarField.clear();
+        datosFiltrados.setPredicate(producto -> true);
+        productosTableView.refresh();
+        ultimoParametroBusqueda = "";
+        ultimoTextoBusqueda = "";
+    }
+
     @FXML
     private void regresarOpcionesAdmin(ActionEvent event) throws IOException {
         File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
@@ -330,13 +464,5 @@ public class AdminViewController {
         Stage stage = (Stage) btnAtras.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();
-    }
-
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
     }
 }
