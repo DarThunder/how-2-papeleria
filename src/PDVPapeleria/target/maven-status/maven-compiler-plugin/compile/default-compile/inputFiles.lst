@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\LoginController.java
 C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\EmpleadoDAO.java
 C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\DatabaseConnection.java
@@ -30,36 +29,3 @@ C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapele
 C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\DueñoViewController.java
 C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\ProductoDAO.java
 C:\Users\laura\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdminProveedoresViewController.java
-=======
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\App.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\ConnectionDB.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdminAgregarProveedorViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdminEditarProveedorViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdminEliminarProveedorViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdministracionEmpleados.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdministracionEmpleadosController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdminProveedoresViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AdminViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\AgregarProductoController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\CajeroViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\CambiarContraseñaController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\DueñoViewController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\LoginController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\ModificarProductoController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\OpcionesAdministradorController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\PlantillaController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\ProductoDetalleController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\com\idar\pdvpapeleria\controllers\VerificacionCodigoSeguridadController.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\DatabaseConnection.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\EmpleadoDAO.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\ProductoDAO.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAO\ProveedorDAO.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAOImp\EmpleadoDAOImp.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAOImp\ProductoDAOImp.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\DAOImp\ProveedorDAOImp.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\lib\SqlLib.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\Vista\AlertaPDV.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\VO\EmpleadoVO.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\VO\ProductoVO.java
-C:\Users\TheAl\how-2-papeleria\src\PDVPapeleria\src\main\java\VO\ProveedorVO.java
->>>>>>> de2c3f930792a14b46e2342cf1f3fcc1635ad4d1
