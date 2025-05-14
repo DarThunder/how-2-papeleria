@@ -172,4 +172,51 @@ BEGIN
 END $$
 DELIMITER ;
 
+-- Procedimiento almacenado para modificar un producto existente
+DELIMITER $$
+
+CREATE PROCEDURE modificarProducto(
+    IN p_idProducto INT,
+    IN p_nombre VARCHAR(255),
+    IN p_precioDeCompra INT,
+    IN p_precioDeVenta INT,
+    IN p_stock INT,
+    IN p_descripcion TEXT,
+    IN p_categoria ENUM(
+        'Material de Escritura',
+        'Papelería y Cuadernos',
+        'Arte y Manualidades',
+        'Oficina y Organización',
+        'Tecnología y Electrónica'
+    ),
+    IN p_idProveedor INT
+)
+BEGIN
+    -- Actualizar los datos del producto
+    UPDATE producto 
+    SET 
+        nombre = p_nombre,
+        precioDeCompra = p_precioDeCompra,
+        precioDeVenta = p_precioDeVenta,
+        stock = p_stock,
+        descripcion = p_descripcion,
+        categoria = p_categoria
+    WHERE idProducto = p_idProducto;
+    
+    -- Verificar si ya existe una relación con el proveedor
+    IF NOT EXISTS (SELECT 1 FROM provee WHERE idProducto = p_idProducto AND idProveedor = p_idProveedor) THEN
+        -- Si no existe, actualizar la relación con el proveedor
+        UPDATE provee
+        SET idProveedor = p_idProveedor
+        WHERE idProducto = p_idProducto;
+        
+        -- Si no había ninguna relación previa, insertar una nueva
+        IF ROW_COUNT() = 0 THEN
+            INSERT INTO provee (idProducto, idProveedor)
+            VALUES (p_idProducto, p_idProveedor);
+        END IF;
+    END IF;
+END $$
+
+DELIMITER ;
 
