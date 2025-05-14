@@ -6,6 +6,7 @@ package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
 import DAOImp.EmpleadoDAOImp;
+import Vista.AlertaPDV;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -70,11 +71,11 @@ public class AbrirCajaViewController implements Initializable {
         String username = TFNombre.getText().trim();
         String codigoSeguridad = TFCodigoSeguridad.getText().trim(); 
         if (username.isEmpty() || codigoSeguridad.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Error", "Todos los campos deben estar llenos"); 
             return;
         }
         if (codigoSeguridad.length() != 4) {
-            JOptionPane.showMessageDialog(null, "El código de seguridad debe tener exactamente 4 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Error", "El código de seguridad deben ser 4 números");
             return;
         }
         if (db.verificarCodigoSeguridad(username, codigoSeguridad)) {
@@ -84,7 +85,7 @@ public class AbrirCajaViewController implements Initializable {
                 e.printStackTrace();
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Código de seguridad incorrecto o usuario no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            AlertaPDV.mostrarError("Error", "Código de seguridad incorrecto o usuario no encontrado");
         }
     }
     
