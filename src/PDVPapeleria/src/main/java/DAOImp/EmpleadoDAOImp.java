@@ -237,5 +237,81 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
 
         return empleados;
     }
-}
 
+    @Override
+    public boolean actualizarNombreEmpleado(int idEmpleado, String nuevoNombre) {
+        String sql = "{CALL actualizarNombreEmpleado(?, ?)}";
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (CallableStatement stmt = connection.prepareCall(sql)) {
+                stmt.setInt(1, idEmpleado);            // ID del empleado
+                stmt.setString(2, nuevoNombre);        // Nuevo nombre
+                stmt.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Error al actualizar nombre: " + e.getMessage());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean actualizarCodigoSeguridadEmpleado(int idEmpleado, String nuevoCodigoSeguridad) {
+        String sql = "{CALL actualizarCodigoSeguridadEmpleado(?, ?)}";
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (CallableStatement stmt = connection.prepareCall(sql)) {
+                stmt.setInt(1, idEmpleado);                     // ID del empleado
+                stmt.setString(2, nuevoCodigoSeguridad);       // Nuevo código de seguridad
+                stmt.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Error al actualizar código de seguridad: " + e.getMessage());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean actualizarRolEmpleado(int idEmpleado, String nuevoRol) {
+        String sql = "{CALL actualizarRolEmpleado(?, ?)}";
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (CallableStatement stmt = connection.prepareCall(sql)) {
+                stmt.setInt(1, idEmpleado);        // ID del empleado
+                stmt.setString(2, nuevoRol);       // Nuevo rol (Dueño, Administrador, Cajero)
+                stmt.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Error al actualizar rol: " + e.getMessage());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean actualizarEstadoEmpleado(int idEmpleado, String nuevoEstado) {
+        String sql = "{CALL actualizarEstadoEmpleado(?, ?)}";
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (CallableStatement stmt = connection.prepareCall(sql)) {
+                stmt.setInt(1, idEmpleado);          // ID del empleado
+                stmt.setString(2, nuevoEstado);      // Nuevo estado (Activo, Inactivo)
+                stmt.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println("Error al actualizar estado: " + e.getMessage());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+}

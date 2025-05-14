@@ -33,5 +33,13 @@ public interface EmpleadoDAO {
     boolean eliminarEmpleado(int id);
 
     List<EmpleadoVO> obtenerTodosEmpleados() throws SQLException;
+    
+    boolean actualizarNombreEmpleado(int idEmpleado, String nuevoNombre);
+    
+    boolean actualizarCodigoSeguridadEmpleado(int idEmpleado, String nuevoCodigoSeguridad);
+
+    boolean actualizarRolEmpleado(int idEmpleado, String nuevoRol);
+    
+    boolean actualizarEstadoEmpleado(int idEmpleado, String nuevoEstado);
 
 }

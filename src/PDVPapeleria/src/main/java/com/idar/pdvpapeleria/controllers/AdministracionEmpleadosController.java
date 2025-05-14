@@ -30,13 +30,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class AdministracionEmpleadosController {
 
     @FXML
-    private Button BShowAgregar, BShowEliminar, BShowEditar, BAtras, BEliminar, BAgregar;
+    private Button BShowAgregar, BShowEliminar, BShowEditar, BAtras, BEliminar, BAgregar, BModificarNombre, BModificarCodigoSeguridad, BModificarRol, BModificarEstado;
     @FXML
     private Pane PAgregar, PEliminar, PEditar;
     @FXML
-    private ComboBox<String> CBRol, CBParametros, CBEstado;
+    private ComboBox<String> CBRol, CBParametros, CBEstado, CBRolModificar;
     @FXML
-    private TextField TFNombre, TFContraseña, TFCodigoSeguridad, TFEliminar, TFBuscar;
+    private TextField TFNombre, TFContraseña, TFCodigoSeguridad, TFEliminar, TFBuscar, TFModificar, TFNuevoNombre, TFNuevoCodigoSeguridad;
     @FXML
     private TableView<EmpleadoVO> TV1;
     @FXML
@@ -72,6 +72,7 @@ public class AdministracionEmpleadosController {
 
     private void configurarComponentes() {
         CBRol.getItems().addAll("Dueño", "Administrador", "Cajero");
+        CBRolModificar.getItems().addAll("Dueño", "Administrador", "Cajero");
         CBEstado.getItems().addAll("Activo", "Inactivo");
         CBParametros.getItems().addAll(parametrosMap.keySet());
         CBParametros.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -169,7 +170,7 @@ public class AdministracionEmpleadosController {
             return;
         }
         if (textoBusqueda.isEmpty()) {
-            TV1.setItems(empleadosList); 
+            TV1.setItems(empleadosList);
             return;
         }
 
@@ -254,6 +255,17 @@ public class AdministracionEmpleadosController {
                 && CBRol.getValue() != null;
     }
 
+    /**
+     * Método para validar que el código de seguridad tenga exactamente 4
+     * caracteres.
+     *
+     * @param codigo El código de seguridad a validar.
+     * @return true si tiene exactamente 4 caracteres, false de lo contrario.
+     */
+    private boolean validarCodigoSeguridad(String codigo) {
+        return codigo.length() == 4;
+    }
+
     @FXML
     private boolean validarCodigoSeguridad() {
         return TFCodigoSeguridad.getText().length() == 4;
@@ -282,6 +294,7 @@ public class AdministracionEmpleadosController {
         if (db.createUser(empleado)) {
             AlertaPDV.mostrarExito("", "Empleado agregado correctamente");
             limpiarCampos();
+            cargarEmpleados();
         } else {
             AlertaPDV.mostrarError("", "Error al agregar al empleado");
         }
@@ -332,21 +345,135 @@ public class AdministracionEmpleadosController {
             AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
             return;
         }
-        int confirmacion = JOptionPane.showConfirmDialog(
-                null,
-                "¿Estás seguro de que deseas eliminar al empleado con ID: " + id + "?",
+        boolean confirmacion = AlertaPDV.mostrarConfirmacion(
                 "Confirmación de eliminación",
-                JOptionPane.YES_NO_OPTION
+                "¿Estás seguro de que deseas eliminar al empleado con ID: " + id + "?"
         );
-        if (confirmacion == JOptionPane.YES_OPTION) {
+        if (confirmacion) {
             if (db.eliminarEmpleado(id)) {
                 AlertaPDV.mostrarExito("", "Empleado eliminado correctamente.");
                 TFEliminar.setText("");
+                cargarEmpleados();
             } else {
                 AlertaPDV.mostrarError("Error al eliminar", "Se produjo un error al eliminar al empleado.");
             }
         } else {
             AlertaPDV.mostrarError("", "Eliminación cancelada.");
+        }
+    }
+
+    @FXML
+    private void modificarNombre() {
+        String nuevoNombre = TFNuevoNombre.getText().trim();
+        String idEmpleado = TFModificar.getText().trim();
+
+        if (nuevoNombre.isEmpty() || idEmpleado.isEmpty()) {
+            AlertaPDV.mostrarError("", "El ID de empleado y el nuevo nombre no pueden estar vacíos.");
+            return;
+        }
+        int id;
+        try {
+            id = Integer.parseInt(idEmpleado);
+        } catch (NumberFormatException e) {
+            AlertaPDV.mostrarError("", "El ID debe ser un número entero.");
+            return;
+        }
+        if (!db.existeEmpleadoPorId(id)) {
+            AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
+            return;
+        }
+        if (db.actualizarNombreEmpleado(id, nuevoNombre)) {
+            AlertaPDV.mostrarExito("", "Nombre del empleado actualizado correctamente.");
+            cargarEmpleados();
+        } else {
+            AlertaPDV.mostrarError("", "Error al actualizar el nombre del empleado.");
+        }
+    }
+
+    @FXML
+    private void modificarCodigoSeguridad() {
+        String nuevoCodigoSeguridad = TFNuevoCodigoSeguridad.getText().trim();
+        String idEmpleado = TFModificar.getText().trim();
+        if (nuevoCodigoSeguridad.isEmpty() || idEmpleado.isEmpty()) {
+            AlertaPDV.mostrarError("", "El ID de empleado y el nuevo código de seguridad no pueden estar vacíos.");
+            return;
+        }
+        int id;
+        try {
+            id = Integer.parseInt(idEmpleado);
+        } catch (NumberFormatException e) {
+            AlertaPDV.mostrarError("", "El ID debe ser un número entero.");
+            return;
+        }
+        if (!db.existeEmpleadoPorId(id)) {
+            AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
+            return;
+        }
+        if (!validarCodigoSeguridad(nuevoCodigoSeguridad)) {
+            AlertaPDV.mostrarError("", "El código de seguridad debe tener exactamente 4 caracteres.");
+            return;
+        }
+        boolean exito = db.actualizarCodigoSeguridadEmpleado(id, nuevoCodigoSeguridad);
+        if (exito) {
+            AlertaPDV.mostrarExito("", "Código de seguridad actualizado correctamente.");
+            cargarEmpleados(); 
+            TFNuevoCodigoSeguridad.setText("");
+        } else {
+            AlertaPDV.mostrarError("", "Error al actualizar el código de seguridad del empleado.");
+        }
+    }
+
+    @FXML
+    private void modificarRol() {
+        String nuevoRol = CBRolModificar.getValue();
+        String idEmpleado = TFModificar.getText().trim();
+        if (nuevoRol == null || idEmpleado.isEmpty()) {
+            AlertaPDV.mostrarError("", "El ID de empleado y el nuevo rol no pueden estar vacíos.");
+            return;
+        }
+        int id;
+        try {
+            id = Integer.parseInt(idEmpleado);
+        } catch (NumberFormatException e) {
+            AlertaPDV.mostrarError("", "El ID debe ser un número entero.");
+            return;
+        }
+        if (!db.existeEmpleadoPorId(id)) {
+            AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
+            return;
+        }
+        if (db.actualizarRolEmpleado(id, nuevoRol)) {
+            AlertaPDV.mostrarExito("", "Rol del empleado actualizado correctamente.");
+            cargarEmpleados();
+        } else {
+            AlertaPDV.mostrarError("", "Error al actualizar el rol del empleado.");
+        }
+    }
+
+    @FXML
+    private void modificarEstado() {
+        String nuevoEstado = CBEstado.getValue();
+        String idEmpleado = TFModificar.getText().trim();
+        if (nuevoEstado == null || idEmpleado.isEmpty()) {
+            AlertaPDV.mostrarError("", "El ID de empleado y el nuevo estado no pueden estar vacíos.");
+            return;
+        }
+        int id;
+        try {
+            id = Integer.parseInt(idEmpleado);
+        } catch (NumberFormatException e) {
+            AlertaPDV.mostrarError("", "El ID debe ser un número entero.");
+            return;
+        }
+        if (!db.existeEmpleadoPorId(id)) {
+            AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
+            return;
+        }
+        if (db.actualizarEstadoEmpleado(id, nuevoEstado)) {
+            AlertaPDV.mostrarExito("", "Estado del empleado actualizado correctamente.");
+            cargarEmpleados();
+        } else {
+            AlertaPDV.mostrarError("", "Error al actualizar el estado del empleado.");
         }
     }
 
