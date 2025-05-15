@@ -79,7 +79,7 @@ public class LoginController {
                             AlertaPDV.mostrarError("Error", "Rol desconocido o no autorizado.");
                     }
                 } else {
-                    AlertaPDV.mostrarError("Error de autenticación", "Contraseña incorrecta.");
+                    AlertaPDV.mostrarError("Error de autenticación", "Usuario inactivo.");
                 }
             } else {
                 AlertaPDV.mostrarError("Error de autenticación", "Nombre de usuario incorrecto.");

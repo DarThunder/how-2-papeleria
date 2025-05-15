@@ -83,7 +83,7 @@ public class CambiarContraseñaController {
     // Método para cambiar a la pantalla del login
     @FXML
     private void switchToLogin() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/scees/login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/login.fxml"));
         Parent root = loader.load();
         Stage stage = (Stage) BCambiarContraseña.getScene().getWindow();
         Scene scene = new Scene(root);

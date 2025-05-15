@@ -309,7 +309,7 @@ public class AdministracionEmpleadosController {
         return empleado;
     }
 
-    private boolean existeEmpleado(EmpleadoVO empleado) {
+    public boolean existeEmpleado(EmpleadoVO empleado) {
         if (db.existeNombreUsuario(empleado.getNombre())) {
             AlertaPDV.mostrarError("", "El nombre de usuario ya existe.");
             return true;
@@ -382,6 +382,17 @@ public class AdministracionEmpleadosController {
             AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
             return;
         }
+        EmpleadoVO empleadoParaValidar = new EmpleadoVO();
+        empleadoParaValidar.setNombre(nuevoNombre);
+        if (existeEmpleado(empleadoParaValidar)) {
+            return;
+        }
+        boolean confirmar = AlertaPDV.mostrarConfirmacion("Confirmar cambio", "¿Estás seguro de que deseas "
+                + "cambiar el nombre del empleado?");
+        if (!confirmar) {
+            return;
+        }
+
         if (db.actualizarNombreEmpleado(id, nuevoNombre)) {
             AlertaPDV.mostrarExito("", "Nombre del empleado actualizado correctamente.");
             cargarEmpleados();
@@ -413,10 +424,20 @@ public class AdministracionEmpleadosController {
             AlertaPDV.mostrarError("", "El código de seguridad debe tener exactamente 4 caracteres.");
             return;
         }
+        EmpleadoVO empleadoParaValidar = new EmpleadoVO();
+        empleadoParaValidar.setCodigoSeguridad(nuevoCodigoSeguridad);
+        if (existeEmpleado(empleadoParaValidar)) {
+            return;
+        }
+        boolean confirmar = AlertaPDV.mostrarConfirmacion("Confirmar cambio", "¿Estás seguro de que deseas cambiar el"
+                + "código de seguridad del empleado?");
+        if (!confirmar) {
+            return;
+        }
         boolean exito = db.actualizarCodigoSeguridadEmpleado(id, nuevoCodigoSeguridad);
         if (exito) {
             AlertaPDV.mostrarExito("", "Código de seguridad actualizado correctamente.");
-            cargarEmpleados(); 
+            cargarEmpleados();
             TFNuevoCodigoSeguridad.setText("");
         } else {
             AlertaPDV.mostrarError("", "Error al actualizar el código de seguridad del empleado.");
@@ -442,6 +463,11 @@ public class AdministracionEmpleadosController {
             AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
             return;
         }
+        boolean confirmar = AlertaPDV.mostrarConfirmacion("Confirmar cambio", "¿Estás seguro de que deseas "
+                + "cambiar el rol del empleado?");
+        if (!confirmar) {
+            return;
+        }
         if (db.actualizarRolEmpleado(id, nuevoRol)) {
             AlertaPDV.mostrarExito("", "Rol del empleado actualizado correctamente.");
             cargarEmpleados();
@@ -454,6 +480,7 @@ public class AdministracionEmpleadosController {
     private void modificarEstado() {
         String nuevoEstado = CBEstado.getValue();
         String idEmpleado = TFModificar.getText().trim();
+
         if (nuevoEstado == null || idEmpleado.isEmpty()) {
             AlertaPDV.mostrarError("", "El ID de empleado y el nuevo estado no pueden estar vacíos.");
             return;
@@ -467,6 +494,10 @@ public class AdministracionEmpleadosController {
         }
         if (!db.existeEmpleadoPorId(id)) {
             AlertaPDV.mostrarError("", "No existe un empleado con ese ID.");
+            return;
+        }
+        boolean confirmar = AlertaPDV.mostrarConfirmacion("Confirmar cambio", "¿Estás seguro de que deseas cambiar el estado del empleado?");
+        if (!confirmar) {
             return;
         }
         if (db.actualizarEstadoEmpleado(id, nuevoEstado)) {
