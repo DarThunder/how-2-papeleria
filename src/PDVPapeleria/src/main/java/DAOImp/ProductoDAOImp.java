@@ -24,15 +24,20 @@ public class ProductoDAOImp implements ProductoDAO {
     }
 
     @Override
-    public boolean reducirStock(int idProducto, int cantidad) throws SQLException {
-        String query = "UPDATE producto SET stock = stock - ? WHERE idProducto = ? AND stock >= ?";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, cantidad);
-            stmt.setInt(2, idProducto);
-            stmt.setInt(3, cantidad);
-            return stmt.executeUpdate() > 0;
+    public boolean reducirStock(int idProducto, int cantidad){
+        try {
+            String query = "UPDATE producto SET stock = stock - ? WHERE idProducto = ? AND stock >= ?";
+            
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            try ( PreparedStatement stmt = conn.prepareStatement(query)) {
+                
+                stmt.setInt(1, cantidad);
+                stmt.setInt(2, idProducto);
+                stmt.setInt(3, cantidad);
+                return stmt.executeUpdate() > 0;
+            }
+        }   catch (SQLException ex) {
+            return false;
         }
     }
 
@@ -48,46 +53,57 @@ public class ProductoDAOImp implements ProductoDAO {
     }
 
     @Override
-    public ProductoVO getProductoById(int id) throws SQLException {
-        String query = "SELECT idProducto, nombre, precioDeCompra, precioDeVenta, stock, descripcion, categoria "
-                + "FROM producto WHERE idProducto = ? AND isDeleted = FALSE";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new ProductoVO(
-                            rs.getInt("idProducto"),
-                            rs.getString("nombre"),
-                            rs.getInt("precioDeCompra"),
-                            rs.getInt("precioDeVenta"),
-                            rs.getInt("stock"),
-                            rs.getString("descripcion"),
-                            rs.getString("categoria")
-                    );
+    public ProductoVO getProductoById(int id) {
+        try {
+            String query = "SELECT idProducto, nombre, precioDeCompra, precioDeVenta, stock, descripcion, categoria "
+                    + "FROM producto WHERE idProducto = ? AND isDeleted = FALSE";
+            
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                
+                stmt.setInt(1, id);
+                
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return new ProductoVO(
+                                rs.getInt("idProducto"),
+                                rs.getString("nombre"),
+                                rs.getInt("precioDeCompra"),
+                                rs.getInt("precioDeVenta"),
+                                rs.getInt("stock"),
+                                rs.getString("descripcion"),
+                                rs.getString("categoria")
+                        );
+                    }
                 }
             }
-        }
-        return null;
+            return null;
+        } catch (SQLException e) {
+                System.out.println("Error al obtener el producto: " + e.getMessage());
+                return null;
+            }
     }
 
     @Override
-    public boolean agregarProductoConProveedor(ProductoVO producto, int idProveedor) throws SQLException {
-        String sql = "{ CALL agregarProductoConProveedor(?, ?, ?, ?, ?, ?, ?) }";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
-
-            stmt.setString(1, producto.getNombre());
-            stmt.setInt(2, producto.getPrecioDeCompra());
-            stmt.setInt(3, producto.getPrecioDeVenta());
-            stmt.setInt(4, producto.getStock());
-            stmt.setString(5, producto.getDescripcion());
-            stmt.setString(6, producto.getCategoria());
-            stmt.setInt(7, idProveedor);
-
-            return stmt.executeUpdate() > 0;
+    public boolean agregarProductoConProveedor(ProductoVO producto, int idProveedor){
+        try {
+            String sql = "{ CALL agregarProductoConProveedor(?, ?, ?, ?, ?, ?, ?) }";
+            
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                
+                stmt.setString(1, producto.getNombre());
+                stmt.setInt(2, producto.getPrecioDeCompra());
+                stmt.setInt(3, producto.getPrecioDeVenta());
+                stmt.setInt(4, producto.getStock());
+                stmt.setString(5, producto.getDescripcion());
+                stmt.setString(6, producto.getCategoria());
+                stmt.setInt(7, idProveedor);
+                
+                return stmt.executeUpdate() > 0;
+            }
+        }   catch (SQLException ex) {
+            return false;
         }
     }
 
@@ -162,7 +178,8 @@ public class ProductoDAOImp implements ProductoDAO {
     public boolean eliminarProducto(int idProducto) throws SQLException {
         String query = "UPDATE producto SET isDeleted = TRUE WHERE idProducto = ?";
 
-        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, idProducto);
             return stmt.executeUpdate() > 0;
@@ -170,18 +187,22 @@ public class ProductoDAOImp implements ProductoDAO {
     }
 
     @Override
-    public ResultSet buscarProductos(String criterio) throws SQLException {
-        String query = "SELECT p.*, pr.nombre as nombreProveedor FROM producto p "
-                + "LEFT JOIN provee pe ON p.idProducto = pe.idProducto "
-                + "LEFT JOIN proveedor pr ON pe.idProveedor = pr.idProveedor "
-                + "WHERE p.isDeleted = FALSE AND (p.nombre LIKE ? OR p.categoria LIKE ?)";
-
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        PreparedStatement stmt = conn.prepareStatement(query);
-        String pattern = "%" + criterio + "%";
-        stmt.setString(1, pattern);
-        stmt.setString(2, pattern);
-        return stmt.executeQuery();
+    public ResultSet buscarProductos(String criterio){
+        try {
+            String query = "SELECT p.*, pr.nombre as nombreProveedor FROM producto p "
+                    + "LEFT JOIN provee pe ON p.idProducto = pe.idProducto "
+                    + "LEFT JOIN proveedor pr ON pe.idProveedor = pr.idProveedor "
+                    + "WHERE p.isDeleted = FALSE AND (p.nombre LIKE ? OR p.categoria LIKE ?)";
+            
+            Connection conn = DatabaseConnection.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            String pattern = "%" + criterio + "%";
+            stmt.setString(1, pattern);
+            stmt.setString(2, pattern);
+            return stmt.executeQuery();
+        } catch (SQLException ex) {
+            return null;
+        }
     }
 
     @Override

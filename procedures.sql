@@ -1,6 +1,5 @@
 -- Eliminar procedimiento almacenado si existe
 DROP PROCEDURE IF EXISTS agregarEmpleado;
-
 -- Procedimiento almacenado para agregar un nuevo empleado
 DELIMITER $$
 
@@ -18,6 +17,40 @@ END $$
 DELIMITER ;
 
 
+DROP PROCEDURE IF EXISTS generarVenta;
+-- Procedimiento para nueva venta
+DELIMITER $$
+
+CREATE PROCEDURE generarVenta (
+    IN p_idEmpleado INT,
+    IN p_fechaYHora DATETIME,
+    IN p_total INT,
+    OUT p_folio INT
+)
+BEGIN
+    INSERT INTO venta (idEmpleado, fechaYHora, total)
+    VALUES (p_idEmpleado, p_fechaYHora, p_total);
+
+    SET p_folio = LAST_INSERT_ID();
+END $$
+
+DELIMITER ;
+
+-- Procedimiento para rollback venta
+DELIMITER $$
+
+CREATE PROCEDURE cancelarVenta (
+    IN p_folio INT
+)
+BEGIN
+    UPDATE venta
+    SET cancelada = TRUE
+    WHERE folio = p_folio;
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS agregarProveedor;
 -- Procedimiento almacenado para agregar un nuevo proveedor
 DELIMITER $$
 
@@ -31,8 +64,9 @@ BEGIN
 	VALUES (p_nombre, p_servicio, p_telefono);
 END $$
 
-DELIMITER $$
+DELIMITER ;
 
+DROP PROCEDURE IF EXISTS eliminarProveedor;
 -- Procedimiento almacenado para eliminar un proveedor
 DELIMITER $$
 
@@ -46,8 +80,9 @@ BEGIN
 	WHERE (`idProveedor` = p_id);
 END $$
 
-DELIMITER $$
+DELIMITER ;
 
+DROP PROCEDURE IF EXISTS editarProveedor;
 -- Procedimiento almacenado para editar proveedor
 DELIMITER $$
 
@@ -65,11 +100,11 @@ BEGIN
 	WHERE idProveedor = p_id;
 END $$
 
-DELIMITER $$
-
+DELIMITER ;
 
 -- Eliminar procedimiento almacenado si existe
 DROP PROCEDURE IF EXISTS agregarProductoConProveedor;
+
 
 DELIMITER $$
 

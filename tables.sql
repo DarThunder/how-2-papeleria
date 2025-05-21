@@ -1,6 +1,7 @@
-create database pdvpapeleria;
+DROP DATABASE IF EXISTS pdvpapeleria;
+CREATE DATABASE pdvpapeleria;
 
-use pdvpapeleria;
+USE pdvpapeleria;
 
 -- Tabla de empleados --
 CREATE TABLE Empleado (
@@ -18,6 +19,7 @@ CREATE TABLE venta (
     idEmpleado INT NOT NULL,
     fechaYHora DATETIME NOT NULL,
     total INT NOT NULL,
+    isDeleted BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (idEmpleado) REFERENCES Empleado(id)
 );
 

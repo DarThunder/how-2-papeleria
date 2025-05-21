@@ -8,7 +8,7 @@ public interface ProductoDAO {
 
     ResultSet getProductos() throws SQLException;
 
-    ProductoVO getProductoById(int id) throws SQLException;
+    ProductoVO getProductoById(int id);
 
     boolean agregarProductoConProveedor(ProductoVO producto, int idProveedor) throws SQLException;
 
