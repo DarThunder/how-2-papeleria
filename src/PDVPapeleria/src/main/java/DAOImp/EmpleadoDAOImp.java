@@ -1,4 +1,4 @@
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -313,5 +313,40 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         }
         return false;
     }
+    
+    @Override
+    public EmpleadoVO obtenerEmpleadoPorUsuarioYCodigo(String username, String codigoSeguridad) {
+        String sql = "SELECT * FROM Empleado WHERE nombre = ? AND codigoSeguridad = ?";
+
+        try {
+            Connection connection = DatabaseConnection.getInstance().getConnection();
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+                stmt.setString(1, username);
+                stmt.setString(2, codigoSeguridad);
+
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    EmpleadoVO empleado = new EmpleadoVO();
+                    empleado.setId(rs.getInt("id"));
+                    empleado.setNombre(rs.getString("nombre"));
+                    empleado.setCodigoSeguridad(rs.getString("codigoSeguridad"));
+                    empleado.setRol(rs.getString("rol"));
+                    empleado.setPassword(rs.getString("contraseña"));
+                    empleado.setEstado(rs.getString("estado"));
+                    return empleado;
+                }
+            } catch (SQLException e) {
+                System.out.println("Error al obtener empleado: " + e.getMessage());
+                Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, e);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EmpleadoDAOImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    
 
 }

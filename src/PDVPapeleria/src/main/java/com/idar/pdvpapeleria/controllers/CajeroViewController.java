@@ -1,80 +1,139 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package com.idar.pdvpapeleria.controllers;
 
 import DAOImp.ProductoDAOImp;
 import DAOImp.VentaDAOImp;
+import VO.EmpleadoVO;
 import VO.ProductoVO;
+import com.idar.pdvpapeleria.utils.PDFGenerator;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class CajeroViewController implements Initializable {
 
-    private final ProductoDAOImp productoDao = ProductoDAOImp.getInstance();
-    private final VentaDAOImp ventaDao = VentaDAOImp.getInstance();
+    // DAOs
+    private ProductoDAOImp productoDao;
+    private VentaDAOImp ventaDao;
+    
+    // Datos del cajero
+    private EmpleadoVO cajeroActual;
+    
+    // Modelos de datos
     private final ObservableList<ProductoVO> products = FXCollections.observableArrayList();
-    private final Map<Integer, ProductoVO> productMap = new HashMap<>(); // Para búsquedas rápidas
-
-    @FXML
-    private AnchorPane AnchorPane;
-    @FXML
-    private TableView<ProductoVO> productosTableView;
-    @FXML
-    private TableColumn<ProductoVO, String> productNameCol;
-    @FXML
-    private TableColumn<ProductoVO, Integer> productCountCol;
-    @FXML
-    private TableColumn<ProductoVO, Integer> productPriceCol;
-    @FXML
-    private TableColumn<ProductoVO, Integer> productSubtotalCol;
-    @FXML
-    private Label totalLabel;
+    private final Map<Integer, ProductoVO> productMap = new HashMap<>();
     private boolean isSellInAction;
+    
+    // Componentes FXML
+    @FXML private TableView<ProductoVO> productosTableView;
+    @FXML private TableColumn<ProductoVO, String> productNameCol;
+    @FXML private TableColumn<ProductoVO, Integer> productCountCol;
+    @FXML private TableColumn<ProductoVO, Integer> productPriceCol;
+    @FXML private TableColumn<ProductoVO, Integer> productSubtotalCol;
+    @FXML private Label totalLabel;
+    @FXML private Label estadoVentaLabel;
+    @FXML private Label nombreCajeroLabel;
+    @FXML private VBox productoInfoBox;
+
+    // Método para establecer el cajero actual
+    public void setCajeroActual(EmpleadoVO cajero) {
+        this.cajeroActual = cajero;
+        updateCajeroInfo();
+        
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.isSellInAction = false;
+        // Inicialización de DAOs
+        productoDao = ProductoDAOImp.getInstance();
+        ventaDao = VentaDAOImp.getInstance();
+        
+        // Configuración inicial
+        isSellInAction = false;
         configureTableColumns();
+        updateUIState();
+        updateCajeroInfo();
 
+        
+        // Configurar listener para selección de productos
+        productosTableView.getSelectionModel().selectedItemProperty().addListener(
+            (obs, oldSelection, newSelection) -> showProductDetails(newSelection));
+        
+        // Configurar atajos de teclado
         Platform.runLater(() -> {
-            if (AnchorPane.getScene() != null) {
-                AnchorPane.getScene().setOnKeyPressed(this::handleKeyEvents);
+            if (productosTableView.getScene() != null) {
+                productosTableView.getScene().setOnKeyPressed(this::handleKeyEvents);
             }
         });
+    }
+    
+    private void updateCajeroInfo() {
+        if (nombreCajeroLabel != null && cajeroActual != null) {
+            nombreCajeroLabel.setText("Cajero: " + cajeroActual.getNombre());
+        }
     }
 
     private void configureTableColumns() {
         productNameCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         productCountCol.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
         productPriceCol.setCellValueFactory(new PropertyValueFactory<>("precioDeVenta"));
-        productSubtotalCol.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
+        productSubtotalCol.setCellValueFactory(cellData -> 
+            new SimpleIntegerProperty(cellData.getValue().getSubtotal()).asObject());
+        
+        productosTableView.setItems(products);
     }
 
     private void updateTotal() {
-        int total = 0;
-        for (ProductoVO p : products) {
-            System.out.println(p.getCantidad());
-            total += (p.getPrecioDeVenta() * p.getCantidad());
+        int total = products.stream()
+            .mapToInt(ProductoVO::getSubtotal)
+            .sum();
+        totalLabel.setText(String.format("Total: $%,d", total));
+    }
+
+    private void updateUIState() {
+        String estado = isSellInAction ? "Venta en curso" : "Venta no iniciada";
+        String color = isSellInAction ? "#4CAF50" : "#F44336";
+        
+        estadoVentaLabel.setText("Estado: " + estado);
+        estadoVentaLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold;");
+    }
+
+    private void showProductDetails(ProductoVO producto) {
+        productoInfoBox.getChildren().clear();
+        
+        if (producto != null) {
+            productoInfoBox.getChildren().addAll(
+                new Label("Nombre: " + producto.getNombre()),
+                new Label("Precio: $" + producto.getPrecioDeVenta()),
+                new Label("En carrito: " + producto.getCantidad()),
+                new Label("Subtotal: $" + producto.getSubtotal()),
+                new Label("Stock disponible: " + producto.getStock())
+            );
+        } else {
+            productoInfoBox.getChildren().add(
+                new Label("Seleccione un producto")
+            );
         }
-        totalLabel.setText(String.format("Total: $%d", total));
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -85,166 +144,193 @@ public class CajeroViewController implements Initializable {
         alert.showAndWait();
     }
 
-    private void addItem(String idProducto, String count) {
-        if (idProducto.isEmpty() || count.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Campo vacío", "Por favor ingresa un ID de producto.");
-            return;
-        }
-
-        try {
-            int id = Integer.parseInt(idProducto);
-            int cnt = Integer.parseInt(count);
-            ProductoVO existingProduct = productMap.get(id);
-
-            if (existingProduct != null) {
-                existingProduct.setCantidad(existingProduct.getCantidad() + cnt);
-                productosTableView.refresh();
-            } else {
-                ProductoVO newProduct = productoDao.getProductoById(id);
-                if (newProduct != null) {
-                    newProduct.setCantidad(cnt);
-                    products.add(newProduct);
-                    productMap.put(id, newProduct);
-                    productosTableView.setItems(products);
-                } else {
-                    showAlert(Alert.AlertType.INFORMATION, "No encontrado", "No se encontró ningún producto con ese ID.");
-                    return;
-                }
-            }
-            updateTotal();
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "ID inválido", "El ID debe ser un número entero.");
-        }
-    }
-
-    private void removeItem(String idProducto, String count) {
-        if (idProducto.isEmpty() || count.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Campo vacío", "Por favor ingresa un ID de producto.");
-            return;
-        }
-
-        try {
-            int id = Integer.parseInt(idProducto);
-            ProductoVO removedProduct = productMap.remove(id);
-
-            if (removedProduct != null) {
-                products.remove(removedProduct);
-                updateTotal();
-                showAlert(Alert.AlertType.INFORMATION, "Producto eliminado", "El producto ha sido eliminado de la lista.");
-            } else {
-                showAlert(Alert.AlertType.INFORMATION, "No encontrado", "El producto no se encuentra en la lista.");
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "ID inválido", "El ID debe ser un número entero.");
-        }
-    }
-
-    private void onInitButtonClicked() {
-        if (this.isSellInAction) {
-            return;
-        }
-
-        this.isSellInAction = true;
-        products.clear();
-        configureTableColumns();
-        showAlert(Alert.AlertType.INFORMATION, "Venta iniciada", "Se inicio una venta");
-    }
-
-    private void onCancelButtonClicked() {
-        if (!this.isSellInAction) {
-            return;
-        }
-        if (products.isEmpty()) {
-            this.isSellInAction = false;
-            showAlert(Alert.AlertType.INFORMATION, "Cancelación de pago realizado", "La cancelación ha sido procesado correctamente.");
-            return;
-        }
-
-        try {
-            this.isSellInAction = false;
+    @FXML
+    private void onInitButtonClicked(ActionEvent event) {
+        if (!isSellInAction) {
+            isSellInAction = true;
             products.clear();
             productMap.clear();
             updateTotal();
-            showAlert(Alert.AlertType.INFORMATION, "Cancelación de pago realizado", "La cancelación ha sido procesado correctamente.");
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error la cancelación de pago", "Ocurrió un error al cancelar el pago: " + e.getMessage());
+            updateUIState();
+            showAlert(Alert.AlertType.INFORMATION, "Venta iniciada", "Se inició una nueva venta");
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Venta en curso", "Ya hay una venta en proceso");
         }
     }
 
-    private void onSearchButtonClicked(boolean deleteMode) {
+    @FXML
+    private void onCancelButtonClicked(ActionEvent event) {
+        if (isSellInAction) {
+            isSellInAction = false;
+            products.clear();
+            productMap.clear();
+            updateTotal();
+            updateUIState();
+            showAlert(Alert.AlertType.INFORMATION, "Venta cancelada", "La venta ha sido cancelada");
+        }
+    }
+
+    @FXML
+    private void onAddButtonClicked(ActionEvent event) {
+        if (!isSellInAction) {
+            showAlert(Alert.AlertType.WARNING, "Venta no iniciada", "Debe iniciar una venta primero");
+            return;
+        }
+        showProductPopup(false);
+    }
+
+    @FXML
+    private void onRemoveButtonClicked(ActionEvent event) {
+        if (!isSellInAction) {
+            showAlert(Alert.AlertType.WARNING, "Venta no iniciada", "Debe iniciar una venta primero");
+            return;
+        }
+        showProductPopup(true);
+    }
+
+    private void showProductPopup(boolean isRemoveOperation) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
-        popup.setTitle("Ingresar datos");
+        popup.setTitle(isRemoveOperation ? "Quitar producto" : "Agregar producto");
 
-        Label idLabel = new Label("ID:");
+        // Crear componentes
+        Label idLabel = new Label("ID del producto:");
         TextField idField = new TextField();
+        idField.setPromptText("Ingrese el ID");
 
         Label cantidadLabel = new Label("Cantidad:");
         TextField cantidadField = new TextField();
+        cantidadField.setPromptText("Ingrese la cantidad");
 
         Button aceptarBtn = new Button("Aceptar");
+        aceptarBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         aceptarBtn.setOnAction(e -> {
-            if (!this.isSellInAction) {
-                return;
-            }
-            String id = idField.getText().trim();
-            String cantidad = cantidadField.getText().trim();
-            if (!deleteMode) {
-                addItem(id, cantidad);
-            } else {
-                removeItem(id, cantidad);
-            }
+            handleProductOperation(idField.getText(), cantidadField.getText(), isRemoveOperation);
             popup.close();
         });
 
+        // Configurar layout
         VBox layout = new VBox(10, idLabel, idField, cantidadLabel, cantidadField, aceptarBtn);
         layout.setPadding(new Insets(15));
-        layout.setStyle("-fx-background-color: #f0f0f0;");
+        layout.setStyle("-fx-background-color: #f5f5f5;");
+
         popup.setScene(new Scene(layout));
         popup.showAndWait();
     }
 
-    private void onPayButtonClicked() {
-        if (products.isEmpty() || !this.isSellInAction) {
+    private void handleProductOperation(String idProducto, String cantidad, boolean isRemoveOperation) {
+        try {
+            int id = Integer.parseInt(idProducto.trim());
+            int cant = cantidad.isEmpty() ? 1 : Integer.parseInt(cantidad.trim());
+            
+            if (isRemoveOperation) {
+                removeProduct(id);
+            } else {
+                addProduct(id, cant);
+            }
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "ID y cantidad deben ser números válidos");
+        }
+    }
+
+    private void addProduct(int id, int cantidad) {
+        try {
+            ProductoVO existingProduct = productMap.get(id);
+            
+            if (existingProduct != null) {
+                existingProduct.setCantidad(existingProduct.getCantidad() + cantidad);
+            } else {
+                ProductoVO newProduct = productoDao.getProductoById(id);
+                if (newProduct != null) {
+                    newProduct.setCantidad(cantidad);
+                    products.add(newProduct);
+                    productMap.put(id, newProduct);
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "No se encontró el producto con ID: " + id);
+                    return;
+                }
+            }
+            
+            productosTableView.refresh();
+            updateTotal();
+            showProductDetails(productosTableView.getSelectionModel().getSelectedItem());
+            
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al agregar el producto: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void removeProduct(int id) {
+        ProductoVO product = productMap.get(id);
+        if (product != null) {
+            products.remove(product);
+            productMap.remove(id);
+            productosTableView.refresh();
+            updateTotal();
+            showProductDetails(productosTableView.getSelectionModel().getSelectedItem());
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error", "El producto no está en la venta actual");
+        }
+    }
+
+    @FXML
+    private void onPayButtonClicked(ActionEvent event) {
+        if (!isSellInAction || products.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Error", "No hay productos en la venta actual");
             return;
         }
 
-        int total = products.stream()
-        .mapToInt(p -> p.getPrecioDeVenta() * p.getCantidad())
-        .sum();
+        try {
+            int total = products.stream()
+                .mapToInt(ProductoVO::getSubtotal)
+                .sum();
 
-        int folio = ventaDao.generarVenta(1, total);
-        if (folio == -1) {
-            showAlert(Alert.AlertType.ERROR, "Error", "No se pudo generar la venta.");
-            return;
-        }
+            int idEmpleado = cajeroActual != null ? cajeroActual.getId() : 1;
+            int folio = ventaDao.generarVenta(idEmpleado, total);
 
-        for (ProductoVO producto : products) {
-            if (!productoDao.reducirStock(producto.getIdProducto(), producto.getCantidad())) {
-                ventaDao.rollbackVenta(folio);
-                showAlert(Alert.AlertType.ERROR, "Error en el pago", "Ocurrió un error al procesar el pago. Se hizo rollback.");
+            if (folio == -1) {
+                showAlert(Alert.AlertType.ERROR, "Error", "No se pudo generar la venta");
                 return;
             }
-        }
 
-        products.clear();
-        productMap.clear();
-        updateTotal();
-        showAlert(Alert.AlertType.INFORMATION, "Pago realizado", "El pago ha sido procesado correctamente.");
+            // Procesar cada producto
+            for (ProductoVO producto : products) {
+                if (!productoDao.reducirStock(producto.getIdProducto(), producto.getCantidad())) {
+                    ventaDao.rollbackVenta(folio);
+                    showAlert(Alert.AlertType.ERROR, "Error", "No hay suficiente stock para " + producto.getNombre());
+                    return;
+                }
+            }
+
+            // Generar PDF del ticket
+            String nombreCajero = cajeroActual != null ? cajeroActual.getNombre() : "Sistema";
+            PDFGenerator.generarTicketVenta(products, folio, total, nombreCajero);
+
+            // Mostrar confirmación
+            showAlert(Alert.AlertType.INFORMATION, "Venta completada", 
+                String.format("Venta #%d completada\nTotal: $%,d\nTicket generado", folio, total));
+
+            // Limpiar y finalizar
+            products.clear();
+            productMap.clear();
+            isSellInAction = false;
+            updateTotal();
+            updateUIState();
+
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al procesar el pago: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void handleKeyEvents(KeyEvent event) {
         switch (event.getCode()) {
-            case F4 ->
-                onInitButtonClicked();
-            case F5 ->
-                onCancelButtonClicked();
-            case F6 ->
-                onSearchButtonClicked(false);
-            case F7 ->
-                onSearchButtonClicked(true);
-            case F8 ->
-                onPayButtonClicked();
+            case F4 -> onInitButtonClicked(new ActionEvent());
+            case F5 -> onCancelButtonClicked(new ActionEvent());
+            case F6 -> onAddButtonClicked(new ActionEvent());
+            case F7 -> onRemoveButtonClicked(new ActionEvent());
+            case F8 -> onPayButtonClicked(new ActionEvent());
         }
     }
 }

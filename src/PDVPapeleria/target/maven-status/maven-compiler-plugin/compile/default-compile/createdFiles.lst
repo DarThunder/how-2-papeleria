@@ -34,6 +34,7 @@ com\idar\pdvpapeleria\controllers\ModificarProductoController$1.class
 com\idar\pdvpapeleria\controllers\ModificarProductoController.class
 DAO\EmpleadoDAO.class
 com\idar\pdvpapeleria\controllers\VerificacionCodigoSeguridadController.class
+com\idar\pdvpapeleria\utils\PDFGenerator.class
 com\idar\pdvpapeleria\controllers\AbrirCajaViewController.class
 com\idar\pdvpapeleria\controllers\AgregarProductoController$2.class
 com\idar\pdvpapeleria\App.class

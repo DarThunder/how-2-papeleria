@@ -52,7 +52,7 @@
                     <Pane HBox.hgrow="ALWAYS" />
                     
                     <!-- MenuButton de ordenamiento (nuevo) -->
-                    <MenuButton fx:id="btnOrdenar" text="Ordenar" style="-fx-background-color: #9C27B0; -fx-text-fill: white;">
+                    <MenuButton fx:id="btnOrdenar" text="Ordenar" style="-fx-background-color: #3371ff -fx-text-fill: white;">
                         <items>
                             <MenuItem text="ID (Asc)" onAction="#ordenarPorIdAsc" />
                             <MenuItem text="ID (Desc)" onAction="#ordenarPorIdDesc" />

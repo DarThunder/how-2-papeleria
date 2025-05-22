@@ -6,6 +6,7 @@ package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
 import DAOImp.EmpleadoDAOImp;
+import VO.EmpleadoVO;
 import Vista.AlertaPDV;
 import java.io.File;
 import java.io.IOException;
@@ -65,27 +66,51 @@ public class AbrirCajaViewController implements Initializable {
         stage.sizeToScene();
         stage.show();
     }
-    
+     
     @FXML
     private void validarCodigoSeguridad() {
         String username = TFNombre.getText().trim();
         String codigoSeguridad = TFCodigoSeguridad.getText().trim(); 
+
         if (username.isEmpty() || codigoSeguridad.isEmpty()) {
             AlertaPDV.mostrarError("Error", "Todos los campos deben estar llenos"); 
             return;
         }
+
         if (codigoSeguridad.length() != 4) {
-            AlertaPDV.mostrarError("Error", "El código de seguridad deben ser 4 números");
+            AlertaPDV.mostrarError("Error", "El código de seguridad debe tener 4 dígitos");
             return;
         }
-        if (db.verificarCodigoSeguridad(username, codigoSeguridad)) {
-            try {
-                switchToCaja();
-            } catch (IOException e) {
-                e.printStackTrace();
+
+        try {
+            EmpleadoVO empleado = db.obtenerEmpleadoPorUsuarioYCodigo(username, codigoSeguridad);
+
+            if (empleado != null) {
+                // Verificar si el empleado es cajero o administrador
+                if (!empleado.getRol().equals("Cajero") && !empleado.getRol().equals("Administrador")) {
+                    AlertaPDV.mostrarError("Error", "Solo personal autorizado puede abrir caja");
+                    return;
+                }
+
+                File fxmlFile = new File("src/main/resources/scenes/cajeroView.fxml");
+                FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
+                Parent root = loader.load();
+
+                CajeroViewController cajeroController = loader.getController();
+                cajeroController.setCajeroActual(empleado);
+
+                Stage stage = (Stage) BAbrirCaja.getScene().getWindow();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.sizeToScene();
+                stage.show();
+
+            } else {
+                AlertaPDV.mostrarError("Error", "Credenciales incorrectas");
             }
-        } else {
-            AlertaPDV.mostrarError("Error", "Código de seguridad incorrecto o usuario no encontrado");
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertaPDV.mostrarError("Error", "Ocurrió un error al validar las credenciales");
         }
     }
     

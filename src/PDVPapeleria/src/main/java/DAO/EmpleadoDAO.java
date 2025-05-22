@@ -41,5 +41,7 @@ public interface EmpleadoDAO {
     boolean actualizarRolEmpleado(int idEmpleado, String nuevoRol);
     
     boolean actualizarEstadoEmpleado(int idEmpleado, String nuevoEstado);
+    
+    EmpleadoVO obtenerEmpleadoPorUsuarioYCodigo(String username, String codigoSeguridad);
 
 }
