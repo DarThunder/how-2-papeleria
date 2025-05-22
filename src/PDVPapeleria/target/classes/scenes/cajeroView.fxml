@@ -17,13 +17,6 @@
             </font>
         </Label>
         
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="ID Producto:" style="-fx-font-weight: bold;"/>
-            <TextField fx:id="idProductField" promptText="Ingrese ID del producto" style="-fx-pref-width: 200;"/>
-            <Button fx:id="searchButton" text="Agregar (F10)" style="-fx-base: #4CAF50; -fx-text-fill: white;"/>
-            <Button fx:id="deleteButton" text="Eliminar (F12)" style="-fx-base: #F44336; -fx-text-fill: white;"/>
-        </HBox>
-        
         <TableView fx:id="productosTableView" style="-fx-pref-height: 300;">
             <columns>
                 <TableColumn fx:id="productNameCol" text="Producto" prefWidth="200"/>
@@ -36,37 +29,13 @@
             </columnResizePolicy>
         </TableView>
         
-        <HBox spacing="20" alignment="CENTER_RIGHT">
-            <Label fx:id="totalLabel" text="Total: $0.00" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-            <Button fx:id="payButton" text="Procesar Pago (F11)" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 200; -fx-pref-height: 40;"/>
-        </HBox>
-        
         <VBox spacing="5" style="-fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-padding: 10; -fx-background-color: #f9f9f9;">
             <Label text="Atajos de teclado:" style="-fx-font-weight: bold;"/>
-            <Label text="ESC - Limpiar campo"/>
-            <Label text="F5/ENTER - Agregar producto"/>
-            <Label text="F6 - Eliminar producto"/>
-            <Label text="F7 - Procesar pago"/>
-            <Label text="F8 - Cancelar pago"/>
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            <Label text="F4 - Iniciar Venta"/>
+            <Label text="F5 - Cancelar venta"/>
+            <Label text="F6 - Agregar Producto"/>
+            <Label text="F7 - Quitar producto"/>
+            <Label text="F8 - Procesar venta"/>
         </VBox>
     </VBox>
 </AnchorPane>

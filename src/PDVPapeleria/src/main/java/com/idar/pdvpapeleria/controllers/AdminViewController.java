@@ -73,10 +73,10 @@ public class AdminViewController {
 
     @FXML
     public void initialize() throws SQLException {
+        productoDAO = ProductoDAOImp.getInstance();
         configurarParametrosBusqueda();
         configurarComponentes();
         configurarColumnas();
-        productoDAO = ProductoDAOImp.getInstance();
         cargarProductos();
         configurarBuscador();
         configurarSeleccionFila();
@@ -167,51 +167,102 @@ public class AdminViewController {
     }
 
     private void configurarBuscador() {
+        // Inicializar la lista original si es null
         if (listaProductosOriginal == null) {
             listaProductosOriginal = FXCollections.observableArrayList();
         }
 
+        // Crear lista filtrada con predicado inicial que muestra todos los elementos
         datosFiltrados = new FilteredList<>(listaProductosOriginal, p -> true);
 
-        // Listener para cambios en el texto de búsqueda
+        // Configurar el listener para búsqueda en tiempo real
         buscarField.textProperty().addListener((observable, oldValue, newValue) -> {
-            String parametroActual = cbParametrosBusqueda.getValue();
-            String textoActual = newValue.trim();
+            String parametro = cbParametrosBusqueda.getValue();
+            String texto = newValue.trim().toLowerCase();
 
-            // Solo buscar automáticamente si es la primera vez o si cambió el parámetro
-            if (!textoActual.isEmpty() && (ultimoParametroBusqueda.isEmpty()
-                    || !parametroActual.equals(ultimoParametroBusqueda))) {
-                aplicarFiltro(parametroActual, textoActual);
-                ultimoParametroBusqueda = parametroActual;
-                ultimoTextoBusqueda = textoActual;
-            }
+            datosFiltrados.setPredicate(producto -> {
+                // Si el campo de búsqueda está vacío, mostrar todos los productos
+                if (texto.isEmpty()) {
+                    return true;
+                }
+
+                // Aplicar filtro según el parámetro seleccionado
+                try {
+                    switch (parametro) {
+                        case "Nombre":
+                            return producto.getNombre().toLowerCase().contains(texto);
+                        case "ID":
+                            return String.valueOf(producto.getIdProducto()).contains(texto);
+                        case "Categoría":
+                            return producto.getCategoria().toLowerCase().contains(texto);
+                        case "Precio Compra":
+                            return String.valueOf(producto.getPrecioDeCompra()).contains(texto);
+                        case "Precio Venta":
+                            return String.valueOf(producto.getPrecioDeVenta()).contains(texto);
+                        case "Stock":
+                            return String.valueOf(producto.getStock()).contains(texto);
+                        default:
+                            return true; // Si no hay parámetro seleccionado, mostrar todos
+                    }
+                } catch (Exception e) {
+                    return false; // En caso de error, ocultar el producto
+                }
+            });
         });
 
-        // Listener para cambios en el parámetro de búsqueda
+        // Configurar listener para cambios en el parámetro de búsqueda
         cbParametrosBusqueda.getSelectionModel().selectedItemProperty().addListener(
-                (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-                    String textoActual = buscarField.getText().trim();
-                    if (!textoActual.isEmpty()) {
-                        aplicarFiltro(newValue, textoActual);
-                        ultimoParametroBusqueda = newValue;
-                        ultimoTextoBusqueda = textoActual;
+                (observable, oldValue, newValue) -> {
+                    String texto = buscarField.getText().trim();
+                    if (!texto.isEmpty()) {
+                        // Forzar actualización del filtro al cambiar el parámetro
+                        buscarField.textProperty().set(texto);
                     }
                 });
 
-        // Configurar botón de búsqueda manual
+        // Configurar botón de búsqueda (opcional, ya que tenemos búsqueda en tiempo real)
         btnBuscar.setOnAction(event -> {
-            String parametroActual = cbParametrosBusqueda.getValue();
-            String textoActual = buscarField.getText().trim();
-            if (!textoActual.isEmpty()) {
-                aplicarFiltro(parametroActual, textoActual);
-                ultimoParametroBusqueda = parametroActual;
-                ultimoTextoBusqueda = textoActual;
+            String texto = buscarField.getText().trim();
+            if (!texto.isEmpty()) {
+                buscarField.textProperty().set(texto); // Dispara el listener
             }
         });
 
+        // Configurar botón de limpiar
+        btnLimpiar.setOnAction(event -> {
+            buscarField.clear();
+            cbParametrosBusqueda.getSelectionModel().clearSelection();
+            // Restablecer la lista completa
+            datosFiltrados.setPredicate(p -> true);
+        });
+
+        // Configurar la tabla con los datos filtrados y ordenados
         SortedList<ProductoVO> datosOrdenados = new SortedList<>(datosFiltrados);
         datosOrdenados.comparatorProperty().bind(productosTableView.comparatorProperty());
         productosTableView.setItems(datosOrdenados);
+    }
+
+    // Método auxiliar para filtrar por campos numéricos
+    private boolean filtrarPorNumero(String texto, int valor) {
+        try {
+            texto = texto.trim();
+
+            // Búsqueda por rango (ej: ">100", "<50")
+            if (texto.startsWith(">")) {
+                int valorBuscado = Integer.parseInt(texto.substring(1).trim());
+                return valor > valorBuscado;
+            } else if (texto.startsWith("<")) {
+                int valorBuscado = Integer.parseInt(texto.substring(1).trim());
+                return valor < valorBuscado;
+            } 
+            // Búsqueda exacta
+            else {
+                int valorBuscado = Integer.parseInt(texto);
+                return valor == valorBuscado;
+            }
+        } catch (NumberFormatException e) {
+            return false; // Si el texto no es un número válido
+        }
     }
 
     private void aplicarFiltro(String parametroSeleccionado, String textoBusqueda) {
@@ -464,5 +515,52 @@ public class AdminViewController {
         Stage stage = (Stage) btnAtras.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();
+    }
+    
+    @FXML
+    private void ordenarPorIdAsc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        idCol.setSortType(TableColumn.SortType.ASCENDING);
+        productosTableView.getSortOrder().add(idCol);
+    }
+
+    @FXML
+    private void ordenarPorIdDesc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        idCol.setSortType(TableColumn.SortType.DESCENDING);
+        productosTableView.getSortOrder().add(idCol);
+    }
+
+    @FXML
+    private void ordenarPorNombreAsc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        nombreCol.setSortType(TableColumn.SortType.ASCENDING);
+        productosTableView.getSortOrder().add(nombreCol);
+    }
+
+    @FXML
+    private void ordenarPorNombreDesc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        nombreCol.setSortType(TableColumn.SortType.DESCENDING);
+        productosTableView.getSortOrder().add(nombreCol);
+    }
+
+    @FXML
+    private void ordenarPorPrecioVentaAsc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        precioVentaCol.setSortType(TableColumn.SortType.ASCENDING);
+        productosTableView.getSortOrder().add(precioVentaCol);
+    }
+
+    @FXML
+    private void ordenarPorPrecioVentaDesc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        precioVentaCol.setSortType(TableColumn.SortType.DESCENDING);
+        productosTableView.getSortOrder().add(precioVentaCol);
+    }
+
+    @FXML
+    private void quitarOrden(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
     }
 }

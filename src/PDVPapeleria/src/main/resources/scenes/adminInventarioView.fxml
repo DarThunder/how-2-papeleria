@@ -7,6 +7,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -48,6 +51,20 @@
                     
                     <Pane HBox.hgrow="ALWAYS" />
                     
+                    <!-- MenuButton de ordenamiento (nuevo) -->
+                    <MenuButton fx:id="btnOrdenar" text="Ordenar" style="-fx-background-color: #9C27B0; -fx-text-fill: white;">
+                        <items>
+                            <MenuItem text="ID (Asc)" onAction="#ordenarPorIdAsc" />
+                            <MenuItem text="ID (Desc)" onAction="#ordenarPorIdDesc" />
+                            <MenuItem text="Nombre (A-Z)" onAction="#ordenarPorNombreAsc" />
+                            <MenuItem text="Nombre (Z-A)" onAction="#ordenarPorNombreDesc" />
+                            <MenuItem text="P. Venta (↑)" onAction="#ordenarPorPrecioVentaAsc" />
+                            <MenuItem text="P. Venta (↓)" onAction="#ordenarPorPrecioVentaDesc" />
+                            <SeparatorMenuItem />
+                            <MenuItem text="Quitar orden" onAction="#quitarOrden" />
+                        </items>
+                    </MenuButton>
+                    
                     <ComboBox fx:id="cbParametrosBusqueda" promptText="Filtrar por..." prefWidth="150" />
                     
                     <TextField fx:id="buscarField" promptText="Texto a buscar..." prefWidth="200" />
@@ -64,6 +81,9 @@
             <!-- Tabla de productos -->
             <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS">
                 <TableView fx:id="productosTableView">
+                    <placeholder>
+                        <Label text="Sin productos" />
+                    </placeholder>
                     <columns>
                         <TableColumn fx:id="idCol" prefWidth="50" text="ID" />
                         <TableColumn fx:id="nombreCol" prefWidth="200" text="Nombre" />
