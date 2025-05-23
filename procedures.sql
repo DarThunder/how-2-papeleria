@@ -17,6 +17,17 @@ END $$
 DELIMITER ;
 
 
+DROP PROCEDURE IF EXISTS eliminarEmpleado;
+-- Procedimiento almacenado para eliminar un empleado
+DELIMITER $$
+CREATE PROCEDURE eliminarEmpleado(IN empId INT)
+BEGIN
+    DELETE FROM Empleado WHERE id = empId;
+END$$
+DELIMITER ;
+
+
+
 DROP PROCEDURE IF EXISTS generarVenta;
 -- Procedimiento para nueva venta
 DELIMITER $$
