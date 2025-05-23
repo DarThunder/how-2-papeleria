@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javax.swing.JOptionPane;
 import DAO.DatabaseConnection;
+import VO.HistorialProveedorVO;
 import Vista.AlertaPDV;
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,8 @@ public class AdminProveedoresViewController implements Initializable {
 
     AlertaPDV alerta = new AlertaPDV();
     List<ProveedorVO> proveedores = new ArrayList<ProveedorVO>();
+    List<HistorialProveedorVO> historialCambios = new ArrayList<>();
+
     public int Id;
     private DatabaseConnection db;
     private ProveedorDAOImp proveedorDAO;
@@ -49,50 +52,51 @@ public class AdminProveedoresViewController implements Initializable {
 
     @FXML
     private TableColumn<ProveedorVO, String> columnaServicio;
-    
+
     //Botones
     @FXML
     private Button agregarViewButton;
-    
+
     @FXML
     private Button editarViewButton;
-    
+
     @FXML
     private Button eliminarViewButton;
-    
+
     @FXML
     private Button regresarViewButton;
-    
+
     @FXML
     private Button accionButton;
-    
+
     @FXML
     private Button resetearCamposButton;
-    
+
+    @FXML
+    private Button historialButton;
+
     //Texts
     @FXML
     private Text descripcionLabel;
-    
+
     @FXML
     private Label labelNombre;
-    
+
     @FXML
     private Label labelServicio;
-    
+
     @FXML
     private Label labelTelefono;
-    
+
     //TextFields
     @FXML
     private TextField TF_Nombre;
-    
+
     @FXML
     private TextField TF_Servicio;
-    
+
     @FXML
     private TextField TF_Telefono;
-    
-    
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -102,86 +106,94 @@ public class AdminProveedoresViewController implements Initializable {
             configurarTabla();
             cargarProveedores();
             mostrarInfo();
-                    
+
         } catch (SQLException e) {
             System.err.println("Error al conectar a la base de datos: " + e.getMessage());
             alerta.mostrarError("Error BD", "Error al conectar a la base de datos");
         }
     }
-    
+
     /**
-     * Agarra el contenido de los textFields, valida que no esten vacios o incorrectos
-     * y si todo esta bien, manda a llamar al metodo "agregarProveedor" del objeto
-     * "proveedorDAO"
-     * Adivina que hace el metodo ese..
-     * 
+     * Agarra el contenido de los textFields, valida que no esten vacios o
+     * incorrectos y si todo esta bien, manda a llamar al metodo
+     * "agregarProveedor" del objeto "proveedorDAO" Adivina que hace el metodo
+     * ese..
+     *
      * Accion que ocurre al presionar el boton "Crear Nuevo Proveedor"
      */
     @FXML
-    private void agregarProveedor(){
+    private void agregarProveedor() {
         String Nombre = TF_Nombre.getText();
         String Servicio = TF_Servicio.getText();
         String Telefono = TF_Telefono.getText();
-        
-        if(validarCampos(Nombre, Servicio, Telefono)){
+
+        if (validarCampos(Nombre, Servicio, Telefono)) {
             ProveedorVO p = new ProveedorVO(0, Nombre, Servicio, Telefono);
             try {
                 proveedorDAO.agregarProveedor(p);
                 cargarProveedores();
                 alerta.mostrarExito("Exito", "Se agregó correctamente al proveedor");
                 resetearCampos();
-            } catch (SQLException e){
+            } catch (SQLException e) {
                 alerta.mostrarExcepcion("Error", "Error al agregar proveedor", e);
                 System.err.println("Error al agregar proveedor: " + e.getMessage());
-            }   
+            }
         }
     }
-    
-    /**
-     * Agarra el contenido de los textFields, valida que no esten vacios o incorrectos
-     * y si todo esta bien, manda a llamar al metodo "agregarProveedor" del objeto
-     * "proveedorDAO"
-     * Adivina que hace el metodo ese..
-     * 
-     * Accion que ocurre al presionar el boton "Crear Nuevo Proveedor"
-     */
-    
-    
+
     @FXML
-    private void editarProveedor(){
-        String Nombre = TF_Nombre.getText();
-        String Servicio = TF_Servicio.getText();
-        String Telefono = TF_Telefono.getText();
-        
-        if(validarCampos(Nombre, Servicio, Telefono)){
+    private void editarProveedor() {
+        String nombreNuevo = TF_Nombre.getText();
+        String servicioNuevo = TF_Servicio.getText();
+        String telefonoNuevo = TF_Telefono.getText();
+
+        if (validarCampos(nombreNuevo, servicioNuevo, telefonoNuevo)) {
             try {
-                proveedorDAO.editarProveedor(Id, Nombre, Servicio, Telefono);
+                ProveedorVO proveedorViejo = proveedorDAO.obtenerProveedorPorId(Id);
+
+                proveedorDAO.editarProveedor(Id, nombreNuevo, servicioNuevo, telefonoNuevo);
+
+                // Registrar cambio en historial
+                String fechaHora = java.time.LocalDateTime.now().toString();
+                HistorialProveedorVO cambio = new HistorialProveedorVO(
+                        Id,
+                        proveedorViejo.getNombreProveedor(),
+                        proveedorViejo.getServicioProveedor(),
+                        proveedorViejo.getTelefonoProveedor(),
+                        nombreNuevo,
+                        servicioNuevo,
+                        telefonoNuevo,
+                        fechaHora
+                );
+                historialCambios.add(cambio);
+
                 cargarProveedores();
-                alerta.mostrarExito("Exito", "Proveedor editado correctamente");
+                alerta.mostrarExito("Éxito", "Proveedor editado correctamente");
                 resetearCampos();
-            } catch (SQLException e){
+
+            } catch (SQLException e) {
                 alerta.mostrarExcepcion("Error", "Error al editar proveedor", e);
                 System.err.println("Error al editar proveedor: " + e.getMessage());
-            }   
+            }
         }
     }
-    
+
     /**
-     * Se saca el indice seleccionado de la tabla, este junto al arraylist "provedores" son
-     * utilizados para el metodo "eliminarProveedor" del objeto "proveedorDAO".
-     * Adivina que es lo que hace ese metodo...
-     * 
+     * Se saca el indice seleccionado de la tabla, este junto al arraylist
+     * "provedores" son utilizados para el metodo "eliminarProveedor" del objeto
+     * "proveedorDAO". Adivina que es lo que hace ese metodo...
+     *
      * Accion que ocurre al presionar el boton "Eliminar Proveedor"
      */
     @FXML
-    private void eliminarProveedor() throws SQLException{
+    private void eliminarProveedor() throws SQLException {
         int indice = tablaProveedores.getSelectionModel().getSelectedIndex();
         //System.out.println("Indice Seleccionado: " + indice);
-        
-        if(indice > -1){
-            boolean resultado = alerta.mostrarConfirmacion("Eliminar", 
+
+        if (indice > -1) {
+            boolean resultado = alerta.mostrarConfirmacion("Eliminar",
                     "¡Seguro que desea eliminar el siguiente proveedor?");
-            if(resultado){
+            if (resultado) {
                 proveedorDAO.eliminarProveedor(proveedores, indice);
                 cargarProveedores();
                 alerta.mostrarExito("Exito", "El proveedor fue eliminado");
@@ -193,28 +205,27 @@ public class AdminProveedoresViewController implements Initializable {
         }
     }
 
-    
     public void accionButtonClicked() throws SQLException {
-    switch (accionButton.getText()) {
-        case "Agregar Proveedor":
-            agregarProveedor();
-            break;
+        switch (accionButton.getText()) {
+            case "Agregar Proveedor":
+                agregarProveedor();
+                break;
 
-        case "Guardar Cambios":
-            editarProveedor();
-            break;
+            case "Guardar Cambios":
+                editarProveedor();
+                break;
 
-        case "Eliminar Proveedor":
-            eliminarProveedor();
-            break;
+            case "Eliminar Proveedor":
+                eliminarProveedor();
+                break;
 
-        default:
-            System.out.println("Acción no reconocida: " + accionButton.getText());
-            break;
+            default:
+                System.out.println("Acción no reconocida: " + accionButton.getText());
+                break;
         }
     }
 
-    public void salirPresionado() throws MalformedURLException, IOException{
+    public void salirPresionado() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
@@ -224,8 +235,8 @@ public class AdminProveedoresViewController implements Initializable {
         stage.sizeToScene();
         stage.show();
     }
-    
-    private void mostrarItems(){
+
+    private void mostrarItems() {
         labelNombre.setVisible(true);
         labelNombre.setManaged(true);
         labelServicio.setVisible(true);
@@ -239,20 +250,19 @@ public class AdminProveedoresViewController implements Initializable {
         TF_Servicio.setManaged(true);
         TF_Telefono.setVisible(true);
         TF_Telefono.setManaged(true);
-        
+
         resetearCamposButton.setVisible(true);
         resetearCamposButton.setManaged(true);
     }
-    
-    
-    private void ocultarItems(){
+
+    private void ocultarItems() {
         labelNombre.setVisible(false);
         labelNombre.setManaged(false);
         labelServicio.setVisible(false);
         labelServicio.setManaged(false);
         labelTelefono.setVisible(false);
         labelTelefono.setManaged(false);
-        
+
         TF_Nombre.setVisible(false);
         TF_Nombre.setManaged(false);
         TF_Servicio.setVisible(false);
@@ -260,126 +270,124 @@ public class AdminProveedoresViewController implements Initializable {
         TF_Telefono.setVisible(false);
         TF_Telefono.setManaged(false);
     }
-    
+
     /**
      * Pone los textFields vacios
      */
-    public void resetearCampos(){
+    public void resetearCampos() {
         TF_Nombre.setText("");
         TF_Servicio.setText("");
         TF_Telefono.setText("");
     }
-    
-    
-    public void mostrarInfo(){
-            tablaProveedores.setOnMouseClicked(event -> {
-            if(accionButton.getText().equals("Guardar Cambios")){
+
+    public void mostrarInfo() {
+        tablaProveedores.setOnMouseClicked(event -> {
+            if (accionButton.getText().equals("Guardar Cambios")) {
                 ProveedorVO seleccionado = proveedores.get(
-                    tablaProveedores.getSelectionModel().getSelectedIndex());
-                if (seleccionado != null){
+                        tablaProveedores.getSelectionModel().getSelectedIndex());
+                if (seleccionado != null) {
                     //System.out.println("Seleccionado: " + seleccionado);
-                
+
                     TF_Nombre.setText(seleccionado.getNombreProveedor());
                     TF_Servicio.setText(seleccionado.getServicioProveedor());
                     TF_Telefono.setText(seleccionado.getTelefonoProveedor());
-                
+
                     Id = seleccionado.getIdProveedor();
                 }
             }
         });
     }
-    
+
     /**
      * Al hacer click en el boton "Agregar" abre el respectivo FXML
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     @FXML
-    private void onAgregarViewButtonClicked() throws IOException{
+    private void onAgregarViewButtonClicked() throws IOException {
         descripcionLabel.setText("INGRESA LOS DATOS DE UN PROVEEDOR NUEVO");
         accionButton.setText("Agregar Proveedor");
         mostrarItems();
     }
-    
+
     /**
      * Al hacer click en el boton "Editar" abre el respectivo FXML
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     @FXML
-    private void onEditarViewButtonClicked() throws IOException{
+    private void onEditarViewButtonClicked() throws IOException {
         descripcionLabel.setText("ACTUALIZA LOS DATOS DE UN PROVEEDOR");
         accionButton.setText("Guardar Cambios");
         mostrarItems();
     }
-    
+
     /**
      * Al hacer click en el boton "Eliminar" abre el respectivo FXML
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     @FXML
-    private void onEliminarViewButtonClicked() throws IOException{
+    private void onEliminarViewButtonClicked() throws IOException {
         descripcionLabel.setText("SELECCIONA A UN PROVEEDOR EN LA TABLA Y PRESIONA EL BOTON DE \"ELIMINAR PROVEEDOR\"");
         accionButton.setText("Eliminar Proveedor");
         resetearCamposButton.setVisible(false);
         resetearCamposButton.setManaged(false);
         ocultarItems();
     }
-    
-    
+
     /**
-     * Valida que el telefono tenga el formato de uno real: 10 digitos y que no 
-     * tenga ninguna letra.
-     * True si cumple, false si no
-     * 
+     * Valida que el telefono tenga el formato de uno real: 10 digitos y que no
+     * tenga ninguna letra. True si cumple, false si no
+     *
      * @param telefono
-     * @return 
+     * @return
      */
     @FXML
-    public boolean validarTelefono(String telefono){
+    public boolean validarTelefono(String telefono) {
         return telefono.matches(REGEX_TELEFONO);
     }
-    
+
     /**
      * Valida los campos
-     * 
+     *
      * @param Nombre
      * @param Servicio
      * @param Telefono
-     * @return 
+     * @return
      */
     @FXML
-    public boolean validarCampos(String Nombre, String Servicio, String Telefono){
+    public boolean validarCampos(String Nombre, String Servicio, String Telefono) {
         boolean nombreVacio = Nombre.isEmpty();
         boolean servicioVacio = Servicio.isEmpty();
         boolean telefonoVacio = Telefono.isEmpty();
-        
-        if(nombreVacio && servicioVacio && telefonoVacio){
+
+        if (nombreVacio && servicioVacio && telefonoVacio) {
             alerta.mostrarError("Campos vacios", "Llena todos los campos");
             return false;
         }
-        if (nombreVacio){
+        if (nombreVacio) {
             alerta.mostrarError("Campo Nombre vacio", "Llena el campo de nombre");
             return false;
         }
-        if (servicioVacio){
+        if (servicioVacio) {
             alerta.mostrarError("Campo Servicio vacio", "Llena el campo de servicio");
             return false;
         }
-        if (telefonoVacio){
+        if (telefonoVacio) {
             alerta.mostrarError("Campo Telefono vacio", "Llena el campo de telefono");
             return false;
         }
-        if (!validarTelefono(Telefono)){
+        if (!validarTelefono(Telefono)) {
             alerta.mostrarError("El telefono no es valido", "Ingresa un numero de telefono valido '10 digitos'");
             return false;
         }
         return true;
     }
-    
+
     /**
-     * Configura las columnas de la tabla para que muestren los campos correspondientes
+     * Configura las columnas de la tabla para que muestren los campos
+     * correspondientes
      */
     private void configurarTabla() {
         columnaId.setCellValueFactory(new PropertyValueFactory<>("idProveedor"));
@@ -389,7 +397,8 @@ public class AdminProveedoresViewController implements Initializable {
     }
 
     /**
-     * Carga todos los proveedores desde la bd en un arraylist para su lectura en la tabla
+     * Carga todos los proveedores desde la bd en un arraylist para su lectura
+     * en la tabla
      */
     private void cargarProveedores() {
         try {
@@ -404,11 +413,24 @@ public class AdminProveedoresViewController implements Initializable {
 
     /**
      * Establece la conexion con la bd usando "DataConnection"
-     * 
-     * @throws SQLException 
+     *
+     * @throws SQLException
      */
     public void setDB() throws SQLException {
         this.db = DatabaseConnection.getInstance();
     }
-   
+
+    @FXML
+    public void mostrarHistorialCambios() {
+        if (historialCambios.isEmpty()) {
+            alerta.mostrarError("Historial vacío", "No hay cambios registrados aún.");
+        } else {
+            StringBuilder historialTexto = new StringBuilder();
+            for (HistorialProveedorVO cambio : historialCambios) {
+                historialTexto.append(cambio.toString()).append("\n--------------------------\n");
+            }
+            alerta.mostrarHistorial("Historial de Cambios", historialTexto.toString());
+        }
+    }
+
 }

@@ -9,6 +9,8 @@ public interface ProveedorDAO {
     ProveedorVO obtenerProveedorDeProducto(int idProducto) throws SQLException;
 
     List<ProveedorVO> obtenerTodosProveedores() throws SQLException;
+    
+    ProveedorVO obtenerProveedorPorId(int id) throws SQLException;
 
     boolean agregarProveedor(ProveedorVO proveedor) throws SQLException;
 

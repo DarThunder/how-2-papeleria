@@ -62,6 +62,24 @@ public class ProveedorDAOImp implements ProveedorDAO {
     }
 
     @Override
+    public ProveedorVO obtenerProveedorPorId(int id) throws SQLException {
+        String query = "SELECT * FROM proveedor WHERE idProveedor = ?";
+        try (PreparedStatement stmt = db.getConnection().prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new ProveedorVO(
+                        rs.getInt("idProveedor"),
+                        rs.getString("nombre"),
+                        rs.getString("servicio"),
+                        rs.getString("telefono")
+                );
+            }
+        }
+        return null;
+    }
+
+    @Override
     public boolean agregarProveedor(ProveedorVO proveedor) throws SQLException {
         String sql = "{ CALL agregarProveedor(?, ?, ?) }";
 

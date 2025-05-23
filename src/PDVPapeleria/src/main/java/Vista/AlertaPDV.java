@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
 
 /**
  *
@@ -45,10 +46,10 @@ public class AlertaPDV {
 
     /**
      * Muestra un mensaje de confirmacion de "Si" o "No"
-     * 
+     *
      * @param titulo
      * @param mensaje
-     * @return 
+     * @return
      */
     public static boolean mostrarConfirmacion(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -62,5 +63,20 @@ public class AlertaPDV {
 
         Optional<ButtonType> resultado = alert.showAndWait();
         return resultado.isPresent() && resultado.get() == botonSi;
+    }
+
+    public static void mostrarHistorial(String titulo, String contenido) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+
+        TextArea textArea = new TextArea(contenido);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        alert.getDialogPane().setContent(textArea);
+        alert.showAndWait();
     }
 }

@@ -2,6 +2,7 @@ package com.idar.pdvpapeleria.controllers;
 
 import DAO.ProductoDAO;
 import DAOImp.ProductoDAOImp;
+import VO.HistorialProductoVO;
 import VO.ProductoVO;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import Vista.AlertaPDV;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.beans.value.ObservableValue;
 
@@ -70,7 +73,10 @@ public class AdminViewController {
     private final Map<String, String> parametrosBusqueda = new HashMap<>();
     private String ultimoParametroBusqueda = "";
     private String ultimoTextoBusqueda = "";
-
+    
+    private static List<HistorialProductoVO> historialProductos = new ArrayList<>();
+    ModificarProductoController historial = new ModificarProductoController();
+    
     @FXML
     public void initialize() throws SQLException {
         productoDAO = ProductoDAOImp.getInstance();
@@ -81,6 +87,7 @@ public class AdminViewController {
         configurarBuscador();
         configurarSeleccionFila();
         configurarMenuContextual();
+        historialProductos = historial.getHistorial();
     }
 
     private void configurarParametrosBusqueda() {
@@ -407,6 +414,19 @@ public class AdminViewController {
         fadeIn.setToValue(1);
         dialog.setOnShown(e -> fadeIn.play());
         dialog.showAndWait();
+    }
+    
+    @FXML
+    public void mostrarHistorialCambios() {
+        if (historialProductos.isEmpty()) {
+            AlertaPDV.mostrarError("Historial vacío", "No hay cambios registrados aún.");
+        } else {
+            StringBuilder historialTexto = new StringBuilder();
+            for (HistorialProductoVO cambio : historialProductos) {
+                historialTexto.append(cambio.toString()).append("\n--------------------------\n");
+            }
+            AlertaPDV.mostrarHistorial("Historial de Cambios", historialTexto.toString());
+        }
     }
 
     @FXML

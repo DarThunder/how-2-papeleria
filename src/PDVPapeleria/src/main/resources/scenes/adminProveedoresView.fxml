@@ -18,7 +18,7 @@
          <children>
             <Button fx:id="regresarViewButton" onAction="#salirPresionado" prefHeight="5.0" prefWidth="24.0" text="↩" textAlignment="CENTER">
                <HBox.margin>
-                  <Insets left="-150.0" />
+                  <Insets />
                </HBox.margin>
                <font>
                   <Font name="System Bold" size="11.0" />
@@ -29,9 +29,10 @@
                   <Font name="Georgia Bold" size="26.0" />
                </font>
                <HBox.margin>
-                  <Insets left="200.0" />
+                  <Insets left="150.0" right="75.0" />
                </HBox.margin>
             </Label>
+            <Button fx:id="historialButton" onAction="#mostrarHistorialCambios" prefHeight="25.0" prefWidth="142.0" text=" Historial de Cambios" />
          </children>
       </HBox>
    </top>

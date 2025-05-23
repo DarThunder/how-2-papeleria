@@ -5,10 +5,15 @@ import DAO.ProductoDAO;
 import DAO.ProveedorDAO;
 import DAOImp.ProductoDAOImp;
 import DAOImp.ProveedorDAOImp;
+import VO.HistorialProductoVO;
 import VO.ProductoVO;
 import VO.ProveedorVO;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 import javafx.collections.FXCollections;
@@ -50,6 +55,8 @@ public class ModificarProductoController implements Initializable {
     private ProductoDAO productoDAO;
     private ProveedorDAO proveedorDAO;
 
+    private static List<HistorialProductoVO> historialProductos = new ArrayList<>();
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -73,8 +80,7 @@ public class ModificarProductoController implements Initializable {
                 "Papelería y Cuadernos",
                 "Arte y Manualidades",
                 "Oficina y Organización",
-                "Tecnología y Electrónica"
-        );
+                "Tecnología y Electrónica");
 
         categoriaComboBox.setConverter(new StringConverter<String>() {
             @Override
@@ -189,16 +195,42 @@ public class ModificarProductoController implements Initializable {
                     precioVenta,
                     stock,
                     descripcionField.getText(),
-                    categoriaComboBox.getValue()
-            );
+                    categoriaComboBox.getValue());
+
+            // **REGISTRO DEL HISTORIAL ANTES DE ACTUALIZAR**
+            String fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+            HistorialProductoVO historial = new HistorialProductoVO(
+                    productoOriginal.getIdProducto(),
+                    // Datos ANTES del cambio
+                    productoOriginal.getNombre(),
+                    productoOriginal.getPrecioDeCompra(),
+                    productoOriginal.getPrecioDeVenta(),
+                    productoOriginal.getStock(),
+                    productoOriginal.getDescripcion(),
+                    productoOriginal.getCategoria(),
+                    // Datos DESPUÉS del cambio
+                    productoModificado.getNombre(),
+                    productoModificado.getPrecioDeCompra(),
+                    productoModificado.getPrecioDeVenta(),
+                    productoModificado.getStock(),
+                    productoModificado.getDescripcion(),
+                    productoModificado.getCategoria(),
+                    fechaHoraActual);
+
+            // Agregar al historial en memoria
+            historialProductos.add(historial);
+
+            // Mostrar el registro del historial en consola (opcional)
+            // System.out.println("=== HISTORIAL DE CAMBIO REGISTRADO ===");
+            // System.out.println(historial.toString());
 
             ProveedorVO proveedorSeleccionado = proveedorComboBox.getValue();
 
             // Actualizar en BD
             boolean actualizado = productoDAO.actualizarProductoConProveedor(
                     productoModificado,
-                    proveedorSeleccionado.getIdProveedor()
-            );
+                    proveedorSeleccionado.getIdProveedor());
 
             if (actualizado) {
                 AlertaPDV.mostrarExito("Éxito", "Producto actualizado correctamente");
@@ -212,6 +244,10 @@ public class ModificarProductoController implements Initializable {
         } catch (SQLException e) {
             AlertaPDV.mostrarExcepcion("Error de base de datos", "Error al actualizar el producto", e);
         }
+    }
+
+    public static List<HistorialProductoVO> getHistorial(){
+        return historialProductos;
     }
 
     private boolean camposInvalidos() {
