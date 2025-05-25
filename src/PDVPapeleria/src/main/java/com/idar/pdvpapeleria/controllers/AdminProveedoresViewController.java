@@ -139,6 +139,7 @@ public class AdminProveedoresViewController implements Initializable {
             try {
                 proveedorDAO.agregarProveedor(p);
                 cargarProveedores();
+                cargarComboBoxProveedores();
                 alerta.mostrarExito("Exito", "Se agregó correctamente al proveedor");
                 resetearCampos();
             } catch (SQLException e) {
@@ -175,6 +176,7 @@ public class AdminProveedoresViewController implements Initializable {
                 historialCambios.add(cambio);
 
                 cargarProveedores();
+                cargarComboBoxProveedores();
                 alerta.mostrarExito("Éxito", "Proveedor editado correctamente");
                 resetearCampos();
 
@@ -203,6 +205,7 @@ public class AdminProveedoresViewController implements Initializable {
             if (resultado) {
                 proveedorDAO.eliminarProveedor(proveedores, indice);
                 cargarProveedores();
+                cargarComboBoxProveedores();
                 alerta.mostrarExito("Exito", "El proveedor fue eliminado");
             } else {
                 alerta.mostrarExito("Proceso Cancelado", "Operación cancelada exitosamente");

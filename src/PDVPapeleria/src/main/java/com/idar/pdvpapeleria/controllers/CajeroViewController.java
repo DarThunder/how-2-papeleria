@@ -4,19 +4,27 @@ import DAOImp.ProductoDAOImp;
 import DAOImp.VentaDAOImp;
 import VO.EmpleadoVO;
 import VO.ProductoVO;
+import Vista.AlertaPDV;
 import com.idar.pdvpapeleria.utils.PDFGenerator;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -54,6 +62,7 @@ public class CajeroViewController implements Initializable {
     @FXML private Label estadoVentaLabel;
     @FXML private Label nombreCajeroLabel;
     @FXML private VBox productoInfoBox;
+    @FXML private Button cerrarCajaB; 
 
     // Método para establecer el cajero actual
     public void setCajeroActual(EmpleadoVO cajero) {
@@ -332,5 +341,36 @@ public class CajeroViewController implements Initializable {
             case F7 -> onRemoveButtonClicked(new ActionEvent());
             case F8 -> onPayButtonClicked(new ActionEvent());
         }
+    }
+    
+    @FXML
+    /**
+     * Método para cerrar la caja por medio de una confirmación
+     */
+    private void cerrarCaja(){
+        boolean opcion = AlertaPDV.mostrarConfirmacion("Cerrar caja","¿Quiéres cerrar la caja y terminar tu sesión?" );
+        if(opcion){
+            try {
+                regresarAlogin();
+                //MomichisYam estuvo aqui!!!
+            } catch (IOException ex) {
+                AlertaPDV.mostrarExcepcion("Error", "No se pudo cambiar al login", ex);
+            }
+        }
+    }
+    
+    @FXML
+    /**
+     * Método para regresar al login
+     */
+    public void regresarAlogin() throws MalformedURLException, IOException {
+        File fxmlFile = new File("src/main/resources/scenes/login.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
+        Parent root = loader.load();
+        Stage stage = (Stage) cerrarCajaB.getScene().getWindow();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
     }
 }
