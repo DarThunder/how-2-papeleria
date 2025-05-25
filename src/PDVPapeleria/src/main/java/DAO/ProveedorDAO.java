@@ -15,7 +15,7 @@ public interface ProveedorDAO {
 
     boolean agregarProveedor(ProveedorVO proveedor) throws SQLException;
 
-    boolean eliminarProveedor(List<ProveedorVO> proveedores, int indiceSeleccionado) throws SQLException;
+    public void eliminarProveedor(int idProveedor) throws SQLException;
 
     boolean editarProveedor(int id, String nombre, String servicio, String telefono) throws SQLException;
     

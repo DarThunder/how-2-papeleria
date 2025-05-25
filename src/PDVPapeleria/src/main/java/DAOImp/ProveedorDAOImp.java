@@ -97,15 +97,13 @@ public class ProveedorDAOImp implements ProveedorDAO {
     }
 
     @Override
-    public boolean eliminarProveedor(List<ProveedorVO> proveedores, int indiceSeleccionado) throws SQLException {
-        String sql = "{ CALL eliminarProveedor(?) }";
-
-        try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, proveedores.get(indiceSeleccionado).getIdProveedor());
-            return stmt.executeUpdate() > 0;
-        }
+    public void eliminarProveedor(int idProveedor) throws SQLException {
+    String sql = "{ CALL eliminarProveedor(?)}";
+    try (PreparedStatement ps = db.getConnection().prepareStatement(sql)) {
+        ps.setInt(1, idProveedor);
+        ps.executeUpdate();
     }
+}
 
     @Override
     public boolean editarProveedor(int id, String nombre, String servicio, String telefono) throws SQLException {

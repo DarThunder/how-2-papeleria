@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -79,6 +80,9 @@ public class AdminProveedoresViewController implements Initializable {
     @FXML
     private Button historialButton;
 
+    @FXML
+    private Button BBuscar;
+
     //Texts
     @FXML
     private Text descripcionLabel;
@@ -101,8 +105,12 @@ public class AdminProveedoresViewController implements Initializable {
 
     @FXML
     private TextField TF_Telefono;
-    
-    @FXML private ComboBox<String> comboBoxProveedores;
+
+    @FXML
+    private TextField TFBusqueda;
+
+    @FXML
+    private ComboBox<String> comboBoxProveedores;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -164,14 +172,14 @@ public class AdminProveedoresViewController implements Initializable {
                 // Registrar cambio en historial
                 String fechaHora = java.time.LocalDateTime.now().toString();
                 HistorialProveedorVO cambio = new HistorialProveedorVO(
-                        Id,
-                        proveedorViejo.getNombreProveedor(),
-                        proveedorViejo.getServicioProveedor(),
-                        proveedorViejo.getTelefonoProveedor(),
-                        nombreNuevo,
-                        servicioNuevo,
-                        telefonoNuevo,
-                        fechaHora
+                    Id,
+                    proveedorViejo.getNombreProveedor(),
+                    proveedorViejo.getServicioProveedor(),
+                    proveedorViejo.getTelefonoProveedor(),
+                    nombreNuevo,
+                    servicioNuevo,
+                    telefonoNuevo,
+                    fechaHora
                 );
                 historialCambios.add(cambio);
 
@@ -195,25 +203,22 @@ public class AdminProveedoresViewController implements Initializable {
      * Accion que ocurre al presionar el boton "Eliminar Proveedor"
      */
     @FXML
-    private void eliminarProveedor() throws SQLException {
-        int indice = tablaProveedores.getSelectionModel().getSelectedIndex();
-        //System.out.println("Indice Seleccionado: " + indice);
-
-        if (indice > -1) {
-            boolean resultado = alerta.mostrarConfirmacion("Eliminar",
-                    "¡Seguro que desea eliminar el siguiente proveedor?");
-            if (resultado) {
-                proveedorDAO.eliminarProveedor(proveedores, indice);
-                cargarProveedores();
-                cargarComboBoxProveedores();
-                alerta.mostrarExito("Exito", "El proveedor fue eliminado");
-            } else {
-                alerta.mostrarExito("Proceso Cancelado", "Operación cancelada exitosamente");
-            }
-        } else {
-            alerta.mostrarError("Error", "Selecciona a un proveedor de la tabla");
+private void eliminarProveedor() throws SQLException {
+    ProveedorVO seleccionado = (ProveedorVO) tablaProveedores.getSelectionModel().getSelectedItem();
+    
+    if (seleccionado != null) {
+        boolean resultado = alerta.mostrarConfirmacion("Eliminar", 
+            "¿Seguro que desea eliminar a " + seleccionado.getNombreProveedor() + "?");
+        if (resultado) {
+            proveedorDAO.eliminarProveedor(seleccionado.getIdProveedor()); // Eliminar por ID
+            cargarProveedores();
+            cargarComboBoxProveedores();
+            alerta.mostrarExito("Éxito", "Proveedor eliminado");
         }
+    } else {
+        alerta.mostrarError("Error", "Selecciona un proveedor de la tabla");
     }
+}
 
     public void accionButtonClicked() throws SQLException {
         switch (accionButton.getText()) {
@@ -293,16 +298,12 @@ public class AdminProveedoresViewController implements Initializable {
     public void mostrarInfo() {
         tablaProveedores.setOnMouseClicked(event -> {
             if (accionButton.getText().equals("Guardar Cambios")) {
-                ProveedorVO seleccionado = proveedores.get(
-                        tablaProveedores.getSelectionModel().getSelectedIndex());
+                ProveedorVO seleccionado = (ProveedorVO) tablaProveedores.getSelectionModel().getSelectedItem(); // Obtener el objeto directamente
                 if (seleccionado != null) {
-                    //System.out.println("Seleccionado: " + seleccionado);
-
                     TF_Nombre.setText(seleccionado.getNombreProveedor());
                     TF_Servicio.setText(seleccionado.getServicioProveedor());
                     TF_Telefono.setText(seleccionado.getTelefonoProveedor());
-
-                    Id = seleccionado.getIdProveedor();
+                    Id = seleccionado.getIdProveedor(); // Usar el ID del objeto seleccionado
                 }
             }
         });
@@ -318,6 +319,8 @@ public class AdminProveedoresViewController implements Initializable {
         descripcionLabel.setText("INGRESA LOS DATOS DE UN PROVEEDOR NUEVO");
         accionButton.setText("Agregar Proveedor");
         mostrarItems();
+        configurarColumnasParaProveedores();
+        cargarProveedores();
     }
 
     /**
@@ -330,6 +333,8 @@ public class AdminProveedoresViewController implements Initializable {
         descripcionLabel.setText("ACTUALIZA LOS DATOS DE UN PROVEEDOR");
         accionButton.setText("Guardar Cambios");
         mostrarItems();
+        configurarColumnasParaProveedores();
+        cargarProveedores();
     }
 
     /**
@@ -344,6 +349,8 @@ public class AdminProveedoresViewController implements Initializable {
         resetearCamposButton.setVisible(false);
         resetearCamposButton.setManaged(false);
         ocultarItems();
+        configurarColumnasParaProveedores();
+        cargarProveedores();
     }
 
     /**
@@ -442,7 +449,7 @@ public class AdminProveedoresViewController implements Initializable {
             alerta.mostrarHistorial("Historial de Cambios", historialTexto.toString());
         }
     }
-    
+
     private void cargarComboBoxProveedores() throws SQLException {
         List<String> nombresProveedores = proveedorDAO.obtenerNombresProveedores();
         nombresProveedores.add(0, "Todos los proveedores");
@@ -450,60 +457,84 @@ public class AdminProveedoresViewController implements Initializable {
         comboBoxProveedores.setItems(items);
         comboBoxProveedores.getSelectionModel().selectFirst();
         comboBoxProveedores.getSelectionModel().selectedItemProperty().addListener(
-    (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-        if (newValue != null) {
-            if (newValue.equals("Todos los proveedores")) {
-                configurarColumnasParaProveedores(); // <-- Restaura columnas
-                cargarProveedores();
-            } else {
-                cargarProductos(newValue);
-            }
-        }
-    });
+            (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                if (newValue != null) {
+                    if (newValue.equals("Todos los proveedores")) {
+                        configurarColumnasParaProveedores(); // <-- Restaura columnas
+                        cargarProveedores();
+                    } else {
+                        cargarProductos(newValue);
+                    }
+                }
+            });
     }
-    
+
     private void cargarProductos(String nombreProveedor) {
-    try {
-        configurarColumnasParaProductos();
-        List<ProductoVO> productos = proveedorDAO.obtenerProductosPorProveedor(nombreProveedor);
-        ObservableList<Object> items = FXCollections.observableArrayList(productos); // Usa ProductoVO
-        tablaProveedores.setItems(items);
-    } catch (SQLException e) {
-        alerta.mostrarError("Error", "Error al cargar productos: " + e.getMessage());
+        try {
+            configurarColumnasParaProductos();
+            List<ProductoVO> productos = proveedorDAO.obtenerProductosPorProveedor(nombreProveedor);
+            ObservableList<Object> items = FXCollections.observableArrayList(productos); // Usa ProductoVO
+            tablaProveedores.setItems(items);
+        } catch (SQLException e) {
+            alerta.mostrarError("Error", "Error al cargar productos: " + e.getMessage());
+        }
     }
-}
-    
+
     private void configurarColumnasParaProductos() {
-    tablaProveedores.getColumns().clear();
+        tablaProveedores.getColumns().clear();
 
-    // Crea nuevas columnas específicas para ProductoVO
-    TableColumn<Object, String> colNombreProducto = new TableColumn<>("Producto");
-    TableColumn<Object, Integer> colPrecioCompra = new TableColumn<>("Precio Compra");
-    TableColumn<Object, Integer> colPrecioVenta = new TableColumn<>("Precio Venta");
-    TableColumn<Object, Integer> colStock = new TableColumn<>("Stock");
+        // Crea nuevas columnas específicas para ProductoVO
+        TableColumn<Object, String> colNombreProducto = new TableColumn<>("Producto");
+        TableColumn<Object, Integer> colPrecioCompra = new TableColumn<>("Precio Compra");
+        TableColumn<Object, Integer> colPrecioVenta = new TableColumn<>("Precio Venta");
+        TableColumn<Object, Integer> colStock = new TableColumn<>("Stock");
 
-    // Configura las propiedades usando lambda para manejar Object
-    colNombreProducto.setCellValueFactory(cellData -> 
-        new SimpleStringProperty(((ProductoVO) cellData.getValue()).getNombre()));
-    colPrecioCompra.setCellValueFactory(cellData -> 
-        new SimpleIntegerProperty(((ProductoVO) cellData.getValue()).getPrecioDeCompra()).asObject());
-    colPrecioVenta.setCellValueFactory(cellData -> 
-        new SimpleIntegerProperty(((ProductoVO) cellData.getValue()).getPrecioDeVenta()).asObject());
-    colStock.setCellValueFactory(cellData -> 
-        new SimpleIntegerProperty(((ProductoVO) cellData.getValue()).getStock()).asObject());
+        // Configura las propiedades usando lambda para manejar Object
+        colNombreProducto.setCellValueFactory(cellData
+            -> new SimpleStringProperty(((ProductoVO) cellData.getValue()).getNombre()));
+        colPrecioCompra.setCellValueFactory(cellData
+            -> new SimpleIntegerProperty(((ProductoVO) cellData.getValue()).getPrecioDeCompra()).asObject());
+        colPrecioVenta.setCellValueFactory(cellData
+            -> new SimpleIntegerProperty(((ProductoVO) cellData.getValue()).getPrecioDeVenta()).asObject());
+        colStock.setCellValueFactory(cellData
+            -> new SimpleIntegerProperty(((ProductoVO) cellData.getValue()).getStock()).asObject());
 
-    tablaProveedores.getColumns().addAll(colNombreProducto, colPrecioCompra, colPrecioVenta, colStock);
-}
-    
+        tablaProveedores.getColumns().addAll(colNombreProducto, colPrecioCompra, colPrecioVenta, colStock);
+    }
+
     private void configurarColumnasParaProveedores() {
-    tablaProveedores.getColumns().clear();
-    
-    colPrincipal.setCellValueFactory(new PropertyValueFactory<>("idProveedor"));
-    colSecundaria.setCellValueFactory(new PropertyValueFactory<>("nombreProveedor"));
-    colCuaternaria.setCellValueFactory(new PropertyValueFactory<>("servicioProveedor"));
-    colTerciaria.setCellValueFactory(new PropertyValueFactory<>("telefonoProveedor"));
+        tablaProveedores.getColumns().clear();
 
-    tablaProveedores.getColumns().addAll(colPrincipal, colSecundaria, colTerciaria, colCuaternaria);
-}
+        colPrincipal.setCellValueFactory(new PropertyValueFactory<>("idProveedor"));
+        colSecundaria.setCellValueFactory(new PropertyValueFactory<>("nombreProveedor"));
+        colCuaternaria.setCellValueFactory(new PropertyValueFactory<>("servicioProveedor"));
+        colTerciaria.setCellValueFactory(new PropertyValueFactory<>("telefonoProveedor"));
 
+        tablaProveedores.getColumns().addAll(colPrincipal, colSecundaria, colTerciaria, colCuaternaria);
+    }
+
+    @FXML
+    private void buscarProveedorPorNombre() {
+        String textoBusqueda = TFBusqueda.getText().trim().toLowerCase();
+
+        // Asegurar que la tabla muestre proveedores
+        configurarColumnasParaProveedores();
+
+        if (textoBusqueda.isEmpty()) {
+            cargarProveedores();
+            return;
+        }
+
+        List<ProveedorVO> proveedoresFiltrados = proveedores.stream()
+            .filter(p -> p.getNombreProveedor().toLowerCase().contains(textoBusqueda))
+            .collect(Collectors.toList());
+
+        if (proveedoresFiltrados.isEmpty()) {
+            alerta.mostrarError("Búsqueda sin resultados", "No se encontró ningún proveedor con el nombre: " + textoBusqueda);
+            return; // Opcional: Mantener la lista completa o limpiar la tabla
+        }
+
+        ObservableList<Object> datos = FXCollections.observableArrayList(proveedoresFiltrados);
+        tablaProveedores.setItems(datos);
+    }
 }
