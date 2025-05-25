@@ -2,11 +2,14 @@ package DAOImp;
 
 import DAO.DatabaseConnection;
 import DAO.ProveedorDAO;
+import VO.ProductoVO;
 import VO.ProveedorVO;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,5 +120,57 @@ public class ProveedorDAOImp implements ProveedorDAO {
 
             return stmt.executeUpdate() > 0;
         }
+    }
+    
+    /**
+     * Método para cargar los nombres de los proveedores
+     * @return Lista de nombres
+     * @throws SQLException 
+     */
+    @Override
+    public List<String> obtenerNombresProveedores() throws SQLException {
+        List<String> nombres = new ArrayList<>();
+        String sql = "SELECT nombre FROM proveedor ORDER BY nombre";
+        
+        try (Connection conn = db.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                nombres.add(rs.getString("nombre"));
+            }
+        }
+        return nombres;
+    }
+    
+    /**
+     * Método para cargar los productos por proveedor 
+     * @param nombreProveedor El nombre del proveedor
+     * @return La lista de productos del proveedor 
+     * @throws SQLException 
+     */
+    @Override
+     public List<ProductoVO> obtenerProductosPorProveedor(String nombreProveedor) throws SQLException {
+        List<ProductoVO> productos = new ArrayList<>();
+        
+        try (Connection conn = db.getConnection();
+             CallableStatement cstmt = conn.prepareCall("{CALL ObtenerProductosPorProveedor(?)}")) {
+            
+            cstmt.setString(1, nombreProveedor);
+            ResultSet rs = cstmt.executeQuery();
+            
+            while (rs.next()) {
+                ProductoVO pp = new ProductoVO(
+                    rs.getInt("idProducto"),
+                    rs.getString("nombre_producto"),
+                    rs.getInt("precioDeCompra"),
+                    rs.getInt("precioDeVenta"),
+                    rs.getInt("stock"),
+                    rs.getString("categoria")
+                );
+                productos.add(pp);
+            }
+        }
+        return productos;
     }
 }

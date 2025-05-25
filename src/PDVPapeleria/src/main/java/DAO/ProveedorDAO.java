@@ -1,5 +1,6 @@
 package DAO;
 
+import VO.ProductoVO;
 import VO.ProveedorVO;
 import java.sql.SQLException;
 import java.util.List;
@@ -17,4 +18,8 @@ public interface ProveedorDAO {
     boolean eliminarProveedor(List<ProveedorVO> proveedores, int indiceSeleccionado) throws SQLException;
 
     boolean editarProveedor(int id, String nombre, String servicio, String telefono) throws SQLException;
+    
+    public List<String> obtenerNombresProveedores() throws SQLException; 
+    
+    public List<ProductoVO> obtenerProductosPorProveedor(String nombreProveedor) throws SQLException; 
 }
