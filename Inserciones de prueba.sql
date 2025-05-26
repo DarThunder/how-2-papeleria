@@ -1,5 +1,3 @@
--- Inserciones de prueba
-
 -- Insertar proveedores
 INSERT INTO proveedor (nombre, servicio, telefono) VALUES 
 ('Papelería Moderna', 'Material de oficina', '5551002000'),
@@ -15,15 +13,14 @@ INSERT INTO producto (nombre, precioDeCompra, precioDeVenta, stock, descripcion,
 ('Mouse inalámbrico', 120, 250, 30, 'Mouse ergonómico inalámbrico', 'Tecnología y Electrónica'),
 ('Resma papel carta', 40, 80, 40, 'Paquete de 500 hojas', 'Oficina y Organización');
 
+delete from provee;
 -- Establecer relaciones PROVEE (idProducto, idProveedor)
 INSERT INTO provee (idProducto, idProveedor) VALUES 
 (1, 1),  -- Lápiz HB proveído por Papelería Moderna
-(1, 2),  -- Lápiz HB también proveído por Distribuidora Escolar (relación muchos a muchos)
 (2, 2),  -- Cuaderno profesional proveído por Distribuidora Escolar
 (3, 3),  -- Acuarelas proveídas por ArteCreativo
 (4, 4),  -- Mouse inalámbrico proveído por TecnoSuministros
-(5, 1),  -- Resma papel proveída por Papelería Moderna
-(5, 4);  -- Resma papel también proveída por TecnoSuministros
+(5, 4);  -- Resma papel proveída por Papelería Moderna
 
 -- Consulta de verificación
 SELECT p.nombre AS producto, pr.nombre AS proveedor
