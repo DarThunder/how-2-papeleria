@@ -128,7 +128,7 @@ public class ProveedorDAOImp implements ProveedorDAO {
     @Override
     public List<String> obtenerNombresProveedores() throws SQLException {
         List<String> nombres = new ArrayList<>();
-        String sql = "SELECT nombre FROM proveedor ORDER BY nombre";
+        String sql = "SELECT nombre FROM proveedor WHERE isDeleted = false ORDER BY nombre";
         
         try (Connection conn = db.getConnection();
              Statement stmt = conn.createStatement();
