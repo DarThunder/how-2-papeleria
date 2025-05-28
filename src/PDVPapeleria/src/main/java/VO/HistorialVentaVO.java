@@ -18,13 +18,12 @@ public class HistorialVentaVO {
     private List<ProductoVO> productos;
 
     public HistorialVentaVO(int folio, int idEmpleado, LocalDateTime fechaYHora, int total, 
-                          String nombreEmpleado, List<ProductoVO> productos) {
+                          String nombreEmpleado) {
         this.folio = folio;
         this.idEmpleado = idEmpleado;
         this.fechaYHora = fechaYHora;
         this.total = total;
         this.nombreEmpleado = nombreEmpleado;
-        this.productos = productos;
     }
 
     public int getFolio() {

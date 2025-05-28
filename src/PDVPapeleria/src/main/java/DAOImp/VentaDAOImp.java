@@ -114,16 +114,15 @@ public class VentaDAOImp implements VentaDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int folio = rs.getInt("folio");
-                    List<ProductoVO> productos = obtenerProductosDeVenta(folio);
 
                     resultados.add(new HistorialVentaVO(
-                        folio,
-                        rs.getInt("idEmpleado"),
-                        rs.getTimestamp("fechaYHora").toLocalDateTime(),
-                        rs.getInt("total"),
-                        rs.getString("nombreEmpleado"),
-                        productos
-                    ));
+                    folio,
+                    rs.getInt("idEmpleado"),
+                    rs.getTimestamp("fechaYHora").toLocalDateTime(),
+                    rs.getInt("total"),
+                    rs.getString("nombreEmpleado")
+                ));
+
                 }
             }
         } catch (SQLException e) {
@@ -132,37 +131,7 @@ public class VentaDAOImp implements VentaDAO {
         return resultados;
     }
 
-    public List<ProductoVO> obtenerProductosDeVenta(int folioVenta) {
-        List<ProductoVO> productos = new ArrayList<>();
-
-        String sql = "SELECT p.id, p.nombre, dv.cantidad, dv.precioDeVenta " +
-                     "FROM DetalleVenta dv JOIN Producto p ON dv.idProducto = p.id " +
-                     "WHERE dv.folioVenta = ?";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, folioVenta);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    productos.add(new ProductoVO(
-                        rs.getInt("id"),
-                        rs.getString("nombre"),
-                        0,
-                        rs.getInt("precioDeVenta"),
-                        rs.getInt("cantidad"),
-                        "",
-                        ""
-                    ));
-                }
-            }
-        } catch (SQLException e) {
-            Logger.getLogger(VentaDAOImp.class.getName()).log(Level.SEVERE, null, e);
-        }
-        return productos;
-    }
-
+   
     @FunctionalInterface
     private interface ParameterSetter {
         void setParameters(PreparedStatement ps) throws SQLException;

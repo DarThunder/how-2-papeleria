@@ -53,7 +53,7 @@ public class DueñoViewController {
 
     @FXML
     private void switchToInventario() {
-        switchToScene(BInventario, "src/main/resources/scenes/historialVentas.fxml");
+        switchToScene(BInventario, "src/main/resources/scenes/adminInventarioView.fxml");
     }
 
     @FXML
