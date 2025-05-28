@@ -115,5 +115,9 @@ public class ProductoVO {
     public IntegerProperty subtotalProperty() {
         return new SimpleIntegerProperty(getSubtotal());
     }
+    // Añadir este método a ProductoVO.java para facilitar la visualización
+    public String toString() {
+        return String.format("%s x%d ($%d)", getNombre(), getCantidad(), getPrecioDeVenta());
+    }
 
 }

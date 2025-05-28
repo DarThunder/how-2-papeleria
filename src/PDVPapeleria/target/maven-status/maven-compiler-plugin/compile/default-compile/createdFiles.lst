@@ -11,8 +11,11 @@ DAO\DatabaseConnection.class
 com\idar\pdvpapeleria\controllers\DueñoViewController.class
 com\idar\pdvpapeleria\controllers\LoginController.class
 com\idar\pdvpapeleria\controllers\AgregarProductoController$1.class
+VO\HistorialProductoVO.class
 VO\ProductoVO.class
 com\idar\pdvpapeleria\controllers\AdminViewController.class
+com\idar\pdvpapeleria\controllers\HistorialVentasController.class
+VO\HistorialVentaVO.class
 com\idar\pdvpapeleria\controllers\AdminViewController$2.class
 DAO\ProductoDAO.class
 DAOImp\ProveedorDAOImp.class
@@ -20,15 +23,13 @@ com\idar\pdvpapeleria\controllers\CajeroViewController$1.class
 com\idar\pdvpapeleria\controllers\AdministracionEmpleados.class
 DAOImp\VentaDAOImp.class
 com\idar\pdvpapeleria\controllers\OpcionesAdministradorController.class
-com\idar\pdvpapeleria\controllers\AdminAgregarProveedorViewController.class
 lib\SqlLib.class
 com\idar\pdvpapeleria\controllers\CambiarContraseñaController.class
 com\idar\pdvpapeleria\controllers\ModificarProductoController$2.class
 DAO\VentaDAO.class
 com\idar\pdvpapeleria\controllers\AgregarProductoController.class
+VO\HistorialProveedorVO.class
 com\idar\pdvpapeleria\controllers\AdminViewController$1.class
-com\idar\pdvpapeleria\controllers\AdminEditarProveedorViewController.class
-com\idar\pdvpapeleria\controllers\AdminEliminarProveedorViewController.class
 VO\ProveedorVO.class
 com\idar\pdvpapeleria\controllers\ModificarProductoController$1.class
 com\idar\pdvpapeleria\controllers\ModificarProductoController.class
@@ -39,5 +40,6 @@ com\idar\pdvpapeleria\controllers\AbrirCajaViewController.class
 com\idar\pdvpapeleria\controllers\AgregarProductoController$2.class
 com\idar\pdvpapeleria\App.class
 com\idar\pdvpapeleria\ConnectionDB.class
+DAOImp\VentaDAOImp$ParameterSetter.class
 com\idar\pdvpapeleria\controllers\PlantillaController.class
 VO\EmpleadoVO.class

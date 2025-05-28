@@ -4,6 +4,7 @@ import VO.ProductoVO;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 public interface ProductoDAO {
 
     ResultSet getProductos() throws SQLException;

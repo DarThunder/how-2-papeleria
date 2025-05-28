@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="488.0" prefWidth="675.0" style="-fx-background-color: #266887;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.idar.pdvpapeleria.controllers.HistorialVentasController">
+   <children>
+      <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="675.0" style="-fx-background-color: #c4def6;">
+         <children>
+            <Text layoutX="197.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="HISTORIAL DE VENTAS">
+               <font>
+                  <Font name="Bernard MT Condensed" size="37.0" />
+               </font>
+            </Text>
+            <Button fx:id="buttonAtras" layoutX="21.0" layoutY="17.0" mnemonicParsing="false" onAction="#switchToDueñoView" text="Atras" textFill="#010908" />
+         </children>
+      </Pane>
+      <Text layoutX="24.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parametros">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+      </Text>
+      <ComboBox fx:id="parametroBusquedaCombo" layoutX="124.0" layoutY="84.0" prefHeight="25.0" prefWidth="181.0" promptText="Seleccione Parametro" />
+      <Button fx:id="buscarButton" layoutX="561.0" layoutY="83.0" mnemonicParsing="false" onAction="#buscarVentas" text="Buscar" />
+      <TableView fx:id="historialTableView" layoutX="45.0" layoutY="136.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="314.0" prefWidth="573.0">
+        <columns>
+          <TableColumn fx:id="fechaCol" prefWidth="75.0" text="Fecha" />
+          <TableColumn fx:id="cajeroCol" prefWidth="75.0" text="Cajero" />
+            <TableColumn fx:id="detallesCol" prefWidth="200.0000457763672" text="Detalles" />
+            <TableColumn fx:id="folioCol" prefWidth="87.33331298828125" text="Folio" />
+            <TableColumn fx:id="totalCol" prefWidth="87.33331298828125" text="Total" />
+        </columns>
+      </TableView>
+      <TextField fx:id="BuscarField" layoutX="392.0" layoutY="83.0" />
+   </children>
+</Pane>
