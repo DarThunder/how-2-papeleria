@@ -43,32 +43,42 @@ public class CajeroViewController implements Initializable {
     // DAOs
     private ProductoDAOImp productoDao;
     private VentaDAOImp ventaDao;
-    
+
     // Datos del cajero
     private EmpleadoVO cajeroActual;
-    
+
     // Modelos de datos
     private final ObservableList<ProductoVO> products = FXCollections.observableArrayList();
     private final Map<Integer, ProductoVO> productMap = new HashMap<>();
     private boolean isSellInAction;
-    
+
     // Componentes FXML
-    @FXML private TableView<ProductoVO> productosTableView;
-    @FXML private TableColumn<ProductoVO, String> productNameCol;
-    @FXML private TableColumn<ProductoVO, Integer> productCountCol;
-    @FXML private TableColumn<ProductoVO, Integer> productPriceCol;
-    @FXML private TableColumn<ProductoVO, Integer> productSubtotalCol;
-    @FXML private Label totalLabel;
-    @FXML private Label estadoVentaLabel;
-    @FXML private Label nombreCajeroLabel;
-    @FXML private VBox productoInfoBox;
-    @FXML private Button cerrarCajaB; 
+    @FXML
+    private TableView<ProductoVO> productosTableView;
+    @FXML
+    private TableColumn<ProductoVO, String> productNameCol;
+    @FXML
+    private TableColumn<ProductoVO, Integer> productCountCol;
+    @FXML
+    private TableColumn<ProductoVO, Integer> productPriceCol;
+    @FXML
+    private TableColumn<ProductoVO, Integer> productSubtotalCol;
+    @FXML
+    private Label totalLabel;
+    @FXML
+    private Label estadoVentaLabel;
+    @FXML
+    private Label nombreCajeroLabel;
+    @FXML
+    private VBox productoInfoBox;
+    @FXML
+    private Button cerrarCajaB;
 
     // Método para establecer el cajero actual
     public void setCajeroActual(EmpleadoVO cajero) {
         this.cajeroActual = cajero;
         updateCajeroInfo();
-        
+
     }
 
     @Override
@@ -76,18 +86,17 @@ public class CajeroViewController implements Initializable {
         // Inicialización de DAOs
         productoDao = ProductoDAOImp.getInstance();
         ventaDao = VentaDAOImp.getInstance();
-        
+
         // Configuración inicial
         isSellInAction = false;
         configureTableColumns();
         updateUIState();
         updateCajeroInfo();
 
-        
         // Configurar listener para selección de productos
         productosTableView.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldSelection, newSelection) -> showProductDetails(newSelection));
-        
+                (obs, oldSelection, newSelection) -> showProductDetails(newSelection));
+
         // Configurar atajos de teclado
         Platform.runLater(() -> {
             if (productosTableView.getScene() != null) {
@@ -95,7 +104,7 @@ public class CajeroViewController implements Initializable {
             }
         });
     }
-    
+
     private void updateCajeroInfo() {
         if (nombreCajeroLabel != null && cajeroActual != null) {
             nombreCajeroLabel.setText("Cajero: " + cajeroActual.getNombre());
@@ -106,41 +115,41 @@ public class CajeroViewController implements Initializable {
         productNameCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         productCountCol.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
         productPriceCol.setCellValueFactory(new PropertyValueFactory<>("precioDeVenta"));
-        productSubtotalCol.setCellValueFactory(cellData -> 
-            new SimpleIntegerProperty(cellData.getValue().getSubtotal()).asObject());
-        
+        productSubtotalCol.setCellValueFactory(cellData
+                -> new SimpleIntegerProperty(cellData.getValue().getSubtotal()).asObject());
+
         productosTableView.setItems(products);
     }
 
     private void updateTotal() {
         int total = products.stream()
-            .mapToInt(ProductoVO::getSubtotal)
-            .sum();
+                .mapToInt(ProductoVO::getSubtotal)
+                .sum();
         totalLabel.setText(String.format("Total: $%,d", total));
     }
 
     private void updateUIState() {
         String estado = isSellInAction ? "Venta en curso" : "Venta no iniciada";
         String color = isSellInAction ? "#4CAF50" : "#F44336";
-        
+
         estadoVentaLabel.setText("Estado: " + estado);
         estadoVentaLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold;");
     }
 
     private void showProductDetails(ProductoVO producto) {
         productoInfoBox.getChildren().clear();
-        
+
         if (producto != null) {
             productoInfoBox.getChildren().addAll(
-                new Label("Nombre: " + producto.getNombre()),
-                new Label("Precio: $" + producto.getPrecioDeVenta()),
-                new Label("En carrito: " + producto.getCantidad()),
-                new Label("Subtotal: $" + producto.getSubtotal()),
-                new Label("Stock disponible: " + producto.getStock())
+                    new Label("Nombre: " + producto.getNombre()),
+                    new Label("Precio: $" + producto.getPrecioDeVenta()),
+                    new Label("En carrito: " + producto.getCantidad()),
+                    new Label("Subtotal: $" + producto.getSubtotal()),
+                    new Label("Stock disponible: " + producto.getStock())
             );
         } else {
             productoInfoBox.getChildren().add(
-                new Label("Seleccione un producto")
+                    new Label("Seleccione un producto")
             );
         }
     }
@@ -231,7 +240,7 @@ public class CajeroViewController implements Initializable {
         try {
             int id = Integer.parseInt(idProducto.trim());
             int cant = cantidad.isEmpty() ? 1 : Integer.parseInt(cantidad.trim());
-            
+
             if (isRemoveOperation) {
                 removeProduct(id);
             } else {
@@ -245,12 +254,20 @@ public class CajeroViewController implements Initializable {
     private void addProduct(int id, int cantidad) {
         try {
             ProductoVO existingProduct = productMap.get(id);
-            
+
             if (existingProduct != null) {
+                if (existingProduct.getStock() < (existingProduct.getCantidad() + cantidad)) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "No hay sufciente stock, solo hay " + existingProduct.getStock() + " unidades del producto");
+                    return;
+                }
                 existingProduct.setCantidad(existingProduct.getCantidad() + cantidad);
             } else {
                 ProductoVO newProduct = productoDao.getProductoById(id);
                 if (newProduct != null) {
+                    if (newProduct.getStock() < cantidad) {
+                        showAlert(Alert.AlertType.ERROR, "Error", "No hay sufciente stock, solo hay " + newProduct.getStock() + " unidades del producto");
+                        return;
+                    }
                     newProduct.setCantidad(cantidad);
                     products.add(newProduct);
                     productMap.put(id, newProduct);
@@ -259,11 +276,11 @@ public class CajeroViewController implements Initializable {
                     return;
                 }
             }
-            
+
             productosTableView.refresh();
             updateTotal();
             showProductDetails(productosTableView.getSelectionModel().getSelectedItem());
-            
+
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al agregar el producto: " + e.getMessage());
             e.printStackTrace();
@@ -292,8 +309,8 @@ public class CajeroViewController implements Initializable {
 
         try {
             int total = products.stream()
-                .mapToInt(ProductoVO::getSubtotal)
-                .sum();
+                    .mapToInt(ProductoVO::getSubtotal)
+                    .sum();
 
             int idEmpleado = cajeroActual != null ? cajeroActual.getId() : 1;
             int folio = ventaDao.generarVenta(idEmpleado, total);
@@ -317,8 +334,8 @@ public class CajeroViewController implements Initializable {
             PDFGenerator.generarTicketVenta(products, folio, total, nombreCajero);
 
             // Mostrar confirmación
-            showAlert(Alert.AlertType.INFORMATION, "Venta completada", 
-                String.format("Venta #%d completada\nTotal: $%,d\nTicket generado", folio, total));
+            showAlert(Alert.AlertType.INFORMATION, "Venta completada",
+                    String.format("Venta #%d completada\nTotal: $%,d\nTicket generado", folio, total));
 
             // Limpiar y finalizar
             products.clear();
@@ -335,21 +352,26 @@ public class CajeroViewController implements Initializable {
 
     private void handleKeyEvents(KeyEvent event) {
         switch (event.getCode()) {
-            case F4 -> onInitButtonClicked(new ActionEvent());
-            case F5 -> onCancelButtonClicked(new ActionEvent());
-            case F6 -> onAddButtonClicked(new ActionEvent());
-            case F7 -> onRemoveButtonClicked(new ActionEvent());
-            case F8 -> onPayButtonClicked(new ActionEvent());
+            case F4 ->
+                onInitButtonClicked(new ActionEvent());
+            case F5 ->
+                onCancelButtonClicked(new ActionEvent());
+            case F6 ->
+                onAddButtonClicked(new ActionEvent());
+            case F7 ->
+                onRemoveButtonClicked(new ActionEvent());
+            case F8 ->
+                onPayButtonClicked(new ActionEvent());
         }
     }
-    
+
     @FXML
     /**
      * Método para cerrar la caja por medio de una confirmación
      */
-    private void cerrarCaja(){
-        boolean opcion = AlertaPDV.mostrarConfirmacion("Cerrar caja","¿Quiéres cerrar la caja y terminar tu sesión?" );
-        if(opcion){
+    private void cerrarCaja() {
+        boolean opcion = AlertaPDV.mostrarConfirmacion("Cerrar caja", "¿Quiéres cerrar la caja y terminar tu sesión?");
+        if (opcion) {
             try {
                 regresarAlogin();
                 //MomichisYam estuvo aqui!!!
@@ -358,7 +380,7 @@ public class CajeroViewController implements Initializable {
             }
         }
     }
-    
+
     @FXML
     /**
      * Método para regresar al login
