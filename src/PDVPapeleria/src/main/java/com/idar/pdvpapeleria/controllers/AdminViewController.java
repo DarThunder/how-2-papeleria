@@ -299,6 +299,7 @@ public class AdminViewController {
                         return true;
                 }
             } catch (Exception e) {
+              AlertaPDV.mostrarError("Advertencia", "Ha ocurrido un error al buscar");
                 e.printStackTrace();
                 return false;
             }
@@ -577,6 +578,20 @@ public class AdminViewController {
         productosTableView.getSortOrder().clear();
         precioVentaCol.setSortType(TableColumn.SortType.DESCENDING);
         productosTableView.getSortOrder().add(precioVentaCol);
+    }
+    
+    @FXML
+    private void ordenarPorStockAsc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        stockCol.setSortType(TableColumn.SortType.ASCENDING);
+        productosTableView.getSortOrder().add(stockCol);
+    }
+    
+    @FXML
+    private void ordenarPorStockDesc(ActionEvent event) {
+        productosTableView.getSortOrder().clear();
+        stockCol.setSortType(TableColumn.SortType.DESCENDING);
+        productosTableView.getSortOrder().add(stockCol);
     }
 
     @FXML
