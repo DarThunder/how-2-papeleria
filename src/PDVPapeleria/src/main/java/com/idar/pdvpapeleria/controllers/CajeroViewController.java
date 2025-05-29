@@ -38,6 +38,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/**
+ * Clase controller de la caja del sistema
+ * @author idar, jeshu (documentación) 
+ */
 public class CajeroViewController implements Initializable {
 
     // DAOs
@@ -74,13 +78,25 @@ public class CajeroViewController implements Initializable {
     @FXML
     private Button cerrarCajaB;
 
-    // Método para establecer el cajero actual
+    /**
+     * Método para establecer el cajero actual
+     * @param cajero El cajero que abre la caja 
+     */
     public void setCajeroActual(EmpleadoVO cajero) {
         this.cajeroActual = cajero;
         updateCajeroInfo();
 
     }
 
+    /**
+     * Método inicializador del controller, que además instancia los DAO de 
+     * producto y venta, configura la tabla de productos, configura el estado
+     * de la interfaz de venta, actualiza la información del cajero, configura
+     * listeners para la tabla de productos y configura las teclas con las que 
+     * funciona la caja de ventas
+     * @param url
+     * @param rb 
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Inicialización de DAOs
@@ -105,12 +121,18 @@ public class CajeroViewController implements Initializable {
         });
     }
 
+    /**
+     * Método para actualizar la información del cajero
+     */
     private void updateCajeroInfo() {
         if (nombreCajeroLabel != null && cajeroActual != null) {
             nombreCajeroLabel.setText("Cajero: " + cajeroActual.getNombre());
         }
     }
 
+    /**
+     * Método para configurar las columnas de la tabla de ventas
+     */
     private void configureTableColumns() {
         productNameCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         productCountCol.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
@@ -121,6 +143,9 @@ public class CajeroViewController implements Initializable {
         productosTableView.setItems(products);
     }
 
+    /**
+     * Método para actualizar el total de la venta
+     */
     private void updateTotal() {
         int total = products.stream()
                 .mapToInt(ProductoVO::getSubtotal)
@@ -128,6 +153,9 @@ public class CajeroViewController implements Initializable {
         totalLabel.setText(String.format("Total: $%,d", total));
     }
 
+    /**
+     * Método para actualizar el estado de la interfaz (estado)
+     */
     private void updateUIState() {
         String estado = isSellInAction ? "Venta en curso" : "Venta no iniciada";
         String color = isSellInAction ? "#4CAF50" : "#F44336";
@@ -136,6 +164,10 @@ public class CajeroViewController implements Initializable {
         estadoVentaLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold;");
     }
 
+    /**
+     * Método para mostrar los detalles de un producto con un ProductoInfoBox
+     * @param producto El producto a mostrar sus resultados
+     */
     private void showProductDetails(ProductoVO producto) {
         productoInfoBox.getChildren().clear();
 
@@ -154,6 +186,12 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * M+etodo para mostrar una alerta
+     * @param type El tipo de alerta
+     * @param title El título de la alerta 
+     * @param message El mensaje de la alerta
+     */
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -162,6 +200,10 @@ public class CajeroViewController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Método que inicia una venta cuando se hace clic en el botón de iniciar venta
+     * @param event El evento del botón
+     */
     @FXML
     private void onInitButtonClicked(ActionEvent event) {
         if (!isSellInAction) {
@@ -176,6 +218,10 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * Método que cancela una venta cuando se hace clic en el botón de cancelar
+     * @param event El evento del botón
+     */
     @FXML
     private void onCancelButtonClicked(ActionEvent event) {
         if (isSellInAction) {
@@ -188,6 +234,10 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * Método que muestra un showProductPopup cuando se da clic en el botón de añadir
+     * @param event El evento del botón
+     */
     @FXML
     private void onAddButtonClicked(ActionEvent event) {
         if (!isSellInAction) {
@@ -197,6 +247,10 @@ public class CajeroViewController implements Initializable {
         showProductPopup(false);
     }
 
+    /**
+     * Método que muestra un showProductPopup cuando se da clic en el botón de quitar producto
+     * @param event El evento del botón
+     */
     @FXML
     private void onRemoveButtonClicked(ActionEvent event) {
         if (!isSellInAction) {
@@ -206,6 +260,10 @@ public class CajeroViewController implements Initializable {
         showProductPopup(true);
     }
 
+    /**
+     * Método que muestra un PopUp para añadir o quitar un producto
+     * @param isRemoveOperation Si se esta quitando un producto
+     */
     private void showProductPopup(boolean isRemoveOperation) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
@@ -236,6 +294,13 @@ public class CajeroViewController implements Initializable {
         popup.showAndWait();
     }
 
+    /**
+     * Método que llama a un método de acuerdo a la operación que se quiera
+     * realizar con un producto
+     * @param idProducto El ID del producto
+     * @param cantidad La cantidad del producto
+     * @param isRemoveOperation  Si se esta quitando un producto
+     */
     private void handleProductOperation(String idProducto, String cantidad, boolean isRemoveOperation) {
         try {
             int id = Integer.parseInt(idProducto.trim());
@@ -251,6 +316,11 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * Método para añadir un producto
+     * @param id La ID del producto
+     * @param cantidad La cantidad del producto a agregar
+     */
     private void addProduct(int id, int cantidad) {
         try {
             ProductoVO existingProduct = productMap.get(id);
@@ -287,6 +357,10 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * Método para quitar un producto de la venta 
+     * @param id La ID del producto
+     */
     private void removeProduct(int id) {
         ProductoVO product = productMap.get(id);
         if (product != null) {
@@ -300,6 +374,11 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * Método que realiza la venta cuando se da clic en el botón de pagar, genera
+     * un ticket en PDF, muestra una confirmación y limpia los campos
+     * @param event El evento del botón
+     */
     @FXML
     private void onPayButtonClicked(ActionEvent event) {
         if (!isSellInAction || products.isEmpty()) {
@@ -350,6 +429,10 @@ public class CajeroViewController implements Initializable {
         }
     }
 
+    /**
+     * Método para configurar las teclas con su método asignado
+     * @param event 
+     */
     private void handleKeyEvents(KeyEvent event) {
         switch (event.getCode()) {
             case F4 ->

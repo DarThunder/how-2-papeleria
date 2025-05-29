@@ -27,6 +27,11 @@ import static javafx.application.Application.launch;
  */
 public class App extends Application {
 
+    /**
+     * Método start que inicia la aplicación de JavaFX
+     * @param stage El stage para iniciar 
+     * @throws IOException 
+     */
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = loadFXML("login");
@@ -38,11 +43,22 @@ public class App extends Application {
         stage.show();
     }
 
+    /**
+     * Método para cargar un FXML de acuerdo a su ruta
+     * @param fxml El nombre de la vista FXML 
+     * @return La URL del FXML
+     * @throws IOException 
+     */
     private FXMLLoader loadFXML(String fxml) throws IOException {
         File fxmlFile = new File("src/main/resources/scenes/" + fxml + ".fxml");
         return new FXMLLoader(fxmlFile.toURI().toURL());
     }
 
+    /**
+     * Main de la aplicación, donde se agrega un Cajero, un Administrador y un Dueño, además de llamar al método
+     * launch
+     * @param args 
+     */
     public static void main(String[] args) {
         EmpleadoVO nuevoEmpleado = new EmpleadoVO("Cajero", "9998", "Juan", "321");
         EmpleadoVO nuevoAdmin = new EmpleadoVO("Administrador", "8888", "Luis", "123");

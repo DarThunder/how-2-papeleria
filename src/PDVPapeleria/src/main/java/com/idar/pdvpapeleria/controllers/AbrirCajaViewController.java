@@ -26,35 +26,45 @@ import javax.swing.JOptionPane;
 
 
 /**
- * FXML Controller class
+ * Clase controller que se muestra antes de abrir la caja 
  *
  * @author jeshu
  */
 public class AbrirCajaViewController implements Initializable {
     
+    //Botón para abrir la caja 
     @FXML
     private Button BAbrirCaja; 
     
+    //Botón para regresar al login
     @FXML
     private Button BAtras; 
     
+    //TextField donde se ingresará el nombre del cajero
     @FXML
     private TextField TFNombre; 
     
+    //TextField donde se ingresará el código de seguridad del cajero
     @FXML
     private TextField TFCodigoSeguridad; 
     
-   
+    //Interfaz DAO de empleado
     private EmpleadoDAO db;
 
     /**
-     * Initializes the controller class.
+     * Método inicializador del controller, donde además se hace una instancia
+     * de la implementación del DAO de empleado
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         db = EmpleadoDAOImp.getInstance();
     }    
     
+    /**
+     * Método para cambiar a la caja 
+     * @throws MalformedURLException
+     * @throws IOException 
+     */
      @FXML
      public void switchToCaja() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/cajeroView.fxml");
@@ -67,6 +77,9 @@ public class AbrirCajaViewController implements Initializable {
         stage.show();
     }
      
+    /**
+     * Método que valida si el código de seguridad del cajero es válido
+     */
     @FXML
     private void validarCodigoSeguridad() {
         String username = TFNombre.getText().trim();
@@ -114,6 +127,11 @@ public class AbrirCajaViewController implements Initializable {
         }
     }
     
+    /**
+     * Método para regresar al login
+     * @throws MalformedURLException
+     * @throws IOException 
+     */
     @FXML
     public void regresarAlogin() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/login.fxml");
