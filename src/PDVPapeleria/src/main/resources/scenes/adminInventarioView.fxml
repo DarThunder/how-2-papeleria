@@ -61,6 +61,8 @@
                             <MenuItem onAction="#ordenarPorNombreDesc" text="Nombre (Z-A)" />
                             <MenuItem onAction="#ordenarPorPrecioVentaAsc" text="P. Venta (↑)" />
                             <MenuItem onAction="#ordenarPorPrecioVentaDesc" text="P. Venta (↓)" />
+                            <MenuItem onAction="#ordenarPorStockAsc" text="Stock (↑)" />
+                            <MenuItem onAction="#ordenarPorStockDesc" text="Stock (↓)" />
                             <SeparatorMenuItem />
                             <MenuItem onAction="#quitarOrden" text="Quitar orden" />
                         </items>

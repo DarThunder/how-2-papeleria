@@ -1,3 +1,12 @@
+/**
+ * Controlador para la vista de cambio de contraseña.
+ * 
+ * <p>Permite al usuario ingresar una nueva contraseña, validarla y actualizarla en la base de datos
+ * utilizando el código de seguridad proporcionado previamente.</p>
+ * 
+ * @author dylxn999
+ * @date 28/05/2025
+ */
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
@@ -12,29 +21,37 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-/**
- *
- * @author laura
- */
 public class CambiarContraseñaController {
 
     @FXML
     private TextField TFCambiarContraseña, TFRepetirContraseña;
+
     @FXML
     private Button BCambiarContraseña, BAtras;
 
     private String codigoSeguridad;
     private EmpleadoDAO db;
 
+    /**
+     * Constructor que inicializa la instancia de acceso a datos del empleado.
+     */
     public CambiarContraseñaController() {
         db = EmpleadoDAOImp.getInstance();
     }
 
+    /**
+     * Asigna el código de seguridad usado para identificar al empleado.
+     * 
+     * @param codigoSeguridad Código único de seguridad del empleado.
+     */
     public void setCodigoSeguridad(String codigoSeguridad) {
         this.codigoSeguridad = codigoSeguridad;
-        System.out.println("Código de seguridad recibido en CambiarContraseñaController: " + this.codigoSeguridad);
     }
 
+    /**
+     * Maneja el evento para cambiar la contraseña del usuario.
+     * Valida los campos de entrada y actualiza la contraseña en la base de datos.
+     */
     @FXML
     private void cambiarContraseña() {
         String nuevaContraseña = TFCambiarContraseña.getText().trim();
@@ -53,9 +70,9 @@ public class CambiarContraseñaController {
         if (db.cambiarContraseña(nuevaContraseña, codigoSeguridad)) {
             AlertaPDV.mostrarExito("Éxito", "Contraseña cambiada exitosamente.");
             try {
-                Thread.sleep(2000);
+                Thread.sleep(2000); 
             } catch (InterruptedException e) {
-                AlertaPDV.mostrarExcepcion("Interrupción del Thread.Sleep", "Ocurrio una interrupción inesperada durante la pausa del hilo", e);
+                AlertaPDV.mostrarExcepcion("Interrupción del Thread.Sleep", "Ocurrió una interrupción inesperada durante la pausa del hilo", e);
             }
             try {
                 switchToLogin();
@@ -67,7 +84,11 @@ public class CambiarContraseñaController {
         }
     }
 
-    // Método para cambiar a la pantalla de verificación de código de seguridad
+    /**
+     * Cambia la vista a la pantalla de verificación de código de seguridad.
+     *
+     * @throws IOException Si ocurre un error al cargar el archivo FXML.
+     */
     @FXML
     private void switchToVerificacionCodigoSeguridad() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/verificacionCodigoSeguridad.fxml"));
@@ -80,7 +101,11 @@ public class CambiarContraseñaController {
         stage.show();
     }
 
-    // Método para cambiar a la pantalla del login
+    /**
+     * Cambia la vista a la pantalla de inicio de sesión (login).
+     *
+     * @throws IOException Si ocurre un error al cargar el archivo FXML.
+     */
     @FXML
     private void switchToLogin() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/login.fxml"));

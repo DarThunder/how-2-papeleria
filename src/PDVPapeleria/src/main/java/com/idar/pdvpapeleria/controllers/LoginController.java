@@ -23,24 +23,31 @@ import java.sql.SQLException;
  * Este controlador maneja la interacción del usuario con la pantalla de inicio
  * de sesión, valida las credenciales de usuario y cambia entre las vistas
  * correspondientes según el rol del usuario (Dueño, Administrador o Cajero).
+ * También proporciona acceso a la verificación del código de seguridad para
+ * cambiar la contraseña.
  *
- * @author Dylan
+ * @author dylxn999
+ * @date 28/05/2025
  */
 public class LoginController {
 
     @FXML
     private Button B1, BCambiarContraseña;
+
     @FXML
     private TextField usernameField;
+
     @FXML
     private PasswordField passwordField;
+
     @FXML
     private Label errorMessageLabel;
+
     private EmpleadoDAO empleado;
 
     /**
-     * Inicializa el controlador. Establece la conexión a la base de datos. Si
-     * no se puede conectar a la base de datos, muestra un mensaje de error.
+     * Inicializa el controlador y establece la instancia de conexión con el DAO
+     * de empleados.
      */
     @FXML
     public void initialize() {
@@ -48,11 +55,11 @@ public class LoginController {
     }
 
     /**
-     * Maneja el evento de inicio de sesión cuando el usuario hace clic en el
-     * botón de inicio de sesión. Verifica las credenciales proporcionadas por
-     * el usuario y redirige a la vista correspondiente según el rol del usuario
-     * (Dueño, Administrador, Cajero). Si las credenciales no son válidas,
-     * muestra un mensaje de error.
+     * Maneja el evento de inicio de sesión al hacer clic en el botón
+     * correspondiente. Verifica que los campos no estén vacíos, comprueba la
+     * existencia del usuario y la validez de sus credenciales, y redirige a la
+     * vista correspondiente según el rol del usuario. En caso de error, muestra
+     * una alerta con el motivo.
      */
     @FXML
     private void handleLogin() {
@@ -86,17 +93,16 @@ public class LoginController {
             }
         } catch (SQLException | IOException e) {
             AlertaPDV.mostrarExcepcion("Error de conexión con la base de datos", "Error al iniciar sesión, inténtelo más tarde", e);
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
     }
 
     /**
-     * Cambia la escena actual a una nueva vista especificada por el archivo
-     * FXML.
+     * Cambia la escena actual a una nueva vista según la ruta proporcionada del
+     * archivo FXML.
      *
-     * @param fxmlPath la ruta del archivo FXML que representa la nueva vista.
-     * @throws IOException si ocurre un error al cargar el archivo FXML
-     * correspondiente.
+     * @param fxmlPath Ruta relativa del archivo FXML de la nueva vista.
+     * @throws IOException si ocurre un error al cargar la vista.
      */
     private void switchToView(String fxmlPath) throws IOException {
         URL fxmlUrl = getClass().getResource(fxmlPath);
@@ -116,10 +122,9 @@ public class LoginController {
     }
 
     /**
-     * Cambia la escena actual a la pantalla de opciones del Dueño.
+     * Cambia la vista actual a la interfaz del Dueño.
      *
-     * @throws IOException si ocurre un error al cargar el archivo FXML
-     * correspondiente.
+     * @throws IOException si ocurre un error al cargar la vista.
      */
     @FXML
     private void switchToDueñoView() throws IOException {
@@ -135,15 +140,12 @@ public class LoginController {
     }
 
     /**
-     * Cambia la escena actual a la pantalla de opciones del Administrador.
+     * Cambia la vista actual a la interfaz del Administrador.
      *
-     * @throws IOException si ocurre un error al cargar el archivo FXML
-     * correspondiente.
+     * @throws IOException si ocurre un error al cargar la vista.
      */
     @FXML
     private void switchToAdminView() throws IOException {
-        //File fxmlFile = new File("src/main/resources/scenes/adminInventarioView.fxml");
-        //CARLOS ACA PON LA INTERFAZ DONDE SELECCIONAS SI ES LA GESTION DE PROVEEDORES O DE PRODUCTOS
         File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
         Parent root = loader.load();
@@ -155,10 +157,9 @@ public class LoginController {
     }
 
     /**
-     * Cambia la escena actual a la pantalla de opciones del Cajero.
+     * Cambia la vista actual a la interfaz del Cajero.
      *
-     * @throws IOException si ocurre un error al cargar el archivo FXML
-     * correspondiente.
+     * @throws IOException si ocurre un error al cargar la vista.
      */
     @FXML
     private void switchToCajeroView() throws IOException {
@@ -173,11 +174,10 @@ public class LoginController {
     }
 
     /**
-     * Cambia la escena actual a la pantalla de verificación del código de
-     * seguridad.
+     * Cambia la vista actual a la pantalla de verificación de código de
+     * seguridad, utilizada para cambiar la contraseña del usuario.
      *
-     * @throws IOException si ocurre un error al cargar el archivo FXML
-     * correspondiente.
+     * @throws IOException si ocurre un error al cargar la vista.
      */
     @FXML
     private void switchToVerificacionCodigoSeguridad() throws IOException {

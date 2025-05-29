@@ -20,7 +20,6 @@ com\idar\pdvpapeleria\controllers\AdminViewController$2.class
 DAO\ProductoDAO.class
 DAOImp\ProveedorDAOImp.class
 com\idar\pdvpapeleria\controllers\CajeroViewController$1.class
-com\idar\pdvpapeleria\controllers\AdministracionEmpleados.class
 DAOImp\VentaDAOImp.class
 com\idar\pdvpapeleria\controllers\OpcionesAdministradorController.class
 lib\SqlLib.class
@@ -39,7 +38,5 @@ com\idar\pdvpapeleria\utils\PDFGenerator.class
 com\idar\pdvpapeleria\controllers\AbrirCajaViewController.class
 com\idar\pdvpapeleria\controllers\AgregarProductoController$2.class
 com\idar\pdvpapeleria\App.class
-com\idar\pdvpapeleria\ConnectionDB.class
 DAOImp\VentaDAOImp$ParameterSetter.class
-com\idar\pdvpapeleria\controllers\PlantillaController.class
 VO\EmpleadoVO.class
