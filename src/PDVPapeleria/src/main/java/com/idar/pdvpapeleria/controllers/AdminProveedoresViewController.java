@@ -32,86 +32,142 @@ import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Controlador para la administración de proveedores en el sistema PDV Papelería.
+ * 
+ * Esta clase maneja todas las operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+ * relacionadas con los proveedores, incluyendo la visualización en tabla,
+ * validación de datos, historial de cambios y búsqueda de proveedores.
+ * 
+ * @author goatt
+ * @version 1.0
+ * @since 2025
+ */
 public class AdminProveedoresViewController implements Initializable {
 
+    /** Instancia para mostrar alertas y mensajes al usuario */
     AlertaPDV alerta = new AlertaPDV();
+    
+    /** Lista que contiene todos los proveedores cargados desde la base de datos */
     List<ProveedorVO> proveedores = new ArrayList<ProveedorVO>();
+    
+    /** Lista que mantiene el historial de cambios realizados en los proveedores */
     List<HistorialProveedorVO> historialCambios = new ArrayList<>();
 
+    /** ID del proveedor seleccionado para operaciones de edición */
     public int Id;
+    
+    /** Conexión a la base de datos */
     private DatabaseConnection db;
+    
+    /** Objeto de acceso a datos para operaciones con proveedores */
     private ProveedorDAOImp proveedorDAO;
+    
+    /** Expresión regular para validar números de teléfono (10 dígitos) */
     public static final String REGEX_TELEFONO = "^[0-9]{10}$";
 
+    // Componentes de la interfaz gráfica
+    
+    /** Tabla principal que muestra los proveedores o productos según el contexto */
     @FXML
     private TableView<Object> tablaProveedores;
 
+    /** Columna principal de la tabla (ID o nombre de producto) */
     @FXML
     private TableColumn<Object, Integer> colPrincipal;
 
+    /** Columna secundaria de la tabla (nombre del proveedor o precio de compra) */
     @FXML
     private TableColumn<Object, String> colSecundaria;
 
+    /** Columna terciaria de la tabla (teléfono o precio de venta) */
     @FXML
     private TableColumn<Object, String> colTerciaria;
 
+    /** Columna cuaternaria de la tabla (servicio o stock) */
     @FXML
     private TableColumn<Object, String> colCuaternaria;
 
-    //Botones
+    // Botones de la interfaz
+    
+    /** Botón para acceder a la vista de agregar proveedor */
     @FXML
     private Button agregarViewButton;
 
+    /** Botón para acceder a la vista de editar proveedor */
     @FXML
     private Button editarViewButton;
 
+    /** Botón para acceder a la vista de eliminar proveedor */
     @FXML
     private Button eliminarViewButton;
 
+    /** Botón para regresar a la vista anterior */
     @FXML
     private Button regresarViewButton;
 
+    /** Botón dinámico que cambia su función según el contexto (Agregar/Editar/Eliminar) */
     @FXML
     private Button accionButton;
 
+    /** Botón para limpiar todos los campos de entrada */
     @FXML
     private Button resetearCamposButton;
 
+    /** Botón para mostrar el historial de cambios */
     @FXML
     private Button historialButton;
 
+    /** Botón para ejecutar búsquedas */
     @FXML
     private Button BBuscar;
 
-    //Texts
+    // Etiquetas y campos de texto
+    
+    /** Etiqueta que describe la acción actual en la interfaz */
     @FXML
     private Text descripcionLabel;
 
+    /** Etiqueta del campo nombre */
     @FXML
     private Label labelNombre;
 
+    /** Etiqueta del campo servicio */
     @FXML
     private Label labelServicio;
 
+    /** Etiqueta del campo teléfono */
     @FXML
     private Label labelTelefono;
 
-    //TextFields
+    /** Campo de texto para el nombre del proveedor */
     @FXML
     private TextField TF_Nombre;
 
+    /** Campo de texto para el servicio que ofrece el proveedor */
     @FXML
     private TextField TF_Servicio;
 
+    /** Campo de texto para el teléfono del proveedor */
     @FXML
     private TextField TF_Telefono;
 
+    /** Campo de texto para realizar búsquedas */
     @FXML
     private TextField TFBusqueda;
 
+    /** ComboBox para seleccionar proveedores y filtrar productos */
     @FXML
     private ComboBox<String> comboBoxProveedores;
 
+    /**
+     * Inicializa el controlador después de que se haya cargado el archivo FXML.
+     * Configura la conexión a la base de datos, inicializa los componentes
+     * y carga los datos iniciales.
+     * 
+     * @param url La ubicación utilizada para resolver rutas relativas para el objeto raíz
+     * @param rb Los recursos utilizados para localizar el objeto raíz
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -129,12 +185,13 @@ public class AdminProveedoresViewController implements Initializable {
     }
 
     /**
-     * Agarra el contenido de los textFields, valida que no esten vacios o
-     * incorrectos y si todo esta bien, manda a llamar al metodo
-     * "agregarProveedor" del objeto "proveedorDAO" Adivina que hace el metodo
-     * ese..
-     *
-     * Accion que ocurre al presionar el boton "Crear Nuevo Proveedor"
+     * Agrega un nuevo proveedor al sistema.
+     * 
+     * Obtiene los datos de los campos de texto, los valida y si son correctos,
+     * crea un nuevo proveedor en la base de datos. Actualiza la tabla y el
+     * ComboBox después de la operación exitosa.
+     * 
+     * @throws SQLException si ocurre un error al acceder a la base de datos
      */
     @FXML
     private void agregarProveedor() {
@@ -157,6 +214,15 @@ public class AdminProveedoresViewController implements Initializable {
         }
     }
 
+    /**
+     * Edita un proveedor existente en el sistema.
+     * 
+     * Obtiene los nuevos datos de los campos de texto, los valida y actualiza
+     * el proveedor en la base de datos. Registra el cambio en el historial
+     * para mantener un seguimiento de las modificaciones.
+     * 
+     * @throws SQLException si ocurre un error al acceder a la base de datos
+     */
     @FXML
     private void editarProveedor() {
         String nombreNuevo = TF_Nombre.getText();
@@ -196,30 +262,40 @@ public class AdminProveedoresViewController implements Initializable {
     }
 
     /**
-     * Se saca el indice seleccionado de la tabla, este junto al arraylist
-     * "provedores" son utilizados para el metodo "eliminarProveedor" del objeto
-     * "proveedorDAO". Adivina que es lo que hace ese metodo...
-     *
-     * Accion que ocurre al presionar el boton "Eliminar Proveedor"
+     * Elimina un proveedor seleccionado del sistema.
+     * 
+     * Obtiene el proveedor seleccionado de la tabla, solicita confirmación
+     * al usuario y procede con la eliminación si es confirmada. Actualiza
+     * la tabla y el ComboBox después de la operación.
+     * 
+     * @throws SQLException si ocurre un error al acceder a la base de datos
      */
     @FXML
-private void eliminarProveedor() throws SQLException {
-    ProveedorVO seleccionado = (ProveedorVO) tablaProveedores.getSelectionModel().getSelectedItem();
-    
-    if (seleccionado != null) {
-        boolean resultado = alerta.mostrarConfirmacion("Eliminar", 
-            "¿Seguro que desea eliminar a " + seleccionado.getNombreProveedor() + "?");
-        if (resultado) {
-            proveedorDAO.eliminarProveedor(seleccionado.getIdProveedor()); // Eliminar por ID
-            cargarProveedores();
-            cargarComboBoxProveedores();
-            alerta.mostrarExito("Éxito", "Proveedor eliminado");
+    private void eliminarProveedor() throws SQLException {
+        ProveedorVO seleccionado = (ProveedorVO) tablaProveedores.getSelectionModel().getSelectedItem();
+        
+        if (seleccionado != null) {
+            boolean resultado = alerta.mostrarConfirmacion("Eliminar", 
+                "¿Seguro que desea eliminar a " + seleccionado.getNombreProveedor() + "?");
+            if (resultado) {
+                proveedorDAO.eliminarProveedor(seleccionado.getIdProveedor());
+                cargarProveedores();
+                cargarComboBoxProveedores();
+                alerta.mostrarExito("Éxito", "Proveedor eliminado");
+            }
+        } else {
+            alerta.mostrarError("Error", "Selecciona un proveedor de la tabla");
         }
-    } else {
-        alerta.mostrarError("Error", "Selecciona un proveedor de la tabla");
     }
-}
 
+    /**
+     * Maneja las acciones del botón dinámico según su texto actual.
+     * 
+     * Este método centraliza la lógica de las diferentes acciones que puede
+     * realizar el botón principal, dependiendo del contexto actual de la interfaz.
+     * 
+     * @throws SQLException si ocurre un error durante las operaciones de base de datos
+     */
     public void accionButtonClicked() throws SQLException {
         switch (accionButton.getText()) {
             case "Agregar Proveedor":
@@ -240,6 +316,14 @@ private void eliminarProveedor() throws SQLException {
         }
     }
 
+    /**
+     * Navega de regreso a la vista de opciones del administrador.
+     * 
+     * Carga el archivo FXML de opciones del administrador y cambia la escena actual.
+     * 
+     * @throws MalformedURLException si la URL del archivo FXML es malformada
+     * @throws IOException si ocurre un error al cargar el archivo FXML
+     */
     public void salirPresionado() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlFile.toURI().toURL());
@@ -251,6 +335,12 @@ private void eliminarProveedor() throws SQLException {
         stage.show();
     }
 
+    /**
+     * Hace visibles y manejables los elementos de entrada de datos.
+     * 
+     * Muestra las etiquetas y campos de texto necesarios para las operaciones
+     * de agregar y editar proveedores.
+     */
     private void mostrarItems() {
         labelNombre.setVisible(true);
         labelNombre.setManaged(true);
@@ -270,6 +360,12 @@ private void eliminarProveedor() throws SQLException {
         resetearCamposButton.setManaged(true);
     }
 
+    /**
+     * Oculta los elementos de entrada de datos.
+     * 
+     * Hace invisibles las etiquetas y campos de texto cuando no son necesarios,
+     * como en la vista de eliminación de proveedores.
+     */
     private void ocultarItems() {
         labelNombre.setVisible(false);
         labelNombre.setManaged(false);
@@ -287,7 +383,10 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Pone los textFields vacios
+     * Limpia todos los campos de entrada de datos.
+     * 
+     * Establece el texto de todos los TextField en cadena vacía,
+     * permitiendo al usuario empezar con campos limpios.
      */
     public void resetearCampos() {
         TF_Nombre.setText("");
@@ -295,24 +394,33 @@ private void eliminarProveedor() throws SQLException {
         TF_Telefono.setText("");
     }
 
+    /**
+     * Configura el comportamiento de selección de la tabla.
+     * 
+     * Cuando se está en modo de edición y se selecciona un proveedor de la tabla,
+     * llena automáticamente los campos de texto con los datos del proveedor seleccionado.
+     */
     public void mostrarInfo() {
         tablaProveedores.setOnMouseClicked(event -> {
             if (accionButton.getText().equals("Guardar Cambios")) {
-                ProveedorVO seleccionado = (ProveedorVO) tablaProveedores.getSelectionModel().getSelectedItem(); // Obtener el objeto directamente
+                ProveedorVO seleccionado = (ProveedorVO) tablaProveedores.getSelectionModel().getSelectedItem();
                 if (seleccionado != null) {
                     TF_Nombre.setText(seleccionado.getNombreProveedor());
                     TF_Servicio.setText(seleccionado.getServicioProveedor());
                     TF_Telefono.setText(seleccionado.getTelefonoProveedor());
-                    Id = seleccionado.getIdProveedor(); // Usar el ID del objeto seleccionado
+                    Id = seleccionado.getIdProveedor();
                 }
             }
         });
     }
 
     /**
-     * Al hacer click en el boton "Agregar" abre el respectivo FXML
-     *
-     * @throws IOException
+     * Maneja el evento de clic en el botón "Agregar".
+     * 
+     * Configura la interfaz para el modo de agregar proveedor,
+     * actualiza las etiquetas y botones correspondientes.
+     * 
+     * @throws IOException si ocurre un error al configurar la vista
      */
     @FXML
     private void onAgregarViewButtonClicked() throws IOException {
@@ -324,9 +432,12 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Al hacer click en el boton "Editar" abre el respectivo FXML
-     *
-     * @throws IOException
+     * Maneja el evento de clic en el botón "Editar".
+     * 
+     * Configura la interfaz para el modo de editar proveedor,
+     * actualiza las etiquetas y botones correspondientes.
+     * 
+     * @throws IOException si ocurre un error al configurar la vista
      */
     @FXML
     private void onEditarViewButtonClicked() throws IOException {
@@ -338,9 +449,12 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Al hacer click en el boton "Eliminar" abre el respectivo FXML
-     *
-     * @throws IOException
+     * Maneja el evento de clic en el botón "Eliminar".
+     * 
+     * Configura la interfaz para el modo de eliminar proveedor,
+     * oculta los campos de entrada y actualiza las etiquetas correspondientes.
+     * 
+     * @throws IOException si ocurre un error al configurar la vista
      */
     @FXML
     private void onEliminarViewButtonClicked() throws IOException {
@@ -354,11 +468,13 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Valida que el telefono tenga el formato de uno real: 10 digitos y que no
-     * tenga ninguna letra. True si cumple, false si no
-     *
-     * @param telefono
-     * @return
+     * Valida que un número de teléfono tenga el formato correcto.
+     * 
+     * Utiliza una expresión regular para verificar que el teléfono
+     * contenga exactamente 10 dígitos numéricos.
+     * 
+     * @param telefono el número de teléfono a validar
+     * @return true si el teléfono es válido, false en caso contrario
      */
     @FXML
     public boolean validarTelefono(String telefono) {
@@ -366,12 +482,16 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Valida los campos
-     *
-     * @param Nombre
-     * @param Servicio
-     * @param Telefono
-     * @return
+     * Valida todos los campos de entrada de datos.
+     * 
+     * Verifica que todos los campos requeridos estén llenos y que
+     * el teléfono tenga un formato válido. Muestra mensajes de error
+     * específicos para cada tipo de validación fallida.
+     * 
+     * @param Nombre el nombre del proveedor
+     * @param Servicio el servicio que ofrece el proveedor
+     * @param Telefono el teléfono del proveedor
+     * @return true si todos los campos son válidos, false en caso contrario
      */
     @FXML
     public boolean validarCampos(String Nombre, String Servicio, String Telefono) {
@@ -403,19 +523,23 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Configura las columnas de la tabla para que muestren los campos
-     * correspondientes
+     * Configura las columnas de la tabla para mostrar datos de proveedores.
+     * 
+     * Establece las propiedades de cada columna para que muestren
+     * los campos correspondientes del objeto ProveedorVO.
      */
     private void configurarTabla() {
         colPrincipal.setCellValueFactory(new PropertyValueFactory<>("idProveedor"));
         colSecundaria.setCellValueFactory(new PropertyValueFactory<>("nombreProveedor"));
-        colCuaternaria.setCellValueFactory(new PropertyValueFactory<>("servicioProveedor"));
-        colTerciaria.setCellValueFactory(new PropertyValueFactory<>("telefonoProveedor"));
+        colTerciaria.setCellValueFactory(new PropertyValueFactory<>("servicioProveedor"));
+        colCuaternaria.setCellValueFactory(new PropertyValueFactory<>("telefonoProveedor"));
     }
 
     /**
-     * Carga todos los proveedores desde la bd en un arraylist para su lectura
-     * en la tabla
+     * Carga todos los proveedores desde la base de datos.
+     * 
+     * Obtiene la lista completa de proveedores y la muestra en la tabla.
+     * Maneja las excepciones SQL que puedan ocurrir durante la carga.
      */
     private void cargarProveedores() {
         try {
@@ -429,14 +553,22 @@ private void eliminarProveedor() throws SQLException {
     }
 
     /**
-     * Establece la conexion con la bd usando "DataConnection"
-     *
-     * @throws SQLException
+     * Establece la conexión con la base de datos.
+     * 
+     * Inicializa la instancia de DatabaseConnection utilizando el patrón Singleton.
+     * 
+     * @throws SQLException si ocurre un error al establecer la conexión
      */
     public void setDB() throws SQLException {
         this.db = DatabaseConnection.getInstance();
     }
 
+    /**
+     * Muestra el historial de cambios realizados en los proveedores.
+     * 
+     * Si existen cambios registrados, los muestra en una ventana de diálogo.
+     * Si no hay cambios, muestra un mensaje informativo.
+     */
     @FXML
     public void mostrarHistorialCambios() {
         if (historialCambios.isEmpty()) {
@@ -450,6 +582,15 @@ private void eliminarProveedor() throws SQLException {
         }
     }
 
+    /**
+     * Carga y configura el ComboBox de proveedores.
+     * 
+     * Obtiene los nombres de todos los proveedores y los agrega al ComboBox,
+     * incluyendo una opción para mostrar todos los proveedores. Configura
+     * el listener para cambios de selección.
+     * 
+     * @throws SQLException si ocurre un error al obtener los nombres de proveedores
+     */
     private void cargarComboBoxProveedores() throws SQLException {
         List<String> nombresProveedores = proveedorDAO.obtenerNombresProveedores();
         nombresProveedores.add(0, "Todos los proveedores");
@@ -460,7 +601,7 @@ private void eliminarProveedor() throws SQLException {
             (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                 if (newValue != null) {
                     if (newValue.equals("Todos los proveedores")) {
-                        configurarColumnasParaProveedores(); // <-- Restaura columnas
+                        configurarColumnasParaProveedores();
                         cargarProveedores();
                     } else {
                         cargarProductos(newValue);
@@ -469,17 +610,31 @@ private void eliminarProveedor() throws SQLException {
             });
     }
 
+    /**
+     * Carga los productos de un proveedor específico.
+     * 
+     * Configura la tabla para mostrar productos y carga los productos
+     * asociados al proveedor seleccionado.
+     * 
+     * @param nombreProveedor el nombre del proveedor cuyos productos se van a cargar
+     */
     private void cargarProductos(String nombreProveedor) {
         try {
             configurarColumnasParaProductos();
             List<ProductoVO> productos = proveedorDAO.obtenerProductosPorProveedor(nombreProveedor);
-            ObservableList<Object> items = FXCollections.observableArrayList(productos); // Usa ProductoVO
+            ObservableList<Object> items = FXCollections.observableArrayList(productos);
             tablaProveedores.setItems(items);
         } catch (SQLException e) {
             alerta.mostrarError("Error", "Error al cargar productos: " + e.getMessage());
         }
     }
 
+    /**
+     * Configura las columnas de la tabla para mostrar datos de productos.
+     * 
+     * Limpia las columnas existentes y crea nuevas columnas específicas
+     * para mostrar información de productos (nombre, precios, stock).
+     */
     private void configurarColumnasParaProductos() {
         tablaProveedores.getColumns().clear();
 
@@ -502,6 +657,12 @@ private void eliminarProveedor() throws SQLException {
         tablaProveedores.getColumns().addAll(colNombreProducto, colPrecioCompra, colPrecioVenta, colStock);
     }
 
+    /**
+     * Configura las columnas de la tabla para mostrar datos de proveedores.
+     * 
+     * Limpia las columnas existentes y restaura la configuración original
+     * para mostrar información de proveedores.
+     */
     private void configurarColumnasParaProveedores() {
         tablaProveedores.getColumns().clear();
 
@@ -513,6 +674,13 @@ private void eliminarProveedor() throws SQLException {
         tablaProveedores.getColumns().addAll(colPrincipal, colSecundaria, colTerciaria, colCuaternaria);
     }
 
+    /**
+     * Busca proveedores por nombre utilizando el campo de búsqueda.
+     * 
+     * Filtra la lista de proveedores basándose en el texto ingresado,
+     * realizando una búsqueda parcial que no distingue entre mayúsculas y minúsculas.
+     * Si no se encuentra ningún proveedor, muestra un mensaje de error.
+     */
     @FXML
     private void buscarProveedorPorNombre() {
         String textoBusqueda = TFBusqueda.getText().trim().toLowerCase();
@@ -531,7 +699,7 @@ private void eliminarProveedor() throws SQLException {
 
         if (proveedoresFiltrados.isEmpty()) {
             alerta.mostrarError("Búsqueda sin resultados", "No se encontró ningún proveedor con el nombre: " + textoBusqueda);
-            return; // Opcional: Mantener la lista completa o limpiar la tabla
+            return;
         }
 
         ObservableList<Object> datos = FXCollections.observableArrayList(proveedoresFiltrados);
