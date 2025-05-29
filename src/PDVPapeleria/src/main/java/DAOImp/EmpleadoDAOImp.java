@@ -1,6 +1,9 @@
- /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ * Implementación del DAO para la gestión de empleados, metodos implementados que se emplean en EmpleadoDao.
+ * Contiene métodos para crear, eliminar, actualizar y consultar empleados en la base de datos.
+ * Utiliza procedimientos almacenados y encriptación de contraseñas con BCrypt.
+ * 
+ * @author Jazmin
  */
 package DAOImp;
 
@@ -18,6 +21,11 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
 
     private static EmpleadoDAOImp instance;
 
+    /**
+     * Obtiene la instancia única del DAO.
+     * 
+     * @return instancia de EmpleadoDAOImp
+     */
     public static EmpleadoDAO getInstance() {
         if (instance == null) {
             instance = new EmpleadoDAOImp();
@@ -25,6 +33,12 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return instance;
     }
 
+    /**
+     * Crea un nuevo usuario en la base de datos.
+     * 
+     * @param empleado Objeto EmpleadoVO con los datos del nuevo empleado
+     * @return true si se creó correctamente, false si ya existe el nombre de usuario o código
+     */
     @Override
     public boolean createUser(EmpleadoVO empleado) {
         if (existeNombreUsuario(empleado.getNombre()) || existeCodigoSeguridad(empleado.getCodigoSeguridad())) {
@@ -51,6 +65,13 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Verifica si las credenciales son válidas.
+     * 
+     * @param username nombre del usuario
+     * @param password contraseña sin encriptar
+     * @return true si son válidas y el usuario está activo, false en caso contrario
+     */
     @Override
     public boolean isValidCredentials(String username, String password) throws SQLException {
         String query = "SELECT contraseña, estado FROM Empleado WHERE nombre = ?";
@@ -72,6 +93,12 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         }
     }
 
+    /**
+     * Elimina un empleado por ID usando procedimiento almacenado.
+     * 
+     * @param idEmpleado ID del empleado
+     * @return true si fue eliminado correctamente
+     */
     @Override
     public boolean eliminarEmpleado(int idEmpleado) {
         String sql = "{CALL eliminarEmpleado(?)}";
@@ -90,6 +117,12 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Verifica si existe un empleado por su ID.
+     * 
+     * @param id ID del empleado
+     * @return true si existe
+     */
     @Override
     public boolean existeEmpleadoPorId(int id) {
         try {
@@ -109,13 +142,18 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Verifica si existe un nombre de usuario.
+     * 
+     * @param username nombre de usuario
+     * @return true si existe
+     */
     @Override
     public boolean existeNombreUsuario(String username) {
         try {
             String query = "SELECT COUNT(*) FROM Empleado WHERE nombre = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-
                 statement.setString(1, username);
                 ResultSet rs = statement.executeQuery();
                 return rs.next() && rs.getInt(1) > 0;
@@ -129,13 +167,18 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Verifica si existe un código de seguridad.
+     * 
+     * @param codigoSeguridad código de seguridad
+     * @return true si existe
+     */
     @Override
     public boolean existeCodigoSeguridad(String codigoSeguridad) {
         try {
             String query = "SELECT COUNT(*) FROM Empleado WHERE codigoSeguridad = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-
                 statement.setString(1, codigoSeguridad);
                 ResultSet rs = statement.executeQuery();
                 return rs.next() && rs.getInt(1) > 0;
@@ -149,13 +192,18 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Obtiene el rol de un usuario.
+     * 
+     * @param username nombre del usuario
+     * @return rol del usuario o "nil" si no se encuentra
+     */
     @Override
     public String getRole(String username) {
         try {
             String query = "SELECT rol FROM Empleado WHERE nombre = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-
                 statement.setString(1, username);
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
@@ -169,13 +217,19 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return "nil";
     }
 
+    /**
+     * Verifica que el nombre y el código de seguridad coincidan.
+     * 
+     * @param username nombre del usuario
+     * @param codigoSeguridad código de seguridad
+     * @return true si coinciden
+     */
     @Override
     public boolean verificarCodigoSeguridad(String username, String codigoSeguridad) {
         try {
             String query = "SELECT * FROM Empleado WHERE nombre = ? AND codigoSeguridad = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-
                 statement.setString(1, username);
                 statement.setString(2, codigoSeguridad);
                 ResultSet rs = statement.executeQuery();
@@ -190,6 +244,13 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Cambia la contraseña del usuario usando su código de seguridad.
+     * 
+     * @param nuevaContraseña nueva contraseña sin encriptar
+     * @param codigoSeguridad código de seguridad del usuario
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean cambiarContraseña(String nuevaContraseña, String codigoSeguridad) {
         try {
@@ -197,7 +258,6 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
             String query = "UPDATE Empleado SET contraseña = ? WHERE codigoSeguridad = ?";
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement statement = connection.prepareStatement(query)) {
-
                 statement.setString(1, hash);
                 statement.setString(2, codigoSeguridad);
                 return statement.executeUpdate() > 0;
@@ -211,10 +271,21 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Genera el hash de una contraseña utilizando BCrypt.
+     * 
+     * @param password contraseña sin encriptar
+     * @return contraseña encriptada
+     */
     private String generateHash(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
 
+    /**
+     * Obtiene una lista con todos los empleados, mostrando su id, nombre, codigo de seguridad, rol y estado en el sistema.
+     * 
+     * @return lista de EmpleadoVO
+     */
     @Override
     public List<EmpleadoVO> obtenerTodosEmpleados() throws SQLException {
         List<EmpleadoVO> empleados = new ArrayList<>();
@@ -222,8 +293,8 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
 
         Connection connection = DatabaseConnection.getInstance().getConnection();
         try (
-                PreparedStatement statement = connection.prepareStatement(query); ResultSet rs = statement.executeQuery()) {
-
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 EmpleadoVO empleado = new EmpleadoVO();
                 empleado.setId(rs.getInt("id"));
@@ -234,18 +305,24 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
                 empleados.add(empleado);
             }
         }
-
         return empleados;
     }
 
+    /**
+     * Actualiza el nombre de un empleado por ID.
+     * 
+     * @param idEmpleado ID del empleado
+     * @param nuevoNombre nuevo nombre
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean actualizarNombreEmpleado(int idEmpleado, String nuevoNombre) {
         String sql = "{CALL actualizarNombreEmpleado(?, ?)}";
         try {
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (CallableStatement stmt = connection.prepareCall(sql)) {
-                stmt.setInt(1, idEmpleado);            // ID del empleado
-                stmt.setString(2, nuevoNombre);        // Nuevo nombre
+                stmt.setInt(1, idEmpleado);
+                stmt.setString(2, nuevoNombre);
                 stmt.execute();
                 return true;
             } catch (SQLException e) {
@@ -257,14 +334,21 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Actualiza el código de seguridad de un empleado.
+     * 
+     * @param idEmpleado ID del empleado
+     * @param nuevoCodigoSeguridad nuevo código
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean actualizarCodigoSeguridadEmpleado(int idEmpleado, String nuevoCodigoSeguridad) {
         String sql = "{CALL actualizarCodigoSeguridadEmpleado(?, ?)}";
         try {
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (CallableStatement stmt = connection.prepareCall(sql)) {
-                stmt.setInt(1, idEmpleado);                     // ID del empleado
-                stmt.setString(2, nuevoCodigoSeguridad);       // Nuevo código de seguridad
+                stmt.setInt(1, idEmpleado);
+                stmt.setString(2, nuevoCodigoSeguridad);
                 stmt.execute();
                 return true;
             } catch (SQLException e) {
@@ -276,14 +360,21 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Actualiza el rol de un empleado.
+     * 
+     * @param idEmpleado ID del empleado
+     * @param nuevoRol nuevo rol (Dueño, Administrador, Cajero)
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean actualizarRolEmpleado(int idEmpleado, String nuevoRol) {
         String sql = "{CALL actualizarRolEmpleado(?, ?)}";
         try {
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (CallableStatement stmt = connection.prepareCall(sql)) {
-                stmt.setInt(1, idEmpleado);        // ID del empleado
-                stmt.setString(2, nuevoRol);       // Nuevo rol (Dueño, Administrador, Cajero)
+                stmt.setInt(1, idEmpleado);
+                stmt.setString(2, nuevoRol);
                 stmt.execute();
                 return true;
             } catch (SQLException e) {
@@ -295,14 +386,21 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         return false;
     }
 
+    /**
+     * Actualiza el estado (Activo/Inactivo) de un empleado.
+     * 
+     * @param idEmpleado ID del empleado
+     * @param nuevoEstado nuevo estado
+     * @return true si se actualizó correctamente
+     */
     @Override
     public boolean actualizarEstadoEmpleado(int idEmpleado, String nuevoEstado) {
         String sql = "{CALL actualizarEstadoEmpleado(?, ?)}";
         try {
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (CallableStatement stmt = connection.prepareCall(sql)) {
-                stmt.setInt(1, idEmpleado);          // ID del empleado
-                stmt.setString(2, nuevoEstado);      // Nuevo estado (Activo, Inactivo)
+                stmt.setInt(1, idEmpleado);
+                stmt.setString(2, nuevoEstado);
                 stmt.execute();
                 return true;
             } catch (SQLException e) {
@@ -313,18 +411,22 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         }
         return false;
     }
-    
+
+    /**
+     * Obtiene un empleado dado su nombre y código de seguridad.
+     * 
+     * @param username nombre del usuario
+     * @param codigoSeguridad código de seguridad
+     * @return objeto EmpleadoVO si se encuentra, null si no
+     */
     @Override
     public EmpleadoVO obtenerEmpleadoPorUsuarioYCodigo(String username, String codigoSeguridad) {
         String sql = "SELECT * FROM Empleado WHERE nombre = ? AND codigoSeguridad = ?";
-
         try {
             Connection connection = DatabaseConnection.getInstance().getConnection();
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-
                 stmt.setString(1, username);
                 stmt.setString(2, codigoSeguridad);
-
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs.next()) {
@@ -346,7 +448,4 @@ public class EmpleadoDAOImp implements EmpleadoDAO {
         }
         return null;
     }
-    
-    
-
 }

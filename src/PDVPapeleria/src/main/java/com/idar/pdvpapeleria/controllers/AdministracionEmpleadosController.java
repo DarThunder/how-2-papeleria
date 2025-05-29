@@ -1,3 +1,13 @@
+/**
+ * Controlador para la gestión de empleados en el sistema PDV Papelería.
+ * Permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los empleados,
+ * así como modificar sus atributos como nombre, código de seguridad, rol y estado.
+ * 
+ * <p>Esta clase maneja la interfaz gráfica correspondiente y se comunica con la capa de acceso a datos
+ * a través de la interfaz EmpleadoDAO.</p>
+ * 
+ * @author laura
+ */
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
@@ -29,6 +39,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class AdministracionEmpleadosController {
 
+    /**
+     * Componentes de la interfaz gráfica y la lista de empleados
+     */
     @FXML
     private Button BShowAgregar, BShowEliminar, BShowEditar, BAtras, BEliminar, BAgregar, BModificarNombre, BModificarCodigoSeguridad, BModificarRol, BModificarEstado;
     @FXML
@@ -45,6 +58,10 @@ public class AdministracionEmpleadosController {
     private EmpleadoDAO db;
     private ObservableList<EmpleadoVO> empleadosList;
 
+    /**
+     * Mapa que relaciona los nombres de los parámetros de búsqueda con sus 
+     * correspondientes nombres de propiedades en la clase EmpleadoVO.
+     */
     private final Map<String, String> parametrosMap = new LinkedHashMap<String, String>() {
         {
             put("ID", "id");
@@ -59,7 +76,8 @@ public class AdministracionEmpleadosController {
      * Método de inicialización de la interfaz. Se ejecuta automáticamente
      * cuando la vista es cargada.
      *
-     * Inicializa la instancia de EmpleadoDAOImp.
+     * Inicializa la instancia de EmpleadoDAOImp y configura los componentes.
+     * @throws SQLException si ocurre un error al acceder a la base de datos
      */
     @FXML
     private void initialize() throws SQLException {
@@ -70,6 +88,10 @@ public class AdministracionEmpleadosController {
         TFBuscar.setOnAction(event -> buscarEmpleado());
     }
 
+    /**
+     * Configura los componentes de la interfaz gráfica con sus valores iniciales.
+     * La tabla y las columnas que esta contendra
+     */
     private void configurarComponentes() {
         CBRol.getItems().addAll("Dueño", "Administrador", "Cajero");
         CBRolModificar.getItems().addAll("Dueño", "Administrador", "Cajero");
@@ -83,6 +105,10 @@ public class AdministracionEmpleadosController {
         });
     }
 
+    /**
+     * Carga la lista de empleados desde la base de datos y los muestra en la tabla.
+     * Con sus respectivas caracteristicas segun cuendo fueron agregados
+     */
     private void cargarEmpleados() {
         try {
             List<EmpleadoVO> empleados = db.obtenerTodosEmpleados();
@@ -94,10 +120,18 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Configura las columnas inicial de la tabla con el parámetro "ID" como principal.
+     */
     private void configurarColumnasIniciales() {
         actualizarColumnas("ID");
     }
 
+    /**
+     * Actualiza las columnas de la tabla según el parámetro principal seleccionado.
+     * Y acomoda las demas columnas segun crea necesario.
+     * @param parametroPrincipal El parámetro que determinará la primera columna
+     */
     private void actualizarColumnas(String parametroPrincipal) {
         List<String> otrosParametros = new ArrayList<>(parametrosMap.keySet());
         otrosParametros.remove(parametroPrincipal);
@@ -111,12 +145,22 @@ public class AdministracionEmpleadosController {
         TV1.setItems(empleadosList);
     }
 
+    /**
+     * Configura una columna específica de la tabla.
+     * @param columna La columna a configurar
+     * @param property La propiedad del objeto EmpleadoVO que se mostrará en la columna
+     * @param titulo El título que se mostrará en la cabecera de la columna
+     */
     private void configurarColumna(TableColumn<EmpleadoVO, ?> columna, String property, String titulo) {
         columna.setCellValueFactory(new PropertyValueFactory<>(property));
         columna.setText(titulo);
         columna.setPrefWidth(150);
     }
 
+    /**
+     * Realiza una búsqueda en tiempo real según el texto ingresado en el campo de búsqueda.
+     * Se muestra en la tabla, segun el parametro ya seleccionado
+     */
     @FXML
     private void BuscarText() {
         String textoBusqueda = TFBuscar.getText().toLowerCase();
@@ -135,6 +179,12 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Obtiene el valor de un parámetro específico de un empleado.
+     * @param empleado El empleado del cual se obtendrá el valor
+     * @param parametro El parámetro cuyo valor se quiere obtener
+     * @return El valor del parámetro solicitado, o null si no existe
+     */
     private String getValorParametro(EmpleadoVO empleado, String parametro) {
         switch (parametro) {
             case "Nombre":
@@ -152,14 +202,25 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Muestra un mensaje de error en un diálogo.
+     * @param mensaje El mensaje de error a mostrar
+     */
     private void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Muestra un mensaje informativo en un diálogo.
+     * @param mensaje El mensaje a mostrar
+     */
     private void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(null, mensaje);
     }
 
+    /**
+     * Busca empleados según los criterios especificados en los campos de búsqueda.
+     */
     @FXML
     private void buscarEmpleado() {
         String textoBusqueda = TFBuscar.getText().trim();
@@ -247,6 +308,10 @@ public class AdministracionEmpleadosController {
         PEditar.setVisible(true);
     }
 
+    /**
+     * Verifica que todos los campos necesarios para agregar un empleado estén completos.
+     * @return true si todos los campos están completos, false de lo contrario
+     */
     @FXML
     private boolean verificarCamposAgregarEmpleado() {
         return !TFNombre.getText().trim().isEmpty()
@@ -266,11 +331,19 @@ public class AdministracionEmpleadosController {
         return codigo.length() == 4;
     }
 
+    /**
+     * Valida que el código de seguridad en el campo correspondiente tenga 4 caracteres.
+     * @return true si el código tiene 4 caracteres, false de lo contrario
+     */
     @FXML
     private boolean validarCodigoSeguridad() {
         return TFCodigoSeguridad.getText().length() == 4;
     }
 
+    /**
+     * Agrega un nuevo empleado al sistema después de validar los campos.
+     * @throws SQLException si ocurre un error al acceder a la base de datos
+     */
     @FXML
     private void agregarEmpleado() throws SQLException {
         if (!verificarCamposAgregarEmpleado()) {
@@ -300,6 +373,14 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Crea un objeto EmpleadoVO con los datos proporcionados.
+     * @param nombre El nombre del empleado
+     * @param codigoSeguridad El código de seguridad del empleado
+     * @param contraseña La contraseña del empleado
+     * @param rol El rol del empleado
+     * @return Un objeto EmpleadoVO con los datos proporcionados
+     */
     private EmpleadoVO crearEmpleado(String nombre, String codigoSeguridad, String contraseña, String rol) {
         EmpleadoVO empleado = new EmpleadoVO();
         empleado.setNombre(nombre);
@@ -309,6 +390,11 @@ public class AdministracionEmpleadosController {
         return empleado;
     }
 
+    /**
+     * Verifica si ya existe un empleado con el mismo nombre o código de seguridad.
+     * @param empleado El empleado a verificar
+     * @return true si ya existe un empleado con los mismos datos, false de lo contrario
+     */
     public boolean existeEmpleado(EmpleadoVO empleado) {
         if (db.existeNombreUsuario(empleado.getNombre())) {
             AlertaPDV.mostrarError("", "El nombre de usuario ya existe.");
@@ -321,12 +407,18 @@ public class AdministracionEmpleadosController {
         return false;
     }
 
+    /**
+     * Limpia los campos del formulario de agregar empleado.
+     */
     private void limpiarCampos() {
         TFNombre.setText("");
         TFContraseña.setText("");
         TFCodigoSeguridad.setText("");
     }
 
+    /**
+     * Elimina un empleado del sistema después de validar su ID.
+     */
     @FXML
     private void eliminarEmpleado() {
         String idEmpleado = TFEliminar.getText().trim();
@@ -362,6 +454,9 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Modifica el nombre de un empleado existente.
+     */
     @FXML
     private void modificarNombre() {
         String nuevoNombre = TFNuevoNombre.getText().trim();
@@ -401,6 +496,9 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Modifica el código de seguridad de un empleado existente.
+     */
     @FXML
     private void modificarCodigoSeguridad() {
         String nuevoCodigoSeguridad = TFNuevoCodigoSeguridad.getText().trim();
@@ -444,6 +542,9 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Modifica el rol de un empleado existente.
+     */
     @FXML
     private void modificarRol() {
         String nuevoRol = CBRolModificar.getValue();
@@ -476,6 +577,9 @@ public class AdministracionEmpleadosController {
         }
     }
 
+    /**
+     * Modifica el estado de un empleado existente.
+     */
     @FXML
     private void modificarEstado() {
         String nuevoEstado = CBEstado.getValue();
@@ -507,5 +611,4 @@ public class AdministracionEmpleadosController {
             AlertaPDV.mostrarError("", "Error al actualizar el estado del empleado.");
         }
     }
-
 }
