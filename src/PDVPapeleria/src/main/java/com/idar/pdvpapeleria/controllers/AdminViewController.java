@@ -36,10 +36,20 @@ import java.util.List;
 import java.util.Map;
 import javafx.beans.value.ObservableValue;
 
+/**
+ * Controlador para la vista de administración de productos. Permite gestionar
+ * productos, incluyendo operaciones CRUD, búsqueda y filtrado.
+ */
 public class AdminViewController {
 
-    // Constante para el umbral de stock bajo
+    /**
+     * Umbral para considerar stock bajo
+     */
     private static final int STOCK_BAJO_UMBRAL = 10;
+
+    /**
+     * Estilo CSS para resaltar productos con stock bajo
+     */
     private static final String ESTILO_STOCK_BAJO = "-fx-background-color: #ffcccc; -fx-font-weight: bold;";
 
     @FXML
@@ -73,10 +83,16 @@ public class AdminViewController {
     private final Map<String, String> parametrosBusqueda = new HashMap<>();
     private String ultimoParametroBusqueda = "";
     private String ultimoTextoBusqueda = "";
-    
+
     private static List<HistorialProductoVO> historialProductos = new ArrayList<>();
     ModificarProductoController historial = new ModificarProductoController();
-    
+
+    /**
+     * Inicializa el controlador después de que su elemento raíz haya sido
+     * procesado.
+     *
+     * @throws SQLException Si ocurre un error al acceder a la base de datos
+     */
     @FXML
     public void initialize() throws SQLException {
         productoDAO = ProductoDAOImp.getInstance();
@@ -90,6 +106,9 @@ public class AdminViewController {
         historialProductos = historial.getHistorial();
     }
 
+    /**
+     * Configura los parámetros de búsqueda disponibles.
+     */
     private void configurarParametrosBusqueda() {
         parametrosBusqueda.put("Nombre", "nombre");
         parametrosBusqueda.put("ID", "idProducto");
@@ -99,19 +118,24 @@ public class AdminViewController {
         parametrosBusqueda.put("Categoría", "categoria");
     }
 
+    /**
+     * Configura los componentes iniciales de la interfaz.
+     */
     private void configurarComponentes() {
         cbParametrosBusqueda.getItems().addAll(parametrosBusqueda.keySet());
         cbParametrosBusqueda.getSelectionModel().selectFirst();
         btnLimpiar.setOnAction(event -> limpiarBusqueda());
     }
 
+    /**
+     * Configura las columnas de la tabla de productos.
+     */
     private void configurarColumnas() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
         nombreCol.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         precioCompraCol.setCellValueFactory(new PropertyValueFactory<>("precioDeCompra"));
         precioVentaCol.setCellValueFactory(new PropertyValueFactory<>("precioDeVenta"));
 
-        // Configuración especial para la columna de stock con resaltado
         stockCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
         stockCol.setCellFactory(column -> new TableCell<ProductoVO, Integer>() {
             @Override
@@ -125,7 +149,6 @@ public class AdminViewController {
                 } else {
                     setText(item.toString());
 
-                    // Resaltar si el stock es bajo
                     if (item <= STOCK_BAJO_UMBRAL) {
                         setStyle(ESTILO_STOCK_BAJO);
                         setTooltip(new Tooltip("¡Stock bajo! Por favor reabastecer"));
@@ -140,6 +163,9 @@ public class AdminViewController {
         categoriaCol.setCellValueFactory(new PropertyValueFactory<>("categoria"));
     }
 
+    /**
+     * Carga los productos desde la base de datos y los muestra en la tabla.
+     */
     private void cargarProductos() {
         try {
             ResultSet rs = productoDAO.getProductos();
@@ -157,7 +183,6 @@ public class AdminViewController {
                 ));
             }
 
-            // Actualizar el FilteredList con la nueva lista
             if (datosFiltrados != null) {
                 datosFiltrados = new FilteredList<>(listaProductosOriginal, p -> true);
                 SortedList<ProductoVO> datosOrdenados = new SortedList<>(datosFiltrados);
@@ -173,27 +198,25 @@ public class AdminViewController {
         }
     }
 
+    /**
+     * Configura el sistema de búsqueda y filtrado de productos.
+     */
     private void configurarBuscador() {
-        // Inicializar la lista original si es null
         if (listaProductosOriginal == null) {
             listaProductosOriginal = FXCollections.observableArrayList();
         }
 
-        // Crear lista filtrada con predicado inicial que muestra todos los elementos
         datosFiltrados = new FilteredList<>(listaProductosOriginal, p -> true);
 
-        // Configurar el listener para búsqueda en tiempo real
         buscarField.textProperty().addListener((observable, oldValue, newValue) -> {
             String parametro = cbParametrosBusqueda.getValue();
             String texto = newValue.trim().toLowerCase();
 
             datosFiltrados.setPredicate(producto -> {
-                // Si el campo de búsqueda está vacío, mostrar todos los productos
                 if (texto.isEmpty()) {
                     return true;
                 }
 
-                // Aplicar filtro según el parámetro seleccionado
                 try {
                     switch (parametro) {
                         case "Nombre":
@@ -209,69 +232,72 @@ public class AdminViewController {
                         case "Stock":
                             return String.valueOf(producto.getStock()).contains(texto);
                         default:
-                            return true; // Si no hay parámetro seleccionado, mostrar todos
+                            return true;
                     }
                 } catch (Exception e) {
-                    return false; // En caso de error, ocultar el producto
+                    return false;
                 }
             });
         });
 
-        // Configurar listener para cambios en el parámetro de búsqueda
         cbParametrosBusqueda.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     String texto = buscarField.getText().trim();
                     if (!texto.isEmpty()) {
-                        // Forzar actualización del filtro al cambiar el parámetro
                         buscarField.textProperty().set(texto);
                     }
                 });
 
-        // Configurar botón de búsqueda (opcional, ya que tenemos búsqueda en tiempo real)
         btnBuscar.setOnAction(event -> {
             String texto = buscarField.getText().trim();
             if (!texto.isEmpty()) {
-                buscarField.textProperty().set(texto); // Dispara el listener
+                buscarField.textProperty().set(texto);
             }
         });
 
-        // Configurar botón de limpiar
         btnLimpiar.setOnAction(event -> {
             buscarField.clear();
             cbParametrosBusqueda.getSelectionModel().clearSelection();
-            // Restablecer la lista completa
             datosFiltrados.setPredicate(p -> true);
         });
 
-        // Configurar la tabla con los datos filtrados y ordenados
         SortedList<ProductoVO> datosOrdenados = new SortedList<>(datosFiltrados);
         datosOrdenados.comparatorProperty().bind(productosTableView.comparatorProperty());
         productosTableView.setItems(datosOrdenados);
     }
 
-    // Método auxiliar para filtrar por campos numéricos
+    /**
+     * Filtra productos por campos numéricos.
+     *
+     * @param texto Texto de búsqueda
+     * @param valor Valor numérico a comparar
+     * @return true si el valor coincide con el criterio de búsqueda
+     */
     private boolean filtrarPorNumero(String texto, int valor) {
         try {
             texto = texto.trim();
 
-            // Búsqueda por rango (ej: ">100", "<50")
             if (texto.startsWith(">")) {
                 int valorBuscado = Integer.parseInt(texto.substring(1).trim());
                 return valor > valorBuscado;
             } else if (texto.startsWith("<")) {
                 int valorBuscado = Integer.parseInt(texto.substring(1).trim());
                 return valor < valorBuscado;
-            } 
-            // Búsqueda exacta
-            else {
+            } else {
                 int valorBuscado = Integer.parseInt(texto);
                 return valor == valorBuscado;
             }
         } catch (NumberFormatException e) {
-            return false; // Si el texto no es un número válido
+            return false;
         }
     }
 
+    /**
+     * Aplica un filtro a la lista de productos.
+     *
+     * @param parametroSeleccionado Parámetro por el que filtrar
+     * @param textoBusqueda Texto de búsqueda
+     */
     private void aplicarFiltro(String parametroSeleccionado, String textoBusqueda) {
         if (parametroSeleccionado == null || listaProductosOriginal == null) {
             productosTableView.setItems(listaProductosOriginal);
@@ -299,13 +325,16 @@ public class AdminViewController {
                         return true;
                 }
             } catch (Exception e) {
-              AlertaPDV.mostrarError("Advertencia", "Ha ocurrido un error al buscar");
+                AlertaPDV.mostrarError("Advertencia", "Ha ocurrido un error al buscar");
                 e.printStackTrace();
                 return false;
             }
         });
     }
 
+    /**
+     * Limpia los filtros de búsqueda y muestra todos los productos.
+     */
     @FXML
     private void limpiarBusqueda() {
         buscarField.clear();
@@ -315,6 +344,9 @@ public class AdminViewController {
         ultimoTextoBusqueda = "";
     }
 
+    /**
+     * Configura el menú contextual para la tabla de productos.
+     */
     private void configurarMenuContextual() {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem modificarItem = new MenuItem("Modificar");
@@ -327,6 +359,9 @@ public class AdminViewController {
         productosTableView.setContextMenu(contextMenu);
     }
 
+    /**
+     * Configura el comportamiento de selección de filas en la tabla.
+     */
     private void configurarSeleccionFila() {
         productosTableView.setRowFactory(tv -> {
             TableRow<ProductoVO> row = new TableRow<ProductoVO>() {
@@ -337,7 +372,6 @@ public class AdminViewController {
                     if (empty || item == null) {
                         setStyle("");
                     } else {
-                        // Resaltar toda la fila si el stock es bajo
                         if (item.getStock() <= STOCK_BAJO_UMBRAL) {
                             setStyle(ESTILO_STOCK_BAJO);
                         } else {
@@ -359,6 +393,11 @@ public class AdminViewController {
         });
     }
 
+    /**
+     * Muestra un diálogo con los detalles de un producto.
+     *
+     * @param producto Producto a mostrar
+     */
     private void mostrarDetalleProducto(ProductoVO producto) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Detalles del Producto");
@@ -416,7 +455,10 @@ public class AdminViewController {
         dialog.setOnShown(e -> fadeIn.play());
         dialog.showAndWait();
     }
-    
+
+    /**
+     * Muestra el historial de cambios realizados en los productos.
+     */
     @FXML
     public void mostrarHistorialCambios() {
         if (historialProductos.isEmpty()) {
@@ -430,6 +472,9 @@ public class AdminViewController {
         }
     }
 
+    /**
+     * Abre la ventana para agregar un nuevo producto.
+     */
     @FXML
     private void agregarProducto() {
         try {
@@ -452,6 +497,11 @@ public class AdminViewController {
         }
     }
 
+    /**
+     * Abre la ventana para modificar un producto seleccionado.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void modificarProducto(ActionEvent event) {
         ProductoVO seleccionado = productosTableView.getSelectionModel().getSelectedItem();
@@ -482,6 +532,11 @@ public class AdminViewController {
         }
     }
 
+    /**
+     * Elimina el producto seleccionado después de confirmación.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void eliminarProducto(ActionEvent event) {
         ProductoVO seleccionado = productosTableView.getSelectionModel().getSelectedItem();
@@ -520,6 +575,9 @@ public class AdminViewController {
         }
     }
 
+    /**
+     * Resetea el buscador a su estado inicial.
+     */
     private void resetearBuscador() {
         buscarField.clear();
         datosFiltrados.setPredicate(producto -> true);
@@ -528,6 +586,12 @@ public class AdminViewController {
         ultimoTextoBusqueda = "";
     }
 
+    /**
+     * Regresa a la ventana de opciones de administrador.
+     *
+     * @param event Evento que disparó la acción
+     * @throws IOException Si ocurre un error al cargar la vista
+     */
     @FXML
     private void regresarOpcionesAdmin(ActionEvent event) throws IOException {
         File fxmlFile = new File("src/main/resources/scenes/OpcionesAdministrador.fxml");
@@ -537,7 +601,12 @@ public class AdminViewController {
         stage.setScene(new Scene(root));
         stage.show();
     }
-    
+
+    /**
+     * Ordena los productos por ID ascendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorIdAsc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
@@ -545,6 +614,11 @@ public class AdminViewController {
         productosTableView.getSortOrder().add(idCol);
     }
 
+    /**
+     * Ordena los productos por ID descendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorIdDesc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
@@ -552,6 +626,11 @@ public class AdminViewController {
         productosTableView.getSortOrder().add(idCol);
     }
 
+    /**
+     * Ordena los productos por nombre ascendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorNombreAsc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
@@ -559,6 +638,11 @@ public class AdminViewController {
         productosTableView.getSortOrder().add(nombreCol);
     }
 
+    /**
+     * Ordena los productos por nombre descendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorNombreDesc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
@@ -566,6 +650,11 @@ public class AdminViewController {
         productosTableView.getSortOrder().add(nombreCol);
     }
 
+    /**
+     * Ordena los productos por precio de venta ascendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorPrecioVentaAsc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
@@ -573,20 +662,35 @@ public class AdminViewController {
         productosTableView.getSortOrder().add(precioVentaCol);
     }
 
+    /**
+     * Ordena los productos por precio de venta descendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorPrecioVentaDesc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
         precioVentaCol.setSortType(TableColumn.SortType.DESCENDING);
         productosTableView.getSortOrder().add(precioVentaCol);
     }
-    
+
+    /**
+     * Ordena los productos por stock ascendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorStockAsc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
         stockCol.setSortType(TableColumn.SortType.ASCENDING);
         productosTableView.getSortOrder().add(stockCol);
     }
-    
+
+    /**
+     * Ordena los productos por stock descendente.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void ordenarPorStockDesc(ActionEvent event) {
         productosTableView.getSortOrder().clear();
@@ -594,6 +698,11 @@ public class AdminViewController {
         productosTableView.getSortOrder().add(stockCol);
     }
 
+    /**
+     * Quita cualquier ordenación aplicada a la tabla.
+     *
+     * @param event Evento que disparó la acción
+     */
     @FXML
     private void quitarOrden(ActionEvent event) {
         productosTableView.getSortOrder().clear();

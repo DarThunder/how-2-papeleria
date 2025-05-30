@@ -24,6 +24,17 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import Vista.AlertaPDV;
 
+/**
+ * Controlador para la vista de agregar un nuevo producto en el sistema de punto
+ * de venta. Se encarga de inicializar los componentes, configurar validaciones,
+ * cargar proveedores y categorías, y gestionar la lógica de guardado y
+ * cancelación.
+ *
+ * Utiliza DAOs para comunicarse con la base de datos y muestra alertas en caso
+ * de errores.
+ *
+ * @author Alvaro
+ */
 public class AgregarProductoController implements Initializable {
 
     @FXML
@@ -50,63 +61,66 @@ public class AgregarProductoController implements Initializable {
     private ProductoDAO productoDAO;
     private ProveedorDAO proveedorDAO;
 
+    /**
+     * Inicializa el controlador. Se ejecuta automáticamente al cargar la vista.
+     * Configura las validaciones, ComboBox de proveedores y categorías.
+     *
+     * @param url no utilizado
+     * @param rb no utilizado
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            // Obtener la instancia de DatabaseConnection
             DatabaseConnection dbConnection = DatabaseConnection.getInstance();
-            
-            // Inicializar los DAOs
             productoDAO = ProductoDAOImp.getInstance();
             proveedorDAO = new ProveedorDAOImp(dbConnection);
-            
+
             configurarValidacionesNumericas();
             configurarComboBoxProveedores();
             configurarComboBoxCategorias();
-            
         } catch (SQLException e) {
             AlertaPDV.mostrarError("Error de conexión", "No se pudo establecer conexión con la base de datos");
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Configura la ComboBox de categorías disponibles.
+     */
     private void configurarComboBoxCategorias() {
-    // Definir las categorías
-    ObservableList<String> categorias = FXCollections.observableArrayList(
-        "Material de Escritura",
-        "Papelería y Cuadernos",
-        "Arte y Manualidades", 
-        "Oficina y Organización",
-        "Tecnología y Electrónica"
-    );
-    
-    // Configurar un StringConverter personalizado
-    categoriaComboBox.setConverter(new StringConverter<String>() {
-        @Override
-        public String toString(String categoria) {
-            return categoria == null ? "Sin selección" : categoria;
-        }
+        ObservableList<String> categorias = FXCollections.observableArrayList(
+                "Material de Escritura",
+                "Papelería y Cuadernos",
+                "Arte y Manualidades",
+                "Oficina y Organización",
+                "Tecnología y Electrónica"
+        );
 
-        @Override
-        public String fromString(String string) {
-            return string.equals("Sin selección") ? null : string;
-        }
-    });
-    
-    categoriaComboBox.setItems(categorias);
-    
-    // Establecer valor inicial nulo con prompt
-    categoriaComboBox.setValue(null);
-    categoriaComboBox.setPromptText("Seleccione una categoría");
-}
+        categoriaComboBox.setConverter(new StringConverter<String>() {
+            @Override
+            public String toString(String categoria) {
+                return categoria == null ? "Sin selección" : categoria;
+            }
 
+            @Override
+            public String fromString(String string) {
+                return string.equals("Sin selección") ? null : string;
+            }
+        });
+
+        categoriaComboBox.setItems(categorias);
+        categoriaComboBox.setValue(null);
+        categoriaComboBox.setPromptText("Seleccione una categoría");
+    }
+
+    /**
+     * Configura filtros para que solo se acepten valores numéricos en los
+     * campos de precio de compra, precio de venta y stock.
+     */
     private void configurarValidacionesNumericas() {
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String newText = change.getControlNewText();
-            if (newText.matches("\\d*")) {
-                return change;
-            }
-            return null;
+            return newText.matches("\\d*") ? change : null;
         };
 
         precioCompraField.setTextFormatter(new TextFormatter<>(filter));
@@ -114,38 +128,41 @@ public class AgregarProductoController implements Initializable {
         stockField.setTextFormatter(new TextFormatter<>(filter));
     }
 
+    /**
+     * Configura la ComboBox de proveedores con los datos obtenidos desde la
+     * base de datos.
+     */
     private void configurarComboBoxProveedores() {
-    try {
-        // Configurar el StringConverter
-        proveedorComboBox.setConverter(new StringConverter<ProveedorVO>() {
-            @Override
-            public String toString(ProveedorVO proveedor) {
-                return proveedor == null ? "Sin selección" : proveedor.getNombreProveedor();
-            }
+        try {
+            proveedorComboBox.setConverter(new StringConverter<ProveedorVO>() {
+                @Override
+                public String toString(ProveedorVO proveedor) {
+                    return proveedor == null ? "Sin selección" : proveedor.getNombreProveedor();
+                }
 
-            @Override
-            public ProveedorVO fromString(String string) {
-                return null; // No necesario para selección simple
-            }
-        });
+                @Override
+                public ProveedorVO fromString(String string) {
+                    return null; // No necesario
+                }
+            });
 
-        // Cargar los proveedores
-        proveedorComboBox.getItems().addAll(proveedorDAO.obtenerTodosProveedores());
-        
-        // Establecer valor inicial nulo con prompt
-        proveedorComboBox.setValue(null);
-        proveedorComboBox.setPromptText("Seleccione un proveedor");
-        
-    } catch (SQLException e) {
-        AlertaPDV.mostrarExcepcion("Error de carga", "No se pudieron cargar los proveedores", e);
-        e.printStackTrace();
+            proveedorComboBox.getItems().addAll(proveedorDAO.obtenerTodosProveedores());
+            proveedorComboBox.setValue(null);
+            proveedorComboBox.setPromptText("Seleccione un proveedor");
+
+        } catch (SQLException e) {
+            AlertaPDV.mostrarExcepcion("Error de carga", "No se pudieron cargar los proveedores", e);
+            e.printStackTrace();
+        }
     }
-}
 
+    /**
+     * Evento asociado al botón "Guardar". Valida los campos y, si son
+     * correctos, guarda el producto en la base de datos.
+     */
     @FXML
     private void guardarProducto() {
         try {
-            // Validaciones
             if (camposInvalidos()) {
                 AlertaPDV.mostrarError("Campos incompletos", "Todos los campos son obligatorios, excepto descripción");
                 return;
@@ -186,6 +203,11 @@ public class AgregarProductoController implements Initializable {
         }
     }
 
+    /**
+     * Verifica si alguno de los campos obligatorios está vacío o sin selección.
+     *
+     * @return true si algún campo es inválido; false en caso contrario.
+     */
     private boolean camposInvalidos() {
         return nombreField.getText().isEmpty()
                 || precioCompraField.getText().isEmpty()
@@ -194,14 +216,20 @@ public class AgregarProductoController implements Initializable {
                 || categoriaComboBox.getValue() == null;
     }
 
+    /**
+     * Evento asociado al botón "Cancelar". Cierra la ventana actual sin guardar
+     * cambios.
+     */
     @FXML
     private void cancelar() {
         cerrarVentana();
     }
 
+    /**
+     * Cierra la ventana actual.
+     */
     private void cerrarVentana() {
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
     }
-
 }

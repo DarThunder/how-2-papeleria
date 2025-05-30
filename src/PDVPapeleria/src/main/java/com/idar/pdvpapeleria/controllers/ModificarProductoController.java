@@ -30,6 +30,11 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import Vista.AlertaPDV;
 
+/**
+ * Controlador para la ventana de modificación de productos en el sistema PDV.
+ * Permite editar información de un producto, validarla, actualizar la base de
+ * datos y registrar los cambios en un historial.
+ */
 public class ModificarProductoController implements Initializable {
 
     @FXML
@@ -57,6 +62,10 @@ public class ModificarProductoController implements Initializable {
 
     private static List<HistorialProductoVO> historialProductos = new ArrayList<>();
 
+    /**
+     * Inicializa el controlador, configurando la conexión a la base de datos,
+     * los ComboBox y las validaciones para los campos numéricos.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -74,6 +83,9 @@ public class ModificarProductoController implements Initializable {
         }
     }
 
+    /**
+     * Configura el ComboBox con categorías de productos.
+     */
     private void configurarComboBoxCategorias() {
         ObservableList<String> categorias = FXCollections.observableArrayList(
                 "Material de Escritura",
@@ -98,6 +110,10 @@ public class ModificarProductoController implements Initializable {
         categoriaComboBox.setPromptText("Seleccione una categoría");
     }
 
+    /**
+     * Aplica validaciones para que los campos de precio y stock acepten solo
+     * números enteros.
+     */
     private void configurarValidacionesNumericas() {
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String newText = change.getControlNewText();
@@ -112,6 +128,10 @@ public class ModificarProductoController implements Initializable {
         stockField.setTextFormatter(new TextFormatter<>(filter));
     }
 
+    /**
+     * Carga la lista de proveedores desde la base de datos y los muestra en el
+     * ComboBox.
+     */
     private void configurarComboBoxProveedores() {
         try {
             proveedorComboBox.setConverter(new StringConverter<ProveedorVO>() {
@@ -122,7 +142,7 @@ public class ModificarProductoController implements Initializable {
 
                 @Override
                 public ProveedorVO fromString(String string) {
-                    return null; // No necesario para selección simple
+                    return null;
                 }
             });
 
@@ -134,6 +154,12 @@ public class ModificarProductoController implements Initializable {
         }
     }
 
+    /**
+     * Inicializa el formulario con los datos del producto seleccionado para
+     * modificación.
+     *
+     * @param producto ProductoVO que se desea modificar.
+     */
     public void initData(ProductoVO producto) {
         this.productoOriginal = producto;
 
@@ -154,10 +180,13 @@ public class ModificarProductoController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón "Guardar". Valida los campos, actualiza el
+     * producto en la base de datos y registra el historial de cambios.
+     */
     @FXML
     private void guardarCambios() {
         try {
-            // Validaciones
             if (camposInvalidos()) {
                 AlertaPDV.mostrarError("Campos incompletos", "Complete todos los campos obligatorios");
                 return;
@@ -182,12 +211,10 @@ public class ModificarProductoController implements Initializable {
                 return;
             }
 
-            // Confirmación
             if (!AlertaPDV.mostrarConfirmacion("Confirmar cambios", "¿Está seguro de guardar los cambios?")) {
                 return;
             }
 
-            // Crear objeto modificado
             ProductoVO productoModificado = new ProductoVO(
                     productoOriginal.getIdProducto(),
                     nombreField.getText(),
@@ -197,19 +224,16 @@ public class ModificarProductoController implements Initializable {
                     descripcionField.getText(),
                     categoriaComboBox.getValue());
 
-            // **REGISTRO DEL HISTORIAL ANTES DE ACTUALIZAR**
             String fechaHoraActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             HistorialProductoVO historial = new HistorialProductoVO(
                     productoOriginal.getIdProducto(),
-                    // Datos ANTES del cambio
                     productoOriginal.getNombre(),
                     productoOriginal.getPrecioDeCompra(),
                     productoOriginal.getPrecioDeVenta(),
                     productoOriginal.getStock(),
                     productoOriginal.getDescripcion(),
                     productoOriginal.getCategoria(),
-                    // Datos DESPUÉS del cambio
                     productoModificado.getNombre(),
                     productoModificado.getPrecioDeCompra(),
                     productoModificado.getPrecioDeVenta(),
@@ -218,16 +242,10 @@ public class ModificarProductoController implements Initializable {
                     productoModificado.getCategoria(),
                     fechaHoraActual);
 
-            // Agregar al historial en memoria
             historialProductos.add(historial);
-
-            // Mostrar el registro del historial en consola (opcional)
-            // System.out.println("=== HISTORIAL DE CAMBIO REGISTRADO ===");
-            // System.out.println(historial.toString());
 
             ProveedorVO proveedorSeleccionado = proveedorComboBox.getValue();
 
-            // Actualizar en BD
             boolean actualizado = productoDAO.actualizarProductoConProveedor(
                     productoModificado,
                     proveedorSeleccionado.getIdProveedor());
@@ -246,10 +264,20 @@ public class ModificarProductoController implements Initializable {
         }
     }
 
-    public static List<HistorialProductoVO> getHistorial(){
+    /**
+     * Devuelve la lista de cambios registrados en el historial de productos.
+     *
+     * @return Lista de objetos HistorialProductoVO.
+     */
+    public static List<HistorialProductoVO> getHistorial() {
         return historialProductos;
     }
 
+    /**
+     * Verifica si hay campos vacíos o inválidos en el formulario.
+     *
+     * @return true si hay campos inválidos, false si todo es válido.
+     */
     private boolean camposInvalidos() {
         return nombreField.getText().isEmpty()
                 || precioCompraField.getText().isEmpty()
@@ -258,11 +286,17 @@ public class ModificarProductoController implements Initializable {
                 || categoriaComboBox.getValue() == null;
     }
 
+    /**
+     * Maneja el evento del botón "Cancelar", cerrando la ventana actual.
+     */
     @FXML
     private void cancelar() {
         cerrarVentana();
     }
 
+    /**
+     * Cierra la ventana actual del formulario.
+     */
     private void cerrarVentana() {
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
