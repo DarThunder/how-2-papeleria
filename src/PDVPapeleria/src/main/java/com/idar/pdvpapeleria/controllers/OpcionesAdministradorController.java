@@ -17,6 +17,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
+/**
+ * Controlador FXML para la vista de opciones del administrador.
+ * Gestiona la navegación entre las vistas disponibles para el administrador,
+ * incluyendo la gestión de productos, proveedores y el regreso a la pantalla de login.
+ */
 public class OpcionesAdministradorController {
 
     @FXML
@@ -28,14 +33,22 @@ public class OpcionesAdministradorController {
     @FXML
     private Button BProveedor;
     @FXML
-    private Button atrasButton; // Asumiendo que es el botón "Atrás" aunque no tiene fx:id en el FXML
+    private Button atrasButton;
 
-    // Método de inicialización
+    /**
+     * Método de inicialización del controlador.
+     * Se ejecuta automáticamente después de que se haya cargado el archivo FXML.
+     */
     @FXML
     private void initialize() {
-        // Puedes agregar código de inicialización aquí si es necesario
     }
 
+    /**
+     * Abre la ventana de gestión de productos.
+     * 
+     * @throws MalformedURLException Si la URL del archivo FXML es inválida
+     * @throws IOException Si ocurre un error al cargar el archivo FXML
+     */
     @FXML
     public void abrirVentanaProducto() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/adminInventarioView.fxml");
@@ -48,6 +61,12 @@ public class OpcionesAdministradorController {
         stage.show();
     }
 
+    /**
+     * Abre la ventana de gestión de proveedores.
+     * 
+     * @throws MalformedURLException Si la URL del archivo FXML es inválida
+     * @throws IOException Si ocurre un error al cargar el archivo FXML
+     */
     @FXML
     public void abrirVentanaProveedor() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/adminProveedoresView.fxml");
@@ -60,6 +79,12 @@ public class OpcionesAdministradorController {
         stage.show();
     }
 
+    /**
+     * Regresa a la pantalla de login cerrando la ventana actual.
+     * 
+     * @throws MalformedURLException Si la URL del archivo FXML es inválida
+     * @throws IOException Si ocurre un error al cargar el archivo FXML
+     */
     @FXML
     public void regresarAlogin() throws MalformedURLException, IOException {
         File fxmlFile = new File("src/main/resources/scenes/login.fxml");
