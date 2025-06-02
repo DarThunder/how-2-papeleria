@@ -1,13 +1,4 @@
-/**
- * Controlador para la gestión de empleados en el sistema PDV Papelería.
- * Permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los empleados,
- * así como modificar sus atributos como nombre, código de seguridad, rol y estado.
- * 
- * <p>Esta clase maneja la interfaz gráfica correspondiente y se comunica con la capa de acceso a datos
- * a través de la interfaz EmpleadoDAO.</p>
- * 
- * @author laura
- */
+
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
@@ -37,6 +28,17 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+
+/**
+ * Controlador para la gestión de empleados en el sistema PDV Papelería.
+ * Permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los empleados,
+ * así como modificar sus atributos como nombre, código de seguridad, rol y estado.
+ * 
+ * <p>Esta clase maneja la interfaz gráfica correspondiente y se comunica con la capa de acceso a datos
+ * a través de la interfaz EmpleadoDAO.</p>
+ * 
+ * @author dylxn999
+ */
 public class AdministracionEmpleadosController {
 
     /**

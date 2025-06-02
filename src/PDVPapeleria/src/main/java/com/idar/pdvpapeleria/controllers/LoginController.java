@@ -27,7 +27,7 @@ import java.sql.SQLException;
  * cambiar la contraseña.
  *
  * @author dylxn999
- * @date 28/05/2025
+ * Fecha 28/05/2025
  */
 public class LoginController {
 

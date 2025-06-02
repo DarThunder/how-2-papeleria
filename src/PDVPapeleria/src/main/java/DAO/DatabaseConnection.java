@@ -1,52 +1,64 @@
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-/**
- *
- * @author laura
- */
 package DAO;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Clase que gestiona la conexión a la base de datos utilizando el patrón Singleton.
+ * <p>
+ * Esta clase se encarga de establecer y proporcionar acceso a una única instancia
+ * de conexión a una base de datos MySQL. Es útil para evitar múltiples conexiones
+ * innecesarias y mejorar la eficiencia de acceso a los datos.
+ * </p>
+ * 
+ * 
+ * @author dylxn999
+ */
 public class DatabaseConnection {
 
-    // Instancia singleton de la DB
+    /**
+     * Instancia única de la clase DatabaseConnection (Singleton).
+     */
     private static DatabaseConnection instance;
 
-    // Conexión a la DB
+    /**
+     * Objeto Connection activo para interactuar con la base de datos.
+     */
     private final Connection connection;
 
-    // Llaves de acceso a la DB (a quien se le ocurrio hardcodearlo????)
+    /**
+     * URL de conexión a la base de datos.
+     */
     private final String url = "jdbc:mysql://localhost:3306/pdvpapeleria";
-    private final String username = "root"; // cambiele aqui a su usuario no sean cojudos
-    private final String password = ""; // Aca tambien cambienle la contraseña
+
+    /**
+     * Nombre de usuario de la base de datos.
+     */
+    private final String username = "root";
+
+    /**
+     * Contraseña del usuario de la base de datos.
+     */
+    private final String password = "";
 
     /**
      * Constructor privado que establece la conexión a la base de datos.
-     * Implementa el patrón Singleton para garantizar una única instancia de
-     * conexión.
+     * Se llama únicamente desde {@link #getInstance()}.
      *
-     * @throws SQLException si ocurre un error al establecer la conexión con la
-     * base de datos
+     * @throws SQLException si ocurre un error al establecer la conexión.
      */
     private DatabaseConnection() throws SQLException {
         connection = DriverManager.getConnection(url, username, password);
-        System.out.println("Conexion establecida exitosamente.");
+        System.out.println("Conexión establecida exitosamente.");
     }
 
     /**
-     * Obtiene la única instancia de DatabaseConnection (patrón Singleton). Si
-     * no existe una instancia previa, crea una nueva; de lo contrario, retorna
-     * la instancia existente.
+     * Obtiene la única instancia de {@code DatabaseConnection}.
+     * Si no existe, se crea una nueva instancia.
      *
-     * @return la instancia única de DatabaseConnection
-     * @throws SQLException si ocurre un error al crear la conexión a la base de
-     * datos
+     * @return instancia única de {@code DatabaseConnection}.
+     * @throws SQLException si ocurre un error al crear la conexión.
      */
     public static DatabaseConnection getInstance() throws SQLException {
         if (instance == null) {
@@ -56,12 +68,16 @@ public class DatabaseConnection {
     }
 
     /**
-     * Obtiene una nueva conexión a la base de datos. Nota: Este método crea una
-     * nueva conexión cada vez que se llama, lo cual puede no ser la
-     * implementación ideal para un patrón Singleton.
+     * Devuelve una nueva conexión a la base de datos.
+     * <p>
+     * Aunque la clase sigue el patrón Singleton, este método crea una nueva conexión
+     * cada vez que se invoca. Esto puede ser útil en ciertos contextos donde se 
+     * requiere múltiples conexiones independientes, pero no es el comportamiento típico
+     * de un Singleton.
+     * </p>
      *
-     * @return un objeto Connection para interactuar con la base de datos
-     * @throws SQLException si ocurre un error al establecer la conexión
+     * @return una nueva conexión {@link Connection} a la base de datos.
+     * @throws SQLException si ocurre un error al establecer la conexión.
      */
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, username, password);

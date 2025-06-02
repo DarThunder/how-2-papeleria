@@ -1,15 +1,16 @@
-/**
- * Clase que representa un empleado en el sistema.
- * 
- * <p>Contiene atributos como rol, código de seguridad, nombre, contraseña,
- * estado e ID. Se utiliza para transportar datos relacionados con empleados
- * entre las capas de la aplicación.</p>
- * 
- * @author dylxn999
- * @date 28/05/2025
- */
 package VO;
 
+/**
+ * Clase que representa un empleado en el sistema.
+ *
+ * <p>
+ * Contiene atributos como rol, código de seguridad, nombre, contraseña, estado
+ * e ID. Se utiliza para transportar datos relacionados con empleados entre las
+ * capas de la aplicación.</p>
+ *
+ * @author dylxn999
+ * Fecha: 28/05/2025
+ */
 public class EmpleadoVO {
 
     private String rol;
@@ -26,12 +27,13 @@ public class EmpleadoVO {
     }
 
     /**
-     * Constructor con parámetros para inicializar los atributos principales del empleado.
+     * Constructor con parámetros para inicializar los atributos principales del
+     * empleado.
      *
-     * @param rol              Rol del empleado.
-     * @param codigoSeguridad  Código de seguridad del empleado.
-     * @param nombre           Nombre del empleado.
-     * @param password         Contraseña del empleado.
+     * @param rol Rol del empleado.
+     * @param codigoSeguridad Código de seguridad del empleado.
+     * @param nombre Nombre del empleado.
+     * @param password Contraseña del empleado.
      */
     public EmpleadoVO(String rol, String codigoSeguridad, String nombre, String password) {
         this.rol = rol;

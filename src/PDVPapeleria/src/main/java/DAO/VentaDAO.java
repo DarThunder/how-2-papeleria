@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  *
+ *
+ * Interfaz que define las operaciones de acceso a datos relacionadas con las ventas.
  * @author dard
  */
 public interface VentaDAO {

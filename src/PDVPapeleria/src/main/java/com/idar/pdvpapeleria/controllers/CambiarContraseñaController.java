@@ -1,12 +1,3 @@
-/**
- * Controlador para la vista de cambio de contraseña.
- * 
- * <p>Permite al usuario ingresar una nueva contraseña, validarla y actualizarla en la base de datos
- * utilizando el código de seguridad proporcionado previamente.</p>
- * 
- * @author dylxn999
- * @date 28/05/2025
- */
 package com.idar.pdvpapeleria.controllers;
 
 import DAO.EmpleadoDAO;
@@ -21,6 +12,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+/**
+ * Controlador para la vista de cambio de contraseña.
+ *
+ * <p>
+ * Permite al usuario ingresar una nueva contraseña, validarla y actualizarla en
+ * la base de datos utilizando el código de seguridad proporcionado
+ * previamente.</p>
+ *
+ * @author dylxn999
+ * Fecha: 28/05/2025
+ */
 public class CambiarContraseñaController {
 
     @FXML
@@ -41,7 +43,7 @@ public class CambiarContraseñaController {
 
     /**
      * Asigna el código de seguridad usado para identificar al empleado.
-     * 
+     *
      * @param codigoSeguridad Código único de seguridad del empleado.
      */
     public void setCodigoSeguridad(String codigoSeguridad) {
@@ -49,8 +51,8 @@ public class CambiarContraseñaController {
     }
 
     /**
-     * Maneja el evento para cambiar la contraseña del usuario.
-     * Valida los campos de entrada y actualiza la contraseña en la base de datos.
+     * Maneja el evento para cambiar la contraseña del usuario. Valida los
+     * campos de entrada y actualiza la contraseña en la base de datos.
      */
     @FXML
     private void cambiarContraseña() {
@@ -70,7 +72,7 @@ public class CambiarContraseñaController {
         if (db.cambiarContraseña(nuevaContraseña, codigoSeguridad)) {
             AlertaPDV.mostrarExito("Éxito", "Contraseña cambiada exitosamente.");
             try {
-                Thread.sleep(2000); 
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 AlertaPDV.mostrarExcepcion("Interrupción del Thread.Sleep", "Ocurrió una interrupción inesperada durante la pausa del hilo", e);
             }

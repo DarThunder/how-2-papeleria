@@ -1,10 +1,4 @@
-/**
- * Implementación del DAO para la gestión de empleados, metodos implementados que se emplean en EmpleadoDao.
- * Contiene métodos para crear, eliminar, actualizar y consultar empleados en la base de datos.
- * Utiliza procedimientos almacenados y encriptación de contraseñas con BCrypt.
- * 
- * @author Jazmin
- */
+
 package DAOImp;
 
 import DAO.DatabaseConnection;
@@ -16,6 +10,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mindrot.jbcrypt.BCrypt;
+
+/**
+ * Implementación del DAO para la gestión de empleados, metodos implementados que se emplean en EmpleadoDao.
+ * Contiene métodos para crear, eliminar, actualizar y consultar empleados en la base de datos.
+ * Utiliza procedimientos almacenados y encriptación de contraseñas con BCrypt.
+ * 
+ * @author Jazmin
+ */
 
 public class EmpleadoDAOImp implements EmpleadoDAO {
 

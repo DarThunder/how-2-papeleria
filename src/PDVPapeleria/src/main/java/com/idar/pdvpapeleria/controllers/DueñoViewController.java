@@ -1,12 +1,3 @@
-/**
- * Controlador de la vista principal del dueño del sistema PDV Papelería.
- * 
- * <p>Este controlador permite la navegación entre diferentes vistas del sistema,
- * como administración de empleados, inventario, historial de ventas y login.</p>
- * 
- * @author dylxn999
- * @date 28/05/2025
- */
 package com.idar.pdvpapeleria.controllers;
 
 import java.io.File;
@@ -20,6 +11,17 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+/**
+ * Controlador de la vista principal del dueño del sistema PDV Papelería.
+ *
+ * <p>
+ * Este controlador permite la navegación entre diferentes vistas del sistema,
+ * como administración de empleados, inventario, historial de ventas y
+ * login.</p>
+ *
+ * @author dylxn999
+ * Fecha: 28/05/2025
+ */
 public class DueñoViewController {
 
     @FXML
@@ -34,8 +36,8 @@ public class DueñoViewController {
     /**
      * Cambia la escena actual a la especificada mediante un archivo FXML.
      *
-     * @param button    Botón que fue presionado para realizar el cambio de escena.
-     * @param fxmlPath  Ruta del archivo FXML a cargar.
+     * @param button Botón que fue presionado para realizar el cambio de escena.
+     * @param fxmlPath Ruta del archivo FXML a cargar.
      */
     private void switchToScene(Button button, String fxmlPath) {
         try {

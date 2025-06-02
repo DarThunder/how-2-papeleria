@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.idar.pdvpapeleria"},{"l":"com.idar.pdvpapeleria.controllers"},{"l":"com.idar.pdvpapeleria.utils"},{"l":"DAO"},{"l":"DAOImp"},{"l":"Vista"},{"l":"VO"}];updateSearchResults();
